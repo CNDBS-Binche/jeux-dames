@@ -1,0 +1,29 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  td {
+    width: 60px;
+    height: 60px;
+  }
+
+  .white {
+    background-color: #f0d9b5;
+  }
+
+  .black {
+    background-color: #b58863;
+  }
+
+    .coord {
+    background: #ddd;
+    font-weight: bold;
+  }
