@@ -11,6 +11,20 @@
 <table>
 
   <tbody>
+
+    <tr>
+      <td class="coord"></td>
+      <td class="coord">A</td>
+      <td class="coord">B</td>
+      <td class="coord">C</td>
+      <td class="coord">D</td>
+      <td class="coord">E</td>
+      <td class="coord">F</td>
+      <td class="coord">G</td>
+      <td class="coord">H</td>
+      <td class="coord"></td>
+    </tr>
+
     <!-- Ligne 1 -->
     <tr>
       <td class="white"></td>

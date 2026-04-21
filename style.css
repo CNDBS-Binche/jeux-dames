@@ -24,6 +24,8 @@ body {
   }
 
     .coord {
-    background: #ddd;
+    width: 30px;
+    height: 30px;
     font-weight: bold;
+    background: transparent;
   }
