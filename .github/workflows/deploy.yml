@@ -19,4 +19,4 @@ jobs:
           server: ftp.tonsite.com
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /www/échec et M
+          server-dir: /www/échec et M/
