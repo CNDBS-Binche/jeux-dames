@@ -24,8 +24,9 @@ body {
   }
 
     .coord {
+    color : black;
     width: 30px;
     height: 30px;
     font-weight: bold;
-    background: transparent;
+    background: black;
   }
