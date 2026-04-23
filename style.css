@@ -1,46 +1,80 @@
+/* --- Styles Généraux du Corps --- */
 body {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #2c3e50; /* Fond sombre pour faire ressortir le bois */
+  background-color: #2c3e50; /* Fond sombre pour le contraste */
   margin: 0;
 }
 
+/* --- Style du Plateau --- */
 table {
   border-collapse: collapse;
-  /* Bordure extérieure épaisse qui simule le cadre en bois de la photo */
-  border: 20px solid #5d3a1a; 
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  background-color: #5d3a1a; /* Couleur du cadre */
+  background-color: #5d3a1a; /* Couleur du cadre en bois */
+  border: 15px solid #5d3a1a; /* Bordure épaisse qui fait le cadre */
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
 }
 
 td {
   width: 60px;
   height: 60px;
   padding: 0;
+  position: relative; /* Nécessaire pour centrer les pions absolute */
 }
 
-/* Texture bois clair */
-.white {
-  background: linear-gradient(45deg, #e3c9a1 25%, #d9b986 100%);
-  border: 0.5px solid rgba(0,0,0,0.05);
-}
+/* --- Couleurs des Cases --- */
+.white { background-color: #e3c9a1; } /* Bois clair */
+.black { background-color: #7a4a28; } /* Bois foncé */
 
-/* Texture bois foncé */
+/* --- Centrage des Pions dans les cases noires --- */
 .black {
-  background: linear-gradient(45deg, #7a4a28 25%, #5d3a1a 100%);
-  border: 0.5px solid rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* Style des coordonnées (Lettres et Chiffres) */
+/* --- Style des Coordonnées (Lettres/Chiffres) --- */
 .coord {
-  text-align: center;
-  color: #f0d9b5; /* Couleur crème pour le texte sur bois */
-  font-family: "Georgia", serif;
-  font-size: 14px;
-  font-weight: bold;
-  width: 30px;
+  width: 30px; /* Plus petit pour les bords */
   height: 30px;
-  background-color: #5d3a1a; /* Même couleur que le cadre */
+  text-align: center;
+  vertical-align: middle;
+  color: #f0d9b5; /* Crème sur bois sombre */
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* --- Style de base des Pions (3D) --- */
+.pion {
+  width: 48px; /* 80% de la case */
+  height: 48px;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centrage absolu parfait */
+}
+
+/* --- Pion Blanc (Comme avant) --- */
+.pion.blanc {
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #e0e0e0 45%, #b0b0b0 100%);
+  box-shadow: 
+    inset 0 -3px 5px rgba(0,0,0,0.2), 
+    0 5px 10px rgba(0,0,0,0.4);
+  border: 1px solid #d0d0d0;
+}
+
+/* --- NOUVEAU : Pion Noir (Effet 3D brillant) --- */
+.pion.noir {
+  /* Dégradé radial du gris foncé au noir pur, simulant la lumière */
+  background: radial-gradient(circle at 35% 35%, #555555 0%, #222222 40%, #000000 100%);
+  
+  /* Ombres pour le relief (lumière blanche interne, ombre portée noire) */
+  box-shadow: 
+    inset 0 2px 4px rgba(255,255,255,0.3), /* Reflet de lumière en haut */
+    0 5px 10px rgba(0,0,0,0.7);            /* Ombre portée forte en bas */
+    
+  border: 1px solid #111111; /* Bordure presque invisible */
 }
