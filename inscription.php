@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
         $ins = $bdd->prepare("INSERT INTO utilisateurs (pseudo, email, mot_de_passe) VALUES (?, ?, ?)");
         $ins->execute([$pseudo, $email, $mdp_hache]);
-        $message = "Compte créé ! <a href='accueil.php'>Connectez-vous</a>";
+        $message = "Compte créé ! <a href='accueil_dames.php'>Connectez-vous</a>";
         $status = "success";
     } catch (Exception $e) {
         $message = "Erreur : Ce nom d'utilisateur ou email est déjà pris.";
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Page d'inscription - Dames</title>
-    <link rel="stylesheet" href="accueil.css">
+    <link rel="stylesheet" href="log.css">
 </head>
 <body>
     <div class="login-container">

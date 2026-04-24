@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Page de connection - Dames</title>
-    <link rel="stylesheet" href="accueil.css">
+    <link rel="stylesheet" href="log.css">
 </head>
 <body>
     <div class="login-container">
