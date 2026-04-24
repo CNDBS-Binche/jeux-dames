@@ -1,9 +1,9 @@
 <?php
 // --- CONFIGURATION DE LA BASE DE DONNÉES ---
-$host = 'localhost';        // Serveur local
-$dbname = 'maxcore981';   // Nom de la base que tu as créée en SQL
-$username = 'root';         // Utilisateur par défaut sur Windows (WAMP/XAMPP)
-$password = '';             // Mot de passe vide par défaut sur Windows
+$host = 'maxcore981.mysql.db';       
+$dbname = 'maxcore981';   
+$username = 'maxcore981';         
+$password = 'Antonio64';
 
 /* Note pour Mac (MAMP) : 
 Si tu es sur Mac, le mot de passe est souvent 'root' au lieu de vide.
