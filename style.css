@@ -78,3 +78,13 @@ td {
     
   border: 1px solid #111111; /* Bordure presque invisible */
 }
+
+/* Style pour le pion sélectionné */
+.pion.selected {
+    border: 3px solid #e67e22; /* Une bordure orange brillante */
+    box-shadow: 0 0 15px #e67e22;
+    transform: translate(-50%, -50%) scale(1.1); /* Il grossit un peu */
+}
+
+/* On change le curseur pour montrer qu'on peut cliquer */
+.pion { cursor: pointer; transition: all 0.2s; }

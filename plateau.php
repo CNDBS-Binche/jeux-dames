@@ -18,6 +18,44 @@ if (!isset($_SESSION['user_id'])) {
 </head>
 <body>
 
+<script>
+let pionSelectionne = null;
+
+// On écoute le clic sur toutes les cases noires
+document.querySelectorAll('.black').forEach(caseNoire => {
+    caseNoire.addEventListener('click', function() {
+        const pion = this.querySelector('.pion');
+        
+        // CAS 1 : On clique sur un pion pour le sélectionner
+        if (pion) {
+            // On retire la sélection précédente s'il y en a une
+            document.querySelectorAll('.pion').forEach(p => p.classList.remove('selected'));
+            
+            // On sélectionne le nouveau pion
+            pion.classList.add('selected');
+            pionSelectionne = {
+                element: pion,
+                ligne: parseInt(this.dataset.ligne),
+                col: parseInt(this.dataset.col),
+                couleur: pion.classList.contains('blanc') ? 'blanc' : 'noir'
+            };
+            console.log("Pion sélectionné en :", pionSelectionne.ligne, pionSelectionne.col);
+        } 
+        
+        // CAS 2 : On a déjà un pion sélectionné et on clique sur une case vide
+        else if (pionSelectionne) {
+            const destinationLigne = parseInt(this.dataset.ligne);
+            const destinationCol = parseInt(this.dataset.col);
+            
+            // Pour l'instant, on déplace juste le pion visuellement (on verra les règles à l'étape 3)
+            this.appendChild(pionSelectionne.element);
+            pionSelectionne.element.classList.remove('selected');
+            pionSelectionne = null;
+        }
+    });
+});
+</script>
+
 <table>
   <thead>
     <tr>
@@ -27,8 +65,6 @@ if (!isset($_SESSION['user_id'])) {
   </thead>
 <tbody>
     <?php
-    // 1. Initialisation du plateau en mémoire (0=vide, 1=blanc, 2=noir)
-    // Dans un vrai projet, ceci viendra d'une base de données ou d'une session
     $plateau = [];
     for ($l = 1; $l <= 10; $l++) {
         for ($c = 1; $c <= 10; $c++) {
