@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </form>
 
         <div class="switch-mode">
-            Déjà inscrit ? <a href="accueil_dames.php">Se connecter</a>
+            Déjà inscrit ? <a href="index.php">Se connecter</a>
         </div>
     </div>
 </body>
