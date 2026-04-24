@@ -71,20 +71,62 @@ document.querySelectorAll('.black').forEach(caseNoire => {
     caseNoire.addEventListener('click', function() {
         const pion = this.querySelector('.pion');
         
+        // --- 1. SÉLECTION D'UN PION ---
         if (pion) {
-            // Sélection d'un pion
             document.querySelectorAll('.pion').forEach(p => p.classList.remove('selected'));
             pion.classList.add('selected');
             pionSelectionne = {
                 element: pion,
                 ligne: parseInt(this.dataset.ligne),
-                col: parseInt(this.dataset.col)
+                col: parseInt(this.dataset.col),
+                couleur: pion.classList.contains('blanc') ? 'blanc' : 'noir'
             };
-        } else if (pionSelectionne) {
-            // Déplacement vers une case vide
-            this.appendChild(pionSelectionne.element);
-            pionSelectionne.element.classList.remove('selected');
-            pionSelectionne = null;
+        } 
+        
+        // --- 2. TENTATIVE DE DÉPLACEMENT ---
+        else if (pionSelectionne) {
+            const destLigne = parseInt(this.dataset.ligne);
+            const destCol = parseInt(this.dataset.col);
+            
+            const diffLigne = destLigne - pionSelectionne.ligne;
+            const diffCol = Math.abs(destCol - pionSelectionne.col);
+
+            let mouvementValide = false;
+
+            // Déplacement simple (1 case en diagonale)
+            if (diffCol === 1) {
+                if (pionSelectionne.couleur === 'blanc' && diffLigne === -1) mouvementValide = true;
+                if (pionSelectionne.couleur === 'noir' && diffLigne === 1) mouvementValide = true;
+            }
+            
+            // Prise d'un pion (saut de 2 cases)
+            else if (diffCol === 2 && Math.abs(diffLigne) === 2) {
+                const sautLigne = pionSelectionne.ligne + (diffLigne / 2);
+                const sautCol = pionSelectionne.col + (destCol - pionSelectionne.col) / 2;
+                const caseSautee = document.querySelector(`[data-ligne="${sautLigne}"][data-col="${sautCol}"]`);
+                const pionSaute = caseSautee.querySelector('.pion');
+
+                // On vérifie s'il y a un pion adverse sur la case sautée
+                if (pionSaute && !pionSaute.classList.contains(pionSelectionne.couleur)) {
+                    pionSaute.remove(); // On mange le pion !
+                    mouvementValide = true;
+                }
+            }
+
+            // --- 3. EXÉCUTION DU MOUVEMENT ---
+            if (mouvementValide) {
+                this.appendChild(pionSelectionne.element);
+                pionSelectionne.element.classList.remove('selected');
+                
+                // Promotion en Dame (si arrive au bout)
+                if ((pionSelectionne.couleur === 'blanc' && destLigne === 1) || 
+                    (pionSelectionne.couleur === 'noir' && destLigne === 10)) {
+                    pionSelectionne.element.classList.add('dame');
+                    pionSelectionne.element.innerHTML = "👑"; // Optionnel : petit visuel
+                }
+                
+                pionSelectionne = null;
+            }
         }
     });
 });
