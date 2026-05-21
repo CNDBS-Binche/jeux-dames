@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($user && password_verify($password, $user['mot_de_passe'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['pseudo'] = $user['pseudo'];
-        header('Location: index.php');
+        header('Location: plateau.php');
         exit();
     } else {
         $erreur = "Identifiant ou mot de passe incorrect.";

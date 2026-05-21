@@ -1,4 +1,3 @@
-/* Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap');
 
 :root {
@@ -21,7 +20,6 @@ body {
     overflow: hidden;
 }
 
-/* Damier animé en arrière-plan */
 body::before {
     content: "";
     position: absolute;
@@ -124,7 +122,6 @@ input:focus {
     font-weight: 600;
 }
 
-/* Alertes PHP */
 .alert {
     padding: 10px;
     border-radius: 8px;
@@ -134,7 +131,6 @@ input:focus {
 .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
 
-/* Pion décoratif */
 .pawn-icon {
     width: 50px;
     height: 50px;

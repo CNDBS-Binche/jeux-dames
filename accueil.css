@@ -1,14 +1,12 @@
-/* --- accueil.css --- */
 @import url('log.css');
 
-/* On s'assure que le body laisse la place à la carte */
 body {
     flex-direction: column;
-    overflow-y: auto; /* Permet le scroll si l'écran est petit */
+    overflow-y: auto; 
 }
 
 .home-container {
-    background: #ffffff !important; /* Force le fond blanc */
+    background: #ffffff !important; 
     padding: 40px;
     border-radius: 15px;
     box-shadow: 0 15px 35px rgba(0,0,0,0.5);
@@ -21,7 +19,6 @@ body {
     margin: 20px;
 }
 
-/* Titre */
 .main-title {
     font-family: 'Playfair Display', serif;
     color: var(--dark);
@@ -29,7 +26,6 @@ body {
     margin: 10px 0;
 }
 
-/* La grille de boutons */
 .menu-grid {
     display: flex;
     flex-direction: column;
@@ -42,7 +38,7 @@ body {
     background: var(--light);
     border-radius: 8px;
     text-decoration: none;
-    color: var(--dark) !important; /* Force la couleur du texte */
+    color: var(--dark) !important; 
     font-weight: 600;
     transition: 0.3s;
     border: 1px solid #ddd;
@@ -53,7 +49,6 @@ body {
     transform: translateY(-2px);
 }
 
-/* Le bouton jouer en noir */
 .btn-play {
     background: var(--dark);
     color: #ffffff !important;
@@ -63,7 +58,6 @@ body {
     background: var(--primary);
 }
 
-/* Les petits pions de déco */
 .divider {
     display: flex;
     align-items: center;
