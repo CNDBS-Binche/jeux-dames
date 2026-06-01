@@ -12,49 +12,77 @@ if (!isset($_SESSION['user_id'])) {
     <meta charset="UTF-8">
     <link rel="stylesheet" href="style.css">
     <title>Damier de Dames 10x10</title>
-<style>
-    .pion.selected {
-        outline: 4px solid #f1c40f !important; 
-        outline-offset: 2px;
-        box-shadow: 0 0 20px #f1c40f !important;
-        transform: translate(-50%, -50%) scale(1.1) !important; 
-        transition: transform 0.2s ease, outline 0.2s ease;
-    }
+    
+    <style>
+        /* Effet au survol discret */
+        .pion {
+            transition: box-shadow 0.2s ease-out;
+            cursor: pointer;
+        }
 
-    .aide-coup {
-        width: 20px;
-        height: 20px;
-        background-color: rgba(46, 204, 113, 0.6); 
-        border-radius: 50%;
-        margin: auto;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        pointer-events: none; 
-        z-index: 5;
-    }
+        .pion.blanc:hover {
+            box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.3);
+        }
 
-    #status-bar {
-        text-align: center;
-        margin: 20px auto;
-        font-family: Arial, sans-serif;
-        font-size: 20px;
-        color: white;
-        background: #1e252b; 
-        padding: 15px;
-        border-radius: 8px;
-        width: fit-content;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    }
-    .tour-blanc { color: #f0d9b5; font-weight: bold; }
-    .tour-noir { color: #c0c0c0; font-weight: bold; } 
-</style>
+        .pion.noir:hover {
+            box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.5), 0 0 6px 1px rgba(255, 255, 255, 0.2);
+        }
+
+        /* --- CONFIGURATION DE LA DAME (DOUBLE PION) --- */
+        /* ::after dessine le deuxième pion empilé au centre */
+        .pion.dame::after {
+            content: "";
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 70%;
+            height: 70%;
+            border-radius: 50%;
+            box-sizing: border-box;
+            z-index: 2;
+        }
+
+        .pion.dame.blanc::after {
+            background-color: white;
+            border: 2px solid #b3b3b3;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .pion.dame.noir::after {
+            background-color: #222;
+            border: 2px solid #444;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* --- AJOUT : LE LOGO DE LA COURONNE AU MILIEU --- */
+        /* ::before place l'émoji couronne au-dessus du double pion */
+        .pion.dame::before {
+            content: "👑";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            
+            /* Alignement flexbox parfait au centre exact */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            /* Taille de la couronne proportionnelle au pion */
+            font-size: 1.2rem; 
+            z-index: 3;
+            
+            /* Empêche la sélection de texte sur l'émoji */
+            user-select: none; 
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
 
 <div id="status-bar">
-    C'est au tour des : <span id="joueur-actif" class="tour-blanc">Blancs</span>
+    <span id="joueur-actif" class="tour-blanc" style="display: none;">Blancs</span>
 </div>
 
 <table>
@@ -70,29 +98,27 @@ if (!isset($_SESSION['user_id'])) {
             for ($c = 1; $c <= 10; $c++) {
                 $plateau[$l][$c] = 0;
                 if (($l + $c) % 2 != 0) {
-                    if ($l <= 4) $plateau[$l][$c] = 2;
-                    if ($l >= 7) $plateau[$l][$c] = 1; 
+                    if ($l <= 4) $plateau[$l][$c] = 1; 
+                    if ($l >= 7) $plateau[$l][$c] = 2; 
                 }
             }
         }
 
-        for ($ligne = 1; $ligne <= 10; $ligne++) {
+        for ($ligne = 10; $ligne >= 1; $ligne--) {
             echo "<tr>";
             echo "<td class='coord'>$ligne</td>";
             for ($col = 1; $col <= 10; $col++) {
                 $typeCase = ($ligne + $col) % 2 == 0 ? 'white' : 'black';
-                $contenuCase = "";
-                if ($plateau[$ligne][$col] == 1) $contenuCase = '<div class="pion blanc"></div>';
-                elseif ($plateau[$ligne][$col] == 2) $contenuCase = '<div class="pion noir"></div>';
+                $contentsCase = "";
+                if ($plateau[$ligne][$col] == 1) $contentsCase = '<div class="pion blanc"></div>';
+                elseif ($plateau[$ligne][$col] == 2) $contentsCase = '<div class="pion noir"></div>';
 
-                echo "<td class='$typeCase' data-ligne='$ligne' data-col='$col'>$contenuCase</td>";
+                echo "<td class='$typeCase' data-ligne='$ligne' data-col='$col'>$contentsCase</td>";
             }
             echo "<td class='coord'>$ligne</td>";
             echo "</tr>";
         }
         ?>
-
-        
     </tbody>
     <tfoot>
         <tr>
@@ -103,7 +129,6 @@ if (!isset($_SESSION['user_id'])) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    
     let pionSelectionne = null;
     let tourActuel = 'blanc'; 
     const statusEl = document.getElementById('joueur-actif');
@@ -126,8 +151,12 @@ document.addEventListener('DOMContentLoaded', function() {
         nettoyerAide();
         const directionsVisibles = [];
         
-        if (pionData.couleur === 'blanc') directionsVisibles.push({l: -1, c: -1}, {l: -1, c: 1});
-        else directionsVisibles.push({l: 1, c: -1}, {l: 1, c: 1});
+        if (pionData.element.classList.contains('dame')) {
+            directionsVisibles.push({l: 1, c: -1}, {l: 1, c: 1}, {l: -1, c: -1}, {l: -1, c: 1});
+        } else {
+            if (pionData.couleur === 'blanc') directionsVisibles.push({l: 1, c: -1}, {l: 1, c: 1});
+            else directionsVisibles.push({l: -1, c: -1}, {l: -1, c: 1});
+        }
 
         directionsVisibles.forEach(dir => {
             const cibleL = pionData.ligne + dir.l;
@@ -159,18 +188,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const casesNoires = document.querySelectorAll('.black');
-    console.log(casesNoires.length + " cases noires trouvées.");
-
     casesNoires.forEach(caseNoire => {
         caseNoire.addEventListener('click', function() {
-            const pion = this.querySelector('.pion');
-            console.log("Clic sur case :", this.dataset.ligne, this.dataset.col, "| Pion présent :", !!pion);
+            let pion = this.querySelector('.pion');
             
             if (pion) {
                 const couleurPion = pion.classList.contains('blanc') ? 'blanc' : 'noir';
                 
                 if (couleurPion !== tourActuel) {
-                    console.log("Ce n'est pas votre tour ! Attendez les :", tourActuel);
                     return; 
                 }
 
@@ -189,14 +214,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             else if (pionSelectionne) {
                 if (!this.querySelector('.aide-coup')) {
-                    console.log("Coup invalide. Cliquez sur un point vert.");
                     return;
                 }
 
                 const destLigne = parseInt(this.dataset.ligne);
                 const destCol = parseInt(this.dataset.col);
                 const diffLigne = destLigne - pionSelectionne.ligne;
-                const diffCol = Math.abs(destCol - pionSelectionne.col);
 
                 if (Math.abs(diffLigne) === 2) {
                     const sautLigne = pionSelectionne.ligne + (diffLigne / 2);
@@ -210,18 +233,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 pionSelectionne.element.classList.remove('selected');
                 nettoyerAide();
                 
-                if ((pionSelectionne.couleur === 'blanc' && destLigne === 1) || 
-                    (pionSelectionne.couleur === 'noir' && destLigne === 10)) {
-                    pionSelectionne.element.classList.add('dame');
-                    pionSelectionne.element.innerHTML = "👑";
+                if (!pionSelectionne.element.classList.contains('dame')) {
+                    if ((pionSelectionne.couleur === 'blanc' && destLigne === 10) || 
+                        (pionSelectionne.couleur === 'noir' && destLigne === 1)) {
+                        
+                        pionSelectionne.element.classList.add('dame');
+                    }
                 }
                 
                 tourActuel = (tourActuel === 'blanc') ? 'noir' : 'blanc';
-                
                 statusEl.innerText = (tourActuel === 'blanc') ? 'Blancs' : 'Noirs';
                 statusEl.className = 'tour-' + tourActuel;
 
-                console.log("Mouvement réussi. C'est aux :", tourActuel);
                 pionSelectionne = null;
             }
         });
