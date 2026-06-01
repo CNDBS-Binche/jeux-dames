@@ -21,15 +21,14 @@ if ($action == 'envoyer' && isset($_POST['message'])) {
     exit;
 }
 
-// ACTION B : Récupérer les messages
+// ACTION B : Récupérer les messages (Version sans les clans pour l'instant)
 if ($action == 'recuperer') {
     try {
-        // LEFT JOIN est crucial ici : il permet d'afficher le message même si cl.tag n'existe pas encore !
+        // Requête simplifiée : on supprime la jointure avec la table clans
         $req = $bdd->query('
-            SELECT c.message, c.date_envoi, u.pseudo, cl.tag 
+            SELECT c.message, c.date_envoi, u.pseudo 
             FROM chat_global c 
             INNER JOIN utilisateurs u ON c.user_id = u.id 
-            LEFT JOIN clans cl ON u.clan_id = cl.id 
             ORDER BY c.date_envoi DESC LIMIT 30
         ');
         
@@ -40,17 +39,15 @@ if ($action == 'recuperer') {
             exit;
         }
         
-        // On remet les messages dans le bon sens chronologique
+        // Remettre les messages dans le bon sens chronologique
         $messages = array_reverse($messages);
 
         foreach ($messages as $msg) {
             $heure = date('H:i', strtotime($msg['date_envoi']));
-            $clanTag = (!empty($msg['tag'])) ? "<span style='color:#f1c40f'>[".$msg['tag']."]</span> " : "";
             
-            echo "<p style='margin: 4px 0;'><strong>[$heure] $clanTag" . htmlspecialchars($msg['pseudo']) . " :</strong> " . htmlspecialchars($msg['message']) . "</p>";
+            echo "<p style='margin: 4px 0;'><strong>[$heure] " . htmlspecialchars($msg['pseudo']) . " :</strong> " . htmlspecialchars($msg['message']) . "</p>";
         }
     } catch (PDOException $e) {
-        // En cas d'erreur SQL (colonne manquante, table mal nommée), elle s'affichera directement dans le chat
         echo "<p style='color:#e74c3c;'>⚠️ Erreur SQL : " . htmlspecialchars($e->getMessage()) . "</p>";
     }
     exit;

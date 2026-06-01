@@ -104,7 +104,7 @@ $username = $_SESSION['pseudo'] ?? 'Joueur';
         <h2>Menu principal</h2>
         <p>Clan : Aucun (Bientôt disponible)</p>
         
-        <a href="damier.php" class="btn-jeu">Jouer (Local)</a>
+        <a href="plateau.php" class="btn-jeu">Jouer (Local)</a>
     </div>
 
     <div class="panel chat-panel">
