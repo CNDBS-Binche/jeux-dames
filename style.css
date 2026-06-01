@@ -95,16 +95,6 @@ td {
 .tour-blanc { color: #f0d9b5; font-weight: bold; }
 .tour-noir { color: #c0c0c0; font-weight: bold; }
 
-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-  background-color: #1a252f;
-  transition: background 0.5s ease-in-out; /* Transition douce lors du changement de tour */
-}
-
 /* --- TOUR DES BLANCS : Voile collé en BAS (ne touche pas le plateau) --- */
 body.tour-actif-blanc {
   background-color: #2c3e50;
@@ -133,4 +123,42 @@ body.tour-actif-noir {
   background-position: top, 40px 0, 40px 0, 0 0, 0 0;
   background-size: auto, 80px 80px, 80px 80px, 80px 80px, 80px 80px;
   background-repeat: no-repeat, repeat, repeat, repeat, repeat;
+}
+
+/* --- BOUTON RETOUR À L'ACCUEIL (Respect DA) --- */
+.btn-accueil {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #5d3a1a; /* Même marron que le bord du damier */
+  color: #f0d9b5;            /* Même couleur crème que les coordonnées */
+  text-decoration: none;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 10px 18px;
+  border-radius: 6px;
+  border: 2px solid #7a4a28; /* Bordure légèrement plus claire pour le relief */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), 
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease-in-out;
+  z-index: 100; /* Passe au-dessus du background et des voiles lumineux */
+}
+
+/* Effet au survol : le bouton s'illumine discrètement */
+.btn-accueil:hover {
+  background-color: #6d4420;
+  color: #ffffff;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5), 
+              0 0 10px rgba(240, 217, 181, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Effet au clic */
+.btn-accueil:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }

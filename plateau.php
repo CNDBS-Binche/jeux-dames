@@ -80,6 +80,7 @@ if (!isset($_SESSION['user_id'])) {
     </style>
 </head>
 <body>
+    <a href="index.php" class="btn-accueil"> Accueil</a>
 
 <div id="status-bar">
     <span id="joueur-actif" class="tour-blanc" style="display: none;">Blancs</span>
