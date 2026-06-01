@@ -95,34 +95,32 @@ td {
 .tour-blanc { color: #f0d9b5; font-weight: bold; }
 .tour-noir { color: #c0c0c0; font-weight: bold; }
 
-/* --- TOUR DES BLANCS : Voile collé en BAS (ne touche pas le plateau) --- */
-body.tour-actif-blanc {
-  background-color: #2c3e50;
-  background-image: 
-    /* Le voile blanc part du centre-bas (ellipse at bottom) */
-    radial-gradient(ellipse at bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 35%, transparent 60%),
-    linear-gradient(135deg, #1e272e 25%, transparent 25%), 
-    linear-gradient(225deg, #1e272e 25%, transparent 25%), 
-    linear-gradient(45deg, #1e272e 25%, transparent 25%), 
-    linear-gradient(315deg, #1e272e 25%, #2c3e50 25%);
-  background-position: bottom, 40px 0, 40px 0, 0 0, 0 0;
-  background-size: auto, 80px 80px, 80px 80px, 80px 80px, 80px 80px;
-  background-repeat: no-repeat, repeat, repeat, repeat, repeat;
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #1a252f;
+  transition: background 0.5s ease-in-out; /* Transition douce lors du changement de tour */
 }
 
-/* --- TOUR DES NOIRS : Voile collé en HAUT (ne touche pas le plateau) --- */
-body.tour-actif-noir {
-  background-color: #2c3e50;
+/* --- TOUR DES BLANCS : Voile en BAS sur fond uni --- */
+body.tour-actif-blanc {
+  background-color: #2c3e50; /* Couleur de fond unie */
   background-image: 
-    /* Le voile blanc part du centre-haut (ellipse at top) */
-    radial-gradient(ellipse at top, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 35%, transparent 60%),
-    linear-gradient(135deg, #1e272e 25%, transparent 25%), 
-    linear-gradient(225deg, #1e272e 25%, transparent 25%), 
-    linear-gradient(45deg, #1e272e 25%, transparent 25%), 
-    linear-gradient(315deg, #1e272e 25%, #2c3e50 25%);
-  background-position: top, 40px 0, 40px 0, 0 0, 0 0;
-  background-size: auto, 80px 80px, 80px 80px, 80px 80px, 80px 80px;
-  background-repeat: no-repeat, repeat, repeat, repeat, repeat;
+    radial-gradient(ellipse at bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 35%, transparent 60%);
+  background-position: bottom;
+  background-repeat: no-repeat;
+}
+
+/* --- TOUR DES NOIRS : Voile en HAUT sur fond uni --- */
+body.tour-actif-noir {
+  background-color: #2c3e50; /* Même couleur de fond unie */
+  background-image: 
+    radial-gradient(ellipse at top, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 35%, transparent 60%);
+  background-position: top;
+  background-repeat: no-repeat;
 }
 
 /* --- BOUTON RETOUR À L'ACCUEIL (Respect DA) --- */
