@@ -71,9 +71,26 @@ td {
 }
 
 .pion.selected {
-    border: 3px solid #e67e22; 
-    box-shadow: 0 0 15px #e67e22;
-    transform: translate(-50%, -50%) scale(1.1); 
+    outline: 4px solid #f1c40f !important; 
+    outline-offset: 2px;
+    box-shadow: 0 0 20px #f1c40f !important;
+    transform: translate(-50%, -50%) scale(1.1) !important; 
+    transition: transform 0.2s ease, outline 0.2s ease;
 }
 
-.pion { cursor: pointer; transition: all 0.2s; }
+.aide-coup {
+    width: 20px;
+    height: 20px;
+    background-color: rgba(46, 204, 113, 0.6); 
+    border-radius: 50%;
+    margin: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none; 
+    z-index: 5;
+}
+
+.tour-blanc { color: #f0d9b5; font-weight: bold; }
+.tour-noir { color: #c0c0c0; font-weight: bold; }
