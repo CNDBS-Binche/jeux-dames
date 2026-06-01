@@ -133,6 +133,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let tourActuel = 'blanc'; 
     const statusEl = document.getElementById('joueur-actif');
 
+    document.body.classList.add('tour-actif-blanc');
+
     console.log("Le script de dames est chargé et prêt.");
 
     function nettoyerAide() {
@@ -244,6 +246,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 tourActuel = (tourActuel === 'blanc') ? 'noir' : 'blanc';
                 statusEl.innerText = (tourActuel === 'blanc') ? 'Blancs' : 'Noirs';
                 statusEl.className = 'tour-' + tourActuel;
+
+                // Gestion dynamique du dégradé de l'arrière-plan
+                if (tourActuel === 'blanc') {
+                    document.body.classList.add('tour-actif-blanc');
+                } else {
+                    document.body.classList.remove('tour-actif-blanc');
+                }
 
                 pionSelectionne = null;
             }
