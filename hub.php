@@ -4,8 +4,8 @@ if (!isset($_SESSION['user_id'])) {
     header('Location: connexion.php');
     exit();
 }
-// Idéalement, récupère ici les infos du joueur connecté ($username, son clan, etc.) pour les afficher.
-$username = $_SESSION['username'] ?? 'Joueur'; 
+// Récupère la session 'pseudo' ou utilise 'Joueur' par défaut si elle n'est pas définie
+$username = $_SESSION['pseudo'] ?? 'Joueur'; 
 ?>
 <!DOCTYPE html>
 <html lang="fr">
