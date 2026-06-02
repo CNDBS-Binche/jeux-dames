@@ -538,7 +538,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         formData.append('arrivee', `${destLigne},${destCol}`);
                         formData.append('couleur', MON_ROLE);
 
-                        fetch('./jeu_ajax.php?action=jouer', {
+                        fetch('jcj_ajax.php?action=jouer', {
                             method: 'POST',
                             body: formData
                         })
@@ -587,7 +587,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (tourActuel === MON_ROLE) return;
 
             // Consommation du flux adverse (Pull)
-            fetch(`./jeu_ajax.php?action=charger_dernier_coup&match_id=${MATCH_ID}`)
+            fetch(`jcj_ajax.php?action=charger_dernier_coup&match_id=${MATCH_ID}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data && data.num_coup > dernierCoupCompteur) {
