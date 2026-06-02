@@ -1,3 +1,6 @@
+/* ==========================================================================
+   1. IMPORTATIONS & CONFIGURATION GLOBALE
+   ========================================================================== */
 @import url('log.css');
 
 body {
@@ -6,9 +9,117 @@ body {
   align-items: center;
   height: 100vh;
   margin: 0;
-  background-color: #333;
+  background-color: #1a252f;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  transition: background 0.5s ease-in-out; /* Transition douce lors du changement de tour */
 }
 
+/* --- TOUR DES BLANCS : Voile en BAS sur fond uni --- */
+body.tour-actif-blanc {
+  background-color: #2c3e50; 
+  background-image: radial-gradient(ellipse at bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 35%, transparent 60%);
+  background-position: bottom;
+  background-repeat: no-repeat;
+}
+
+/* --- TOUR DES NOIRS : Voile en HAUT sur fond uni --- */
+body.tour-actif-noir {
+  background-color: #2c3e50; 
+  background-image: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 35%, transparent 60%);
+  background-position: top;
+  background-repeat: no-repeat;
+}
+
+.zone-jeu-centrale {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  position: relative;
+}
+
+/* ==========================================================================
+   2. INTERFACE DE PRÉPARATION (OVERLAY & BOUTONS PRÊT)
+   ========================================================================== */
+#overlay-preparation {
+  position: absolute;
+  top: 45px; 
+  left: 0;
+  width: 100%;
+  height: calc(100% - 90px);
+  background-color: rgba(26, 37, 47, 0.85);
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  transition: opacity 0.4s ease;
+}
+
+.boite-preparation {
+  background-color: #5d3a1a;
+  border: 4px solid #7a4a28;
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  max-width: 450px;
+  color: #f0d9b5;
+}
+
+.boite-preparation h2 {
+  margin-top: 0;
+  font-size: 1.6rem;
+  letter-spacing: 1px;
+}
+
+.boite-preparation p {
+  font-size: 0.95rem;
+  opacity: 0.9;
+  margin-bottom: 25px;
+}
+
+.zone-boutons-prets {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.btn-pret {
+  background-color: #3e2510;
+  color: #f0d9b5;
+  border: 2px solid #7a4a28;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-pret:hover {
+  background-color: #4f3016;
+  border-color: #f1c40f;
+  transform: translateY(-2px);
+}
+
+.btn-pret.pret-valide {
+  background-color: #27ae60 !important;
+  color: #ffffff !important;
+  border-color: #2ecc71 !important;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
+}
+
+.jeu-verrouille {
+  pointer-events: none !important;
+  opacity: 0.6;
+}
+
+/* ==========================================================================
+   3. STRUCTURE DU DAMIER (TABLE)
+   ========================================================================== */
 table {
   border-collapse: collapse;
   background-color: #5d3a1a; 
@@ -16,7 +127,6 @@ table {
   box-shadow: 0 20px 50px rgba(0,0,0,0.6);
 }
 
-/* Style propre des cases (plus de Flexbox ici pour éviter les surélèvements) */
 td {
   width: 60px;
   height: 60px;
@@ -34,12 +144,13 @@ td {
   text-align: center;
   vertical-align: middle;
   color: #f0d9b5; 
-  font-family: Arial, sans-serif;
   font-weight: bold;
   font-size: 14px;
 }
 
-/* --- CONFIGURATION DES PIONS (Centrage absolu parfait) --- */
+/* ==========================================================================
+   4. DESIGN DES PIONS ET DES DAMES
+   ========================================================================== */
 .pion {
   width: 48px; 
   height: 48px;
@@ -52,14 +163,8 @@ td {
   cursor: pointer;
 }
 
-/* Effet au survol discret */
-.pion.blanc:hover {
-  box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.3);
-}
-
-.pion.noir:hover {
-  box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.5), 0 0 6px 1px rgba(255, 255, 255, 0.2);
-}
+.pion.blanc:hover { box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.3); }
+.pion.noir:hover { box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.5), 0 0 6px 1px rgba(255, 255, 255, 0.2); }
 
 .pion.blanc {
   background: radial-gradient(circle at 35% 35%, #ffffff 0%, #e0e0e0 45%, #b0b0b0 100%);
@@ -73,7 +178,6 @@ td {
   border: 1px solid #111111; 
 }
 
-/* État sélectionné (Conserve le centrage tout en appliquant le zoom) */
 .pion.selected {
   outline: 4px solid #f1c40f !important; 
   outline-offset: 2px;
@@ -81,7 +185,6 @@ td {
   transform: translate(-50%, -50%) scale(1.1) !important; 
 }
 
-/* --- CONFIGURATION DE LA DAME (DOUBLE PION) --- */
 .pion.dame::after {
   content: "";
   position: absolute;
@@ -106,7 +209,6 @@ td {
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
 }
 
-/* Le logo de la couronne au milieu de la dame */
 .pion.dame::before {
   content: "👑";
   position: absolute;
@@ -123,7 +225,9 @@ td {
   pointer-events: none;
 }
 
-/* Aide visuelle des coups possibles (Parfaitement centrée aussi) */
+/* ==========================================================================
+   5. AIDES VISUELLES ET HISTORIQUE DES COUPS
+   ========================================================================== */
 .aide-coup {
   width: 20px;
   height: 20px;
@@ -137,72 +241,276 @@ td {
   z-index: 5;
 }
 
-.derniere-case-depart,
-.case-etape-historique,
+.case-etape-historique {
+  background-color: rgba(37, 202, 106, 0.4) !important; 
+}
+
 .derniere-case-arrivee {
-    background-color: rgba(37, 202, 106, 0.4) !important; /* Vert translucide comme sur ton image */
+  background-color: rgba(37, 202, 106, 0.4) !important; /* Vert translucide */
 }
 
-/* Style des points d'aide temporaires (pendant la sélection) */
-.case-etape-intermediaire {
-    background-color: rgba(230, 126, 34, 0.2) !important; /* Orange très léger pendant le choix */
-}
-.aide-coup.etape-intermediaire {
-    background-color: rgba(211, 84, 0, 1) !important;
-}
-
-.derniere-case-depart, .derniere-case-arrivee {
-    background-color: rgba(37, 202, 106, 0.4) !important; /* Vert translucide */
-}
-
-/* Optionnel : si tu veux différencier légèrement la case de départ et d'arrivée */
 .derniere-case-depart {
-    background-color: rgba(37, 202, 106, 0.4) !important; /* Bleu translucide */
+  background-color: rgba(37, 202, 106, 0.4) !important; /* Bleu/Vert translucide unifié */
+}
+
+.case-etape-intermediaire { 
+  background-color: rgba(230, 126, 34, 0.2) !important; /* Orange très léger pendant le choix */
+}
+
+.aide-coup.etape-intermediaire { 
+  background-color: rgba(211, 84, 0, 1) !important; 
 }
 
 .tour-blanc { color: #f0d9b5; font-weight: bold; }
 .tour-noir { color: #c0c0c0; font-weight: bold; }
 
-body {
+/* ==========================================================================
+   6. LES CHRONOMÈTRES & ANIMATION DE VICTOIRE + CONFETTIS
+   ========================================================================== */
+.timer-global {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  height: 100vh;
-  margin: 0;
-  background-color: #1a252f;
-  transition: background 0.5s ease-in-out; /* Transition douce lors du changement de tour */
+  width: 100%;
+  max-width: 630px; 
+  background-color: #3e2510;
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: 3px solid #523115;
+  box-sizing: border-box;
+  opacity: 0.35;
+  position: relative; 
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* --- TOUR DES BLANCS : Voile en BAS sur fond uni --- */
-body.tour-actif-blanc {
-  background-color: #2c3e50; /* Couleur de fond unie */
-  background-image: 
-    radial-gradient(ellipse at bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 35%, transparent 60%);
-  background-position: bottom;
-  background-repeat: no-repeat;
+.timer-global.actif {
+  opacity: 1;
+  border-color: #f1c40f;
+  box-shadow: 0 0 20px rgba(241, 196, 15, 0.3);
+  transform: scale(1.01);
 }
 
-/* --- TOUR DES NOIRS : Voile en HAUT sur fond uni --- */
-body.tour-actif-noir {
-  background-color: #2c3e50; /* Même couleur de fond unie */
-  background-image: 
-    radial-gradient(ellipse at top, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 35%, transparent 60%);
-  background-position: top;
-  background-repeat: no-repeat;
+.label-joueur {
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 1.5px;
+  color: #f0d9b5;
 }
 
-/* --- BOUTON RETOUR À L'ACCUEIL (Respect DA) --- */
-.btn-accueil {
+.temps-affichage {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.8rem; 
+  font-weight: bold;
+  color: #ffffff;
+  letter-spacing: 2px;
+}
+
+.timer-global.actif .temps-affichage {
+  color: #f1c40f;
+  text-shadow: 0 0 10px rgba(241, 196, 15, 0.6);
+}
+
+.timer-global.temps-depasse {
+  opacity: 1 !important;
+  background-color: #7f231c !important;
+  border-color: #c0392b !important;
+  animation: clignotementErreur 0.8s infinite alternate;
+}
+
+.timer-global.temps-depasse .temps-affichage {
+  color: #ff9f93 !important;
+  text-shadow: none !important;
+}
+
+.badge-victoire {
+  display: none;
   position: absolute;
-  top: 20px;
-  right: 20px;
-  background-color: #5d3a1a; /* Même marron que le bord du damier */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.6);
+  font-weight: bold;
+  background-color: #f1c40f;
+  color: #1a252f;
+  padding: 10px 25px;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  letter-spacing: 1.5px;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.timer-global.victoire-animation {
+  opacity: 1 !important;
+  transform: scale(1.03);
+  background: linear-gradient(135deg, #2c3e50 0%, #1e8449 100%);
+  animation: pulsationOr 1.5s infinite alternate ease-in-out, bordureScintillante 2s infinite linear;
+  box-shadow: 0 0 30px rgba(46, 204, 113, 0.8);
+}
+
+.timer-global.victoire-animation .temps-affichage {
+  color: #2ecc71 !important;
+  text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+}
+
+.timer-global.victoire-animation .label-joueur {
+  color: #ffffff !important;
+  text-shadow: 1px 1px 2px black;
+}
+
+.timer-global.victoire-animation .badge-victoire {
+  display: block;
+  animation: apparitionBadgeCentre 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.particle-confetti {
+  position: absolute;
+  pointer-events: none;
+  z-index: 999;
+  border-radius: 3px;
+  animation: chuteConfetti 2.5s ease-out forwards;
+}
+
+@keyframes apparitionBadgeCentre {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes chuteConfetti {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x), var(--y)) rotate(var(--r));
+    opacity: 0;
+  }
+}
+
+@keyframes pulsationOr {
+  from { box-shadow: 0 0 20px rgba(46, 204, 113, 0.5); }
+  to { box-shadow: 0 0 45px rgba(241, 196, 15, 0.9); }
+}
+
+@keyframes bordureScintillante {
+  0% { border-color: #2ecc71; }
+  50% { border-color: #f1c40f; }
+  100% { border-color: #2ecc71; }
+}
+
+@keyframes clignotementErreur {
+  from { box-shadow: 0 0 5px rgba(192, 57, 43, 0.5); }
+  to { box-shadow: 0 0 25px rgba(192, 57, 43, 0.9); }
+}
+
+/* ==========================================================================
+   7. PANNEAU DE CONTROLE LATÉRAL & BOUTONS
+   ========================================================================== */
+#info-partie {
+  position: absolute;
+  top: 50%;
+  left: 40px;
+  transform: translateY(-50%);
+  width: 240px;
+  background: #5d3a1a; 
+  border: 4px solid #7a4a28;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+  color: #f0d9b5;
+  z-index: 90;
+}
+
+.statut-header {
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 8px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+#statut-jeu {
+  font-size: 0.95rem;
+  text-align: center;
+  font-weight: 600;
+  color: #e67e22; 
+  transition: color 0.3s ease;
+}
+
+.separateur-controle {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #7a4a28, #f0d9b5, #7a4a28, transparent);
+  margin: 15px 0;
+}
+
+.panneau-controles {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-ctrl {
+  background-color: #7a4a28;
+  color: #f0d9b5;
+  border: 1px solid #945d35;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.btn-ctrl:hover:not(:disabled) {
+  background-color: #8c552e;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+}
+
+.btn-danger {
+  background-color: #c0392b;
+  border-color: #d9534f;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #e74c3c !important;
+  box-shadow: 0 6px 10px rgba(231, 76, 60, 0.3);
+}
+
+.btn-warning {
+  background-color: #2980b9;
+  border-color: #3498db;
+}
+
+.btn-warning:hover:not(:disabled) {
+  background-color: #3498db !important;
+  box-shadow: 0 6px 10px rgba(52, 152, 219, 0.3);
+}
+
+.btn-ctrl:disabled {
+  cursor: not-allowed;
+  filter: grayscale(80%);
+  opacity: 0.4;
+}
+
+/* --- BOUTON RETOUR À L'ACCUEIL (Respect Charte Graphique) --- */
+.btn-accueil {
+  background-color: #106d02; /* Même marron que le bord du damier */
   color: #f0d9b5;            /* Même couleur crème que les coordonnées */
   text-decoration: none;
-  font-family: Arial, sans-serif;
   font-weight: bold;
   font-size: 14px;
-  padding: 10px 18px;
+  justify-content: center;    
+  box-sizing: border-box;
   border-radius: 6px;
   border: 2px solid #7a4a28; /* Bordure légèrement plus claire pour le relief */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), 
@@ -211,15 +519,14 @@ body.tour-actif-noir {
   align-items: center;
   gap: 8px;
   transition: all 0.2s ease-in-out;
-  z-index: 100; /* Passe au-dessus du background et des voiles lumineux */
 }
 
 /* Effet au survol : le bouton s'illumine discrètement */
 .btn-accueil:hover {
-  background-color: #6d4420;
-  color: #ffffff;
+  background-color: #106d02 !important;
+  color: #ffffff !important;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5), 
-              0 0 10px rgba(240, 217, 181, 0.3);
+              0 0 10px rgba(240, 217, 181, 0.3) !important;
   transform: translateY(-2px);
 }
 
