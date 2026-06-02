@@ -187,6 +187,54 @@ $defaites = 0;
         </div>
 
     </div>
+<div id="pop-up-defi" style="display:none; position:fixed; bottom:20px; right:20px; background-color:#d35400; border:4px solid #a04000; padding:20px; border-radius:8px; box-shadow:0 10px 20px rgba(0,0,0,0.5); z-index:9999; color:white;">
+    <p id="texte-defi" style="margin:0 0 15px 0; font-weight:bold;"></p>
+    <div style="display:flex; gap:10px;">
+        <button id="btn-accepter-defi" class="btn" style="background-color:#27ae60; margin:0;">Accepter</button>
+        <button id="btn-refuser-defi" class="btn" style="background-color:#c0392b; margin:0;">Refuser</button>
+    </div>
+</div>
 
+<script>
+let ID_MATCH_ACTUEL = null;
+
+function ecouterDefis() {
+    fetch('./jcj_ajax.php?action=verifier_defis')
+    .then(r => r.json())
+    .then(data => {
+        if(data.type === 'recu') {
+            ID_MATCH_ACTUEL = data.match_id;
+            document.getElementById('texte-defi').innerText = `⚔️ ${data.adversaire} vous défie en duel !`;
+            document.getElementById('pop-up-defi').style.display = 'block';
+        }
+    });
+}
+
+document.getElementById('btn-accepter-defi').addEventListener('click', () => {
+    repondreDefi('accepte');
+});
+
+document.getElementById('btn-refuser-defi').addEventListener('click', () => {
+    repondreDefi('refuse');
+});
+
+function repondreDefi(decision) {
+    const data = new FormData();
+    data.append('match_id', ID_MATCH_ACTUEL);
+    data.append('decision', decision);
+
+    fetch('./jcj_ajax.php?action=repondre', { method: 'POST', body: data })
+    .then(() => {
+        document.getElementById('pop-up-defi').style.display = 'none';
+        if(decision === 'accepte') {
+            // Redirection immédiate vers le plateau de jeu en transmettant l'ID de la partie !
+            window.location.href = './plateau.php?match_id=' + ID_MATCH_ACTUEL;
+        }
+    });
+}
+
+// On vérifie toutes les 3 secondes si quelqu'un nous défie
+setInterval(ecouterDefis, 3000);
+</script>
 </body>
 </html>

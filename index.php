@@ -25,9 +25,6 @@
         <p class="subtitle">Défiez l'intelligence artificielle ou un ami en ligne.</p>
 
         <div class="menu-grid">
-            <a href="plateau.php" class="btn-home btn-play">
-                <span>⚡ Commencer à jouer</span>
-            </a>
 
             <a href="connexion.php" class="btn-home">
                 <span>👤 Connexion</span>
