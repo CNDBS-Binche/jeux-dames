@@ -1,8 +1,27 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) {
-    header('Location: connexion.php?erreur=acces_refuse');
-    exit();
+require_once 'config.php';
+
+if (!isset($_SESSION['user_id'])) { header('Location: connexion.php'); exit(); }
+
+$userId = $_SESSION['user_id'];
+$matchId = isset($_GET['match_id']) ? intval($_GET['match_id']) : 0;
+
+$monRole = 'spectateur'; 
+
+if ($matchId > 0) {
+    // On regarde qui est qui dans cette partie
+    $reqPartie = $bdd->prepare('SELECT id_challengeur, id_defie FROM parties_jcj WHERE id = ?');
+    $reqPartie->execute([$matchId]);
+    $partie = $reqPartie->fetch();
+
+    if ($partie) {
+        if ($partie['id_challengeur'] == $userId) {
+            $monRole = 'blanc'; // Le créateur du défi a les Blancs
+        } elseif ($partie['id_defie'] == $userId) {
+            $monRole = 'noir';  // Le défié a les Noirs
+        }
+    }
 }
 ?>
 
@@ -63,6 +82,12 @@ if (!isset($_SESSION['user_id'])) {
 </table>
 
 <script>
+    // Variables PHP transmises au JavaScript
+    const MATCH_ID = <?php echo $matchId; ?>;
+    const MON_ROLE = "<?php echo $monRole; ?>"; // Contient 'blanc', 'noir' ou 'spectateur'
+</script>
+
+<script>
 document.addEventListener('DOMContentLoaded', function() {
     let pionSelectionne = null;
     let tourActuel = 'blanc'; 
@@ -77,6 +102,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let historiquePositions = {}; // Pour la règle des 3 positions identiques
     let compteurCoupsSansPriseNiPion = 0; // Pour la règle des 25 coups
     let decompte16Coups = -1; // -1 signifie non activé, sinon compte à rebours de 32 demi-coups
+
+    // Compteur de coups local pour la synchronisation JcJ
+    let dernierCoupCompteur = 0;
 
     console.log("Moteur de dames (Historique complet de la rafle) prêt.");
 
@@ -262,8 +290,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- FONCTIONS LOGIQUES POUR LES REGLES DE FIN DE PARTIE ---
-    
-    // Génère une chaîne unique représentant l'état du plateau
     function obtenirSnapshotPlateau() {
         let snapshot = "";
         document.querySelectorAll('.black').forEach(c => {
@@ -278,7 +304,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function verifierReglesFinDePartie(aBougeUnPion, aFaitUnePrise) {
-        // Règle 1 : Répétition de la position pour la 3ème fois
         const snapshotActuel = obtenirSnapshotPlateau();
         historiquePositions[snapshotActuel] = (historiquePositions[snapshotActuel] || 0) + 1;
         if (historiquePositions[snapshotActuel] >= 3) {
@@ -286,18 +311,16 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Règle 2 : 25 coups consécutifs sans déplacement de pion ni prise
         if (!aBougeUnPion && !aFaitUnePrise) {
             compteurCoupsSansPriseNiPion++;
         } else {
-            compteurCoupsSansPriseNiPion = 0; // Réinitialisation
+            compteurCoupsSansPriseNiPion = 0; 
         }
         if (compteurCoupsSansPriseNiPion >= 25) {
             declarerEgalite("Égalité : 25 coups sans mouvement de pion ni prise.");
             return;
         }
 
-        // Compte des pièces présentes sur le terrain
         let damesBlanches = 0, pionsBlancs = 0;
         let damesNoires = 0, pionsNoirs = 0;
 
@@ -314,7 +337,6 @@ document.addEventListener('DOMContentLoaded', function() {
         let totalDames = damesBlanches + damesNoires;
         let totalPions = pionsBlancs + pionsNoirs;
 
-        // Règle 4 : 2 dames contre 1, ou 1 dame contre 1 dame (sans phase de jeu/rafle en cours)
         if (totalPions === 0) {
             if ((damesBlanches === 2 && damesNoires === 1) || 
                 (damesBlanches === 1 && damesNoires === 2) || 
@@ -324,11 +346,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Règle 3 : Situations spéciales (3 Dames, 2 Dames + 1 pion, ou 1 Dame + 2 pions contre 1 Dame) -> 16 coups max
         let condition16CoupsRemplie = false;
         
-        if (totalPions + totalDames <= 4) { // Maximum 4 pièces sur tout le damier
-            // Cas où les Blancs ont la dame isolée
+        if (totalPions + totalDames <= 4) { 
             if (damesBlanches === 1 && pionsBlancs === 0) {
                 if ((damesNoires === 3 && pionsNoirs === 0) || 
                     (damesNoires === 2 && pionsNoirs === 1) || 
@@ -336,7 +356,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     condition16CoupsRemplie = true;
                 }
             }
-            // Cas où les Noirs ont la dame isolée
             if (damesNoires === 1 && pionsNoirs === 0) {
                 if ((damesBlanches === 3 && pionsBlancs === 0) || 
                     (damesBlanches === 2 && pionsBlancs === 1) || 
@@ -348,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (condition16CoupsRemplie) {
             if (decompte16Coups === -1) {
-                decompte16Coups = 32; // 16 coups de chaque joueur = 32 demi-coups
+                decompte16Coups = 32; 
                 console.log("Règle des 16 coups activée.");
             } else {
                 decompte16Coups--;
@@ -361,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 statutJeuEl.innerText = `Fin de partie : ${Math.ceil(decompte16Coups / 2)} coups restants`;
             }
         } else {
-            decompte16Coups = -1; // Réinitialise si la configuration change (ex: suite à une prise)
+            decompte16Coups = -1; 
             statutJeuEl.innerText = "Partie en cours";
         }
     }
@@ -373,11 +392,82 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(message);
     }
 
+    // --- EXECUTION TECHNIQUE D'UN DEPLACEMENT REPLICABLE (POUR LE PULL) ---
+    function executerDeplacementGraphique(departLigne, departCol, destLigne, destCol) {
+        const caseDepart = document.querySelector(`[data-ligne="${departLigne}"][data-col="${departCol}"].black`);
+        const caseArrivee = document.querySelector(`[data-ligne="${destLigne}"][data-col="${destCol}"].black`);
+        
+        if (!caseDepart || !caseArrivee) return;
+        const pion = caseDepart.querySelector('.pion');
+        if (!pion) return;
+
+        const estDameAuDepart = pion.classList.contains('dame');
+        const couleurPion = pion.classList.contains('blanc') ? 'blanc' : 'noir';
+
+        // Simulation/calcul temporaire pour générer la trajectoire de l'adversaire
+        let trajectoires = calculerTrajectoires(departLigne, departCol, couleurPion, estDameAuDepart);
+        let coupApplique = trajectoires.find(c => c.destLigne === destLigne && c.destCol === destCol);
+
+        if (!coupApplique) {
+            // Fallback de secours si structure complexe
+            coupApplique = { captures: [], etapes: [{ l: destLigne, c: destCol }] };
+        }
+
+        let aFaitUnePrise = coupApplique.captures.length > 0;
+        let aBougeUnPion = !estDameAuDepart;
+
+        // Suppression des victimes
+        coupApplique.captures.forEach(coordStr => {
+            const [pL, pC] = coordStr.split(',');
+            const caseEnnemi = document.querySelector(`[data-ligne="${pL}"][data-col="${pC}"]`);
+            if (caseEnnemi) {
+                const pionVictime = caseEnnemi.querySelector('.pion');
+                if (pionVictime) pionVictime.remove();
+            }
+        });
+
+        // Déplacement effectif dans le DOM
+        caseArrivee.appendChild(pion);
+
+        marquerCheminHistorique(departLigne, departCol, coupApplique, caseArrivee);
+        nettoyerAide();
+
+        // Promotion potentielle
+        if (!pion.classList.contains('dame')) {
+            if ((couleurPion === 'blanc' && destLigne === 10) || (couleurPion === 'noir' && destLigne === 1)) {
+                pion.classList.add('dame');
+            }
+        }
+
+        // Cycle des règles de fin de partie et bascule du tour
+        verifierReglesFinDePartie(aBougeUnPion, aFaitUnePrise);
+
+        if (!partieTerminee) {
+            tourActuel = (tourActuel === 'blanc') ? 'noir' : 'blanc';
+            statusEl.innerText = (tourActuel === 'blanc') ? 'Blancs' : 'Noirs';
+            statusEl.className = 'tour-' + tourActuel;
+
+            if (tourActuel === 'blanc') {
+                document.body.classList.add('tour-actif-blanc');
+                document.body.classList.remove('tour-actif-noir');
+            } else {
+                document.body.classList.add('tour-actif-noir');
+                document.body.classList.remove('tour-actif-blanc');
+            }
+        }
+    }
+
     // --- SELECTION ET DEPLACEMENT ---
     const casesNoires = document.querySelectorAll('.black');
     casesNoires.forEach(caseNoire => {
         caseNoire.addEventListener('click', function() {
             if (partieTerminee) return; // Bloque le jeu si égalité déclarée
+
+            // Barrière de contrôle du tour JcJ (Consigne 2.2)
+            if (MATCH_ID > 0 && tourActuel !== MON_ROLE) {
+                console.log("Ce n'est pas votre tour !");
+                return;
+            }
 
             let pion = this.querySelector('.pion');
             
@@ -424,7 +514,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     const departCol = pionSelectionne.col;
                     const estUneDameAuDepart = pionSelectionne.element.classList.contains('dame');
 
-                    // Variables pour l'analyse des règles
                     let aFaitUnePrise = coupApplique.captures.length > 0;
                     let aBougeUnPion = !estUneDameAuDepart; 
 
@@ -440,6 +529,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     // Déplacement
                     this.appendChild(pionSelectionne.element);
+
+                    // --- EMISSION DU MOUVEMENT (PUSH - Consigne 3.1) ---
+                    if (MATCH_ID > 0) {
+                        const formData = new FormData();
+                        formData.append('match_id', MATCH_ID);
+                        formData.append('depart', `${departLigne},${departCol}`);
+                        formData.append('arrivee', `${destLigne},${destCol}`);
+                        formData.append('couleur', MON_ROLE);
+
+                        fetch('./jeu_ajax.php?action=jouer', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        // Incrémentation locale immédiate pour rester en phase
+                        dernierCoupCompteur++;
+                    }
+
                     pionSelectionne.element.classList.remove('selected');
                     
                     marquerCheminHistorique(departLigne, departCol, coupApplique, this);
@@ -452,7 +558,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                 
-                    // Appel de la vérification des règles de fin de partie AVANT le changement de tour pour la capture d'historique
                     verifierReglesFinDePartie(aBougeUnPion, aFaitUnePrise);
 
                     if (!partieTerminee) {
@@ -474,6 +579,31 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // --- SYNCHRONISATION PAR POLLING (Consigne 3.2, 3.3 & 3.4) ---
+    if (MATCH_ID > 0) {
+        setInterval(function() {
+            // Filtrage du rafraîchissement : inutile de requêter pendant notre tour
+            if (tourActuel === MON_ROLE) return;
+
+            // Consommation du flux adverse (Pull)
+            fetch(`./jeu_ajax.php?action=charger_dernier_coup&match_id=${MATCH_ID}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.num_coup > dernierCoupCompteur) {
+                        dernierCoupCompteur = data.num_coup;
+
+                        // Extraction des coordonnées du coup adverse (Format attendu : "X,Y")
+                        const [depL, depC] = data.depart.split(',').map(Number);
+                        const [arrL, arrC] = data.arrivee.split(',').map(Number);
+
+                        // Réplication dynamique sur le damier
+                        executerDeplacementGraphique(depL, depC, arrL, arrC);
+                    }
+                })
+                .catch(err => console.error("Erreur lors du polling :", err));
+        }, 2000);
+    }
 });
 </script>
 </body>
