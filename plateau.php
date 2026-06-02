@@ -15,6 +15,11 @@ if (!isset($_SESSION['user_id'])) {
 </head>
 <body>
 
+<div id="info-partie" style="position: absolute; top: 20px; left: 20px; color: #f0d9b5; font-family: Arial, sans-serif; background: #5d3a1a; padding: 10px; border-radius: 6px; border: 2px solid #7a4a28;">
+    Tour : <span id="status-tour" class="tour-blanc">Blancs</span>
+    <div id="statut-jeu" style="margin-top: 5px; color: #2ecc71; font-weight: bold;">Partie en cours</div>
+</div>
+
 <table>
     <thead>
         <tr>
@@ -62,6 +67,16 @@ document.addEventListener('DOMContentLoaded', function() {
     let pionSelectionne = null;
     let tourActuel = 'blanc'; 
     let coupsPossiblesCalcules = []; 
+    
+    // Éléments d'affichage manquants dans le code d'origine
+    const statusEl = document.getElementById('status-tour');
+    const statutJeuEl = document.getElementById('statut-jeu');
+    let partieTerminee = false;
+
+    // --- VARIABLES DE SUIVI DES REGLES DE FIN DE PARTIE ---
+    let historiquePositions = {}; // Pour la règle des 3 positions identiques
+    let compteurCoupsSansPriseNiPion = 0; // Pour la règle des 25 coups
+    let decompte16Coups = -1; // -1 signifie non activé, sinon compte à rebours de 32 demi-coups
 
     console.log("Moteur de dames (Historique complet de la rafle) prêt.");
 
@@ -86,20 +101,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // MODIFICATION : Marque tout le chemin emprunté (Départ -> Escales -> Arrivée)
     function marquerCheminHistorique(caseDepartLigne, caseDepartCol, coupApplique, caseArriveeElement) {
-        // 1. Nettoyage complet de l'ancien historique
         document.querySelectorAll('.derniere-case-depart, .case-etape-historique, .derniere-case-arrivee').forEach(el => {
             el.classList.remove('derniere-case-depart', 'case-etape-historique', 'derniere-case-arrivee');
         });
 
-        // 2. Marquer la case de départ originelle
         const caseDepart = document.querySelector(`[data-ligne="${caseDepartLigne}"][data-col="${caseDepartCol}"]`);
         if (caseDepart) caseDepart.classList.add('derniere-case-depart');
 
-        // 3. Marquer toutes les cases intermédiaires de la rafle
         if (coupApplique.etapes && coupApplique.etapes.length > 1) {
-            // On prend toutes les étapes sauf la dernière (qui est la case d'arrivée)
             for (let i = 0; i < coupApplique.etapes.length - 1; i++) {
                 const etape = coupApplique.etapes[i];
                 const caseEtape = document.querySelector(`[data-ligne="${etape.l}"][data-col="${etape.c}"]`);
@@ -109,7 +119,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // 4. Marquer la case d'arrivée finale
         caseArriveeElement.classList.add('derniere-case-arrivee');
     }
 
@@ -252,10 +261,124 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // --- FONCTIONS LOGIQUES POUR LES REGLES DE FIN DE PARTIE ---
+    
+    // Génère une chaîne unique représentant l'état du plateau
+    function obtenirSnapshotPlateau() {
+        let snapshot = "";
+        document.querySelectorAll('.black').forEach(c => {
+            const pion = c.querySelector('.pion');
+            if (pion) {
+                const couleur = pion.classList.contains('blanc') ? 'B' : 'N';
+                const type = pion.classList.contains('dame') ? 'D' : 'P';
+                snapshot += `${c.dataset.ligne},${c.dataset.col}:${couleur}${type};`;
+            }
+        });
+        return snapshot + `Tour:${tourActuel}`;
+    }
+
+    function verifierReglesFinDePartie(aBougeUnPion, aFaitUnePrise) {
+        // Règle 1 : Répétition de la position pour la 3ème fois
+        const snapshotActuel = obtenirSnapshotPlateau();
+        historiquePositions[snapshotActuel] = (historiquePositions[snapshotActuel] || 0) + 1;
+        if (historiquePositions[snapshotActuel] >= 3) {
+            declarerEgalite("Égalité : 3ème répétition de la même position.");
+            return;
+        }
+
+        // Règle 2 : 25 coups consécutifs sans déplacement de pion ni prise
+        if (!aBougeUnPion && !aFaitUnePrise) {
+            compteurCoupsSansPriseNiPion++;
+        } else {
+            compteurCoupsSansPriseNiPion = 0; // Réinitialisation
+        }
+        if (compteurCoupsSansPriseNiPion >= 25) {
+            declarerEgalite("Égalité : 25 coups sans mouvement de pion ni prise.");
+            return;
+        }
+
+        // Compte des pièces présentes sur le terrain
+        let damesBlanches = 0, pionsBlancs = 0;
+        let damesNoires = 0, pionsNoirs = 0;
+
+        document.querySelectorAll('.pion').forEach(p => {
+            if (p.classList.contains('blanc')) {
+                if (p.classList.contains('dame')) damesBlanches++; else pionsBlancs++;
+            } else {
+                if (p.classList.contains('dame')) damesNoires++; else pionsNoirs++;
+            }
+        });
+
+        let totalBlancs = damesBlanches + pionsBlancs;
+        let totalNoirs = damesNoires + pionsNoirs;
+        let totalDames = damesBlanches + damesNoires;
+        let totalPions = pionsBlancs + pionsNoirs;
+
+        // Règle 4 : 2 dames contre 1, ou 1 dame contre 1 dame (sans phase de jeu/rafle en cours)
+        if (totalPions === 0) {
+            if ((damesBlanches === 2 && damesNoires === 1) || 
+                (damesBlanches === 1 && damesNoires === 2) || 
+                (damesBlanches === 1 && damesNoires === 1)) {
+                declarerEgalite("Égalité : Fin de partie réglementaire (2v1 ou 1v1 de dames).");
+                return;
+            }
+        }
+
+        // Règle 3 : Situations spéciales (3 Dames, 2 Dames + 1 pion, ou 1 Dame + 2 pions contre 1 Dame) -> 16 coups max
+        let condition16CoupsRemplie = false;
+        
+        if (totalPions + totalDames <= 4) { // Maximum 4 pièces sur tout le damier
+            // Cas où les Blancs ont la dame isolée
+            if (damesBlanches === 1 && pionsBlancs === 0) {
+                if ((damesNoires === 3 && pionsNoirs === 0) || 
+                    (damesNoires === 2 && pionsNoirs === 1) || 
+                    (damesNoires === 1 && pionsNoirs === 2)) {
+                    condition16CoupsRemplie = true;
+                }
+            }
+            // Cas où les Noirs ont la dame isolée
+            if (damesNoires === 1 && pionsNoirs === 0) {
+                if ((damesBlanches === 3 && pionsBlancs === 0) || 
+                    (damesBlanches === 2 && pionsBlancs === 1) || 
+                    (damesBlanches === 1 && pionsBlancs === 2)) {
+                    condition16CoupsRemplie = true;
+                }
+            }
+        }
+
+        if (condition16CoupsRemplie) {
+            if (decompte16Coups === -1) {
+                decompte16Coups = 32; // 16 coups de chaque joueur = 32 demi-coups
+                console.log("Règle des 16 coups activée.");
+            } else {
+                decompte16Coups--;
+            }
+
+            if (decompte16Coups === 0) {
+                declarerEgalite("Égalité : Limite des 16 coups atteinte.");
+                return;
+            } else {
+                statutJeuEl.innerText = `Fin de partie : ${Math.ceil(decompte16Coups / 2)} coups restants`;
+            }
+        } else {
+            decompte16Coups = -1; // Réinitialise si la configuration change (ex: suite à une prise)
+            statutJeuEl.innerText = "Partie en cours";
+        }
+    }
+
+    function declarerEgalite(message) {
+        partieTerminee = true;
+        statutJeuEl.innerText = message;
+        statutJeuEl.style.color = "#e67e22";
+        console.log(message);
+    }
+
     // --- SELECTION ET DEPLACEMENT ---
     const casesNoires = document.querySelectorAll('.black');
     casesNoires.forEach(caseNoire => {
         caseNoire.addEventListener('click', function() {
+            if (partieTerminee) return; // Bloque le jeu si égalité déclarée
+
             let pion = this.querySelector('.pion');
             
             if (pion) {
@@ -299,6 +422,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (coupApplique) {
                     const departLigne = pionSelectionne.ligne;
                     const departCol = pionSelectionne.col;
+                    const estUneDameAuDepart = pionSelectionne.element.classList.contains('dame');
+
+                    // Variables pour l'analyse des règles
+                    let aFaitUnePrise = coupApplique.captures.length > 0;
+                    let aBougeUnPion = !estUneDameAuDepart; 
 
                     // Supprimer les victimes
                     coupApplique.captures.forEach(coordStr => {
@@ -314,9 +442,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.appendChild(pionSelectionne.element);
                     pionSelectionne.element.classList.remove('selected');
                     
-                    // MODIFICATION : On enregistre tout l'historique du chemin complet
                     marquerCheminHistorique(departLigne, departCol, coupApplique, this);
-
                     nettoyerAide();
                     
                     if (!pionSelectionne.element.classList.contains('dame')) {
@@ -326,19 +452,24 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                 
-                tourActuel = (tourActuel === 'blanc') ? 'noir' : 'blanc';
-                statusEl.innerText = (tourActuel === 'blanc') ? 'Blancs' : 'Noirs';
-                statusEl.className = 'tour-' + tourActuel;
+                    // Appel de la vérification des règles de fin de partie AVANT le changement de tour pour la capture d'historique
+                    verifierReglesFinDePartie(aBougeUnPion, aFaitUnePrise);
 
-                if (tourActuel === 'blanc') {
-                        document.body.classList.add('tour-actif-blanc');
-                        document.body.classList.remove('tour-actif-noir');
-                } else {
-                    document.body.classList.add('tour-actif-noir');
-                    document.body.classList.remove('tour-actif-blanc');
-                }
+                    if (!partieTerminee) {
+                        tourActuel = (tourActuel === 'blanc') ? 'noir' : 'blanc';
+                        statusEl.innerText = (tourActuel === 'blanc') ? 'Blancs' : 'Noirs';
+                        statusEl.className = 'tour-' + tourActuel;
 
-                pionSelectionne = null;
+                        if (tourActuel === 'blanc') {
+                            document.body.classList.add('tour-actif-blanc');
+                            document.body.classList.remove('tour-actif-noir');
+                        } else {
+                            document.body.classList.add('tour-actif-noir');
+                            document.body.classList.remove('tour-actif-blanc');
+                        }
+                    }
+
+                    pionSelectionne = null;
                 }
             }
         });
