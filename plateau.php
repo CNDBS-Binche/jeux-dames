@@ -250,8 +250,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusEl.innerText = (tourActuel === 'blanc') ? 'Blancs' : 'Noirs';
                 statusEl.className = 'tour-' + tourActuel;
 
-                // Gestion dynamique du dégradé de l'arrière-plan
-                // Gestion dynamique du dégradé de l'arrière-plan (Haut / Bas)
                 if (tourActuel === 'blanc') {
                         document.body.classList.add('tour-actif-blanc');
                         document.body.classList.remove('tour-actif-noir');
