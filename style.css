@@ -6,6 +6,7 @@ body {
   align-items: center;
   height: 100vh;
   margin: 0;
+  background-color: #333;
 }
 
 table {
@@ -15,21 +16,17 @@ table {
   box-shadow: 0 20px 50px rgba(0,0,0,0.6);
 }
 
+/* Style propre des cases (plus de Flexbox ici pour éviter les surélèvements) */
 td {
   width: 60px;
   height: 60px;
   padding: 0;
   position: relative; 
+  box-sizing: border-box;
 }
 
 .white { background-color: #e3c9a1; } 
 .black { background-color: #7a4a28; } 
-
-.black {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
 .coord {
   width: 30px;
@@ -42,6 +39,7 @@ td {
   font-size: 14px;
 }
 
+/* --- CONFIGURATION DES PIONS (Centrage absolu parfait) --- */
 .pion {
   width: 48px; 
   height: 48px;
@@ -50,46 +48,116 @@ td {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  transition: box-shadow 0.2s ease-out, transform 0.2s ease;
+  cursor: pointer;
+}
+
+/* Effet au survol discret */
+.pion.blanc:hover {
+  box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.3);
+}
+
+.pion.noir:hover {
+  box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.5), 0 0 6px 1px rgba(255, 255, 255, 0.2);
 }
 
 .pion.blanc {
   background: radial-gradient(circle at 35% 35%, #ffffff 0%, #e0e0e0 45%, #b0b0b0 100%);
-  box-shadow: 
-    inset 0 -3px 5px rgba(0,0,0,0.2), 
-    0 5px 10px rgba(0,0,0,0.4);
+  box-shadow: inset 0 -3px 5px rgba(0,0,0,0.2), 0 5px 10px rgba(0,0,0,0.4);
   border: 1px solid #d0d0d0;
 }
 
 .pion.noir {
   background: radial-gradient(circle at 35% 35%, #555555 0%, #222222 40%, #000000 100%);
-  
-  box-shadow: 
-    inset 0 2px 4px rgba(255,255,255,0.3),
-    0 5px 10px rgba(0,0,0,0.7);            
-    
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 5px 10px rgba(0,0,0,0.7);            
   border: 1px solid #111111; 
 }
 
+/* État sélectionné (Conserve le centrage tout en appliquant le zoom) */
 .pion.selected {
-    outline: 4px solid #f1c40f !important; 
-    outline-offset: 2px;
-    box-shadow: 0 0 20px #f1c40f !important;
-    transform: translate(-50%, -50%) scale(1.1) !important; 
-    transition: transform 0.2s ease, outline 0.2s ease;
+  outline: 4px solid #f1c40f !important; 
+  outline-offset: 2px;
+  box-shadow: 0 0 20px #f1c40f !important;
+  transform: translate(-50%, -50%) scale(1.1) !important; 
 }
 
+/* --- CONFIGURATION DE LA DAME (DOUBLE PION) --- */
+.pion.dame::after {
+  content: "";
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  box-sizing: border-box;
+  z-index: 2;
+}
+
+.pion.dame.blanc::after {
+  background-color: white;
+  border: 2px solid #b3b3b3;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.pion.dame.noir::after {
+  background-color: #222;
+  border: 2px solid #444;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+}
+
+/* Le logo de la couronne au milieu de la dame */
+.pion.dame::before {
+  content: "👑";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem; 
+  z-index: 3;
+  user-select: none; 
+  pointer-events: none;
+}
+
+/* Aide visuelle des coups possibles (Parfaitement centrée aussi) */
 .aide-coup {
-    width: 20px;
-    height: 20px;
-    background-color: rgba(46, 204, 113, 0.6); 
-    border-radius: 50%;
-    margin: auto;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none; 
-    z-index: 5;
+  width: 20px;
+  height: 20px;
+  background-color: rgba(46, 204, 113, 0.6); 
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none; 
+  z-index: 5;
+}
+
+.derniere-case-depart,
+.case-etape-historique,
+.derniere-case-arrivee {
+    background-color: rgba(37, 202, 106, 0.4) !important; /* Vert translucide comme sur ton image */
+}
+
+/* Style des points d'aide temporaires (pendant la sélection) */
+.case-etape-intermediaire {
+    background-color: rgba(230, 126, 34, 0.2) !important; /* Orange très léger pendant le choix */
+}
+.aide-coup.etape-intermediaire {
+    background-color: rgba(211, 84, 0, 1) !important;
+}
+
+.derniere-case-depart, .derniere-case-arrivee {
+    background-color: rgba(37, 202, 106, 0.4) !important; /* Vert translucide */
+}
+
+/* Optionnel : si tu veux différencier légèrement la case de départ et d'arrivée */
+.derniere-case-depart {
+    background-color: rgba(37, 202, 106, 0.4) !important; /* Bleu translucide */
 }
 
 .tour-blanc { color: #f0d9b5; font-weight: bold; }
