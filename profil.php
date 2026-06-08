@@ -40,15 +40,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $success_msg = "Profil mis à jour avec succès !";
                 }
             } catch (Exception $e) {
-                $error_msg = "Erreur lors de la mise à jour : " . $e->getMessage();
+                error_log('Profile update: ' . $e->getMessage());
+                $error_msg = "Erreur lors de la mise à jour. Veuillez réessayer.";
             }
         }
     }
 
     // Cas du changement dynamique de Thème (via JavaScript/Fetch)
     if (isset($_POST['action']) && $_POST['action'] === 'update_theme') {
-        $light = $_POST['theme_light'];
-        $dark = $_POST['theme_dark'];
+        $light = preg_match('/^#[0-9a-fA-F]{6}$/', $_POST['theme_light'] ?? '') ? $_POST['theme_light'] : '#f0d9b5';
+        $dark  = preg_match('/^#[0-9a-fA-F]{6}$/', $_POST['theme_dark']  ?? '') ? $_POST['theme_dark']  : '#b58863';
         $update = $bdd->prepare('UPDATE utilisateurs SET theme_light = ?, theme_dark = ? WHERE id = ?');
         $update->execute([$light, $dark, $_SESSION['user_id']]);
         echo json_encode(['status' => 'success']);
@@ -497,9 +498,10 @@ $defaites = 0;
         <div class="sidebar-brand">⚪ Jeu de Dames</div>
         <div class="sidebar-menu">
             <a href="dashboard.php" class="sidebar-link">🏠 Accueil</a>
-            <a href="index.php" class="sidebar-link">⚔️ Jouer</a>
+            <a href="plateau.php" class="sidebar-link">⚔️ Jouer</a>
             <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
             <a href="profil.php" class="sidebar-link active">⚙️ Profil</a>
+            <a href="deconnexion.php" class="sidebar-link" style="margin-top:auto;color:#e74c3c;">🚪 Déconnexion</a>
         </div>
     </div>
 
@@ -521,7 +523,7 @@ $defaites = 0;
                 
                 <div class="big-avatar" id="avatarContainer" onclick="triggerAvatarUpload()" title="Cliquez pour changer votre photo de profil">
                     <?php if(!empty($user['avatar'])): ?>
-                        <img src="<?php echo $user['avatar']; ?>" class="avatar-img" id="avatarImg">
+                        <img src="<?php echo htmlspecialchars($user['avatar']); ?>" class="avatar-img" id="avatarImg">
                     <?php else: ?>
                         <span id="avatarPlaceholder">♙</span>
                     <?php endif; ?>

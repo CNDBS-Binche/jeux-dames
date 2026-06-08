@@ -326,7 +326,7 @@ $defaites = isset($defaites) ? $defaites : 0;
             <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
             <a href="profil.php" class="sidebar-link">⚙️ Profil</a>
             
-            <a href="connexion.php" class="sidebar-link btn-logout">🚪 Déconnexion</a>
+            <a href="deconnexion.php" class="sidebar-link btn-logout">🚪 Déconnexion</a>
         </div>
     </div>
 
@@ -336,7 +336,7 @@ $defaites = isset($defaites) ? $defaites : 0;
             <div class="user-profile-info">
                 <div class="user-avatar">
                     <?php if (!empty($user['avatar'])): ?>
-                        <img src="<?php echo $user['avatar']; ?>" alt="Photo de profil">
+                        <img src="<?php echo htmlspecialchars($user['avatar']); ?>" alt="Photo de profil">
                     <?php else: ?>
                         👤
                     <?php endif; ?>

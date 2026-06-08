@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
-    header('Location: connexion.php');
+    header('Location: index.php');
     exit();
 }
 // Récupère la session 'pseudo' ou utilise 'Joueur' par défaut si elle n'est pas définie
@@ -126,18 +126,20 @@ const msgInput = document.getElementById('msg-input');
 // 1. Fonction AJAX pour récupérer les messages
 function chargerChat() {
     fetch('chat_ajax.php?action=recuperer')
-    .then(response => response.text())
-    .then(html => {
-        // Sauvegarder la position du scroll
+    .then(r => r.json())
+    .then(messages => {
         const isScrolledToBottom = chatBox.scrollHeight - chatBox.clientHeight <= chatBox.scrollTop + 50;
-        
-        chatBox.innerHTML = html;
-        
-        // Si l'utilisateur n'était pas en train de lire plus haut, on descend le scroll automatiquement
-        if (isScrolledToBottom) {
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-    });
+        chatBox.innerHTML = messages.length === 0
+            ? "<p style='color:#a1887f;text-align:center;font-style:italic;padding-top:20px;'>Le chat est vide.</p>"
+            : messages.map(m =>
+                `<p style='margin:4px 0'><strong>[${m.heure}] ${escHtml(m.pseudo)} :</strong> ${escHtml(m.message)}</p>`
+              ).join('');
+        if (isScrolledToBottom) chatBox.scrollTop = chatBox.scrollHeight;
+    })
+    .catch(() => {}); // silencieux si le serveur est indisponible
+}
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // 2. Fonction AJAX pour envoyer un message sans recharger la page
