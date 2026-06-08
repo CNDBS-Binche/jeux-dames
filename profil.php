@@ -169,11 +169,21 @@ $defaites = 0;
             padding: 12px 15px;
             border-radius: 6px;
             font-weight: 600;
+            transition: background-color 0.2s, color 0.2s, border-left 0.1s;
         }
 
-        .sidebar-link:hover, .sidebar-link.active {
+        .sidebar-link:hover {
             background-color: rgba(255, 255, 255, 0.1);
             color: #fff;
+        }
+
+        /* Modification ici pour intégrer la ligne verte de repère à gauche */
+        .sidebar-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-left: 4px solid #81b64c;
+            border-radius: 0 6px 6px 0; /* Garde l'arrondi uniquement à droite */
+            padding-left: 11px; /* Compense les 4px de bordure pour l'alignement des icônes */
         }
 
         /* ==========================================================================
@@ -495,20 +505,19 @@ $defaites = 0;
 <body>
 
     <div class="sidebar">
-    <div class="sidebar-brand">⚪ Jeu de Dames</div>
-    
-    <div class="sidebar-menu">
-        <a href="dashboard.php" class="sidebar-link">🏠 Accueil</a>
-        <a href="plateau.php" class="sidebar-link">⚔️ Jouer</a>
-        <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
-        <a href="profil.php" class="sidebar-link active">⚙️ Profil</a>
-        <a href="amis.php" class="sidebar-link active">👥 Amis</a>
-        <a href="clans.php" class="sidebar-link active">🛡️ Clans</a>
+        <div class="sidebar-brand">⚪ Jeu de Dames</div>
+        
+        <div class="sidebar-menu">
+            <a href="dashboard.php" class="sidebar-link">🏠 Accueil</a>
+            <a href="plateau.php" class="sidebar-link">⚔️ Jouer</a>
+            <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
+            <a href="profil.php" class="sidebar-link active">⚙️ Profil</a>
+            <a href="amis.php" class="sidebar-link">👥 Amis</a>
+            <a href="clans.php" class="sidebar-link">🛡️ Clans</a>
+        </div>
 
+        <a href="deconnexion.php" class="sidebar-link" style="margin-top: auto; color: #e74c3c;">🚪 Déconnexion</a>
     </div>
-
-    <a href="deconnexion.php" class="sidebar-link" style="margin-top: auto; color: #e74c3c;">🚪 Déconnexion</a>
-</div>
 
     <div class="main-content">
         
@@ -688,7 +697,6 @@ $defaites = 0;
             document.getElementById('avatarFileInput').click();
         }
 
-        // 1. Envoi asynchrone de la photo de profil (Base64) en BDD
         function uploadAvatar(event) {
             const file = event.target.files[0];
             if (file) {
@@ -696,7 +704,6 @@ $defaites = 0;
                 reader.onload = function(e) {
                     const base64Data = e.target.result;
 
-                    // Requête AJAX vers profil.php
                     const formData = new FormData();
                     formData.append('action', 'update_avatar');
                     formData.append('avatar_base64', base64Data);
@@ -724,14 +731,13 @@ $defaites = 0;
             }
         }
 
-        // 2. Vérification JavaScript avant soumission du formulaire
         function validatePasswordMatch(event) {
             const password = document.getElementById('inputPassword').value;
             const confirmPassword = document.getElementById('inputConfirmPassword').value;
             const errorAlert = document.getElementById('modalErrorAlert');
 
             if (password !== "" && password !== confirmPassword) {
-                event.preventDefault(); // Annule l'envoi du formulaire
+                event.preventDefault();
                 errorAlert.style.display = 'block';
                 errorAlert.innerText = "❌ Les deux mots de passe ne correspondent pas !";
                 return false;
@@ -739,7 +745,6 @@ $defaites = 0;
             return true;
         }
 
-        // 3. Envoi asynchrone et persistance du Thème choisi
         function saveTheme(lightColor, darkColor) {
             const formData = new FormData();
             formData.append('action', 'update_theme');

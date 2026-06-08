@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
     // 2. ACCEPTER UNE DEMANDE
     if ($action === 'accepter' && isset($_POST['relation_id'])) {
-        $relationId = (int)$_POST['relation_id']; // Correction ici : $_POST au lieu de $POST
+        $relationId = (int)$_POST['relation_id'];
         $reqUp = $bdd->prepare('UPDATE amis SET statut = "accepte" WHERE id = ? AND user_id_2 = ?');
         $reqUp->execute([$relationId, $userId]);
         header('Location: ' . $_SERVER['PHP_SELF']);
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
     // 3. REFUSER UNE DEMANDE OU SUPPRIMER UN AMI
     if ($action === 'supprimer' && isset($_POST['relation_id'])) {
-        $relationId = (int)$_POST['relation_id']; // Correction ici : $_POST au lieu de $POST
+        $relationId = (int)$_POST['relation_id'];
         $reqDel = $bdd->prepare('DELETE FROM amis WHERE id = ? AND (user_id_1 = ? OR user_id_2 = ?)');
         $reqDel->execute([$relationId, $userId, $userId]);
         header('Location: ' . $_SERVER['PHP_SELF']);
@@ -92,7 +92,8 @@ $reqAmis = $bdd->prepare('
     JOIN utilisateurs u2 ON a.user_id_2 = u2.id
     WHERE (a.user_id_1 = ? OR a.user_id_2 = ?) AND a.statut = "accepte"
 ');
-$reqAmis->execute([$userId, $userId, $userId]);
+// CORRECTION ICI : Il y a 4 "?" dans la requête ci-dessus, il faut donc 4 variables dans le tableau.
+$reqAmis->execute([$userId, $userId, $userId, $userId]);
 $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
