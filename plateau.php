@@ -703,24 +703,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // --- SYNCHRONISATION PAR POLLING (PULL) ---
-    // --- SYNCHRONISATION PAR POLLING (PULL) ---
+// --- SYNCHRONISATION PAR POLLING (PULL) ---
 if (MATCH_ID > 0) {
     setInterval(function() {
+        // Si c'est à mon tour de jouer, je n'attends pas de coup de l'adversaire
         if (tourActuel === MON_ROLE) return;
 
         fetch(`jcj_ajax.php?action=charger_dernier_coup&match_id=${MATCH_ID}`)
             .then(response => response.json())
             .then(data => {
-                // CORRECTION ICI : Utilisation de case_depart et case_arrivee
+                // On vérifie qu'on a bien reçu un coup et que son numéro est supérieur à notre compteur local
                 if (data && data.num_coup > dernierCoupCompteur) {
+                    console.log("Nouveau coup détecté de l'adversaire :", data);
+                    
                     dernierCoupCompteur = data.num_coup;
+                    
+                    // Extraction des coordonnées (Ligne, Colonne)
                     const [depL, depC] = data.case_depart.split(',').map(Number);
                     const [arrL, arrC] = data.case_arrivee.split(',').map(Number);
+                    
+                    console.log(`Exécution du déplacement : de (${depL},${depC}) vers (${arrL},${arrC})`);
+                    
+                    // On force l'exécution graphique
                     executerDeplacementGraphique(depL, depC, arrL, arrC);
                 }
             })
-            .catch(err => console.error("Erreur polling :", err));
+            .catch(err => console.error("Erreur polling coups :", err));
     }, 2000);
 }
 });
