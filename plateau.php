@@ -160,6 +160,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let partieTerminee = false;
     let partieCommencee = false;
 
+    let dernierCoupCompteur = 0;
+
     // --- GESTION DU SYSTÈME "PRÊT" EN RESEAU ---
     let blancPret = false;
     let noirPret = false;

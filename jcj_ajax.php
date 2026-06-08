@@ -142,7 +142,7 @@ echo json_encode([
 
 
 // 4. VÉRIFIER L'ÉTAT DES PRÊTS (Pour l'overlay)
-if ($action == 'verifier_prets' && isset($_GET['match_id'])) {
+if ($action === 'verifier_prets' && isset($_GET['match_id'])) {
     header('Content-Type: application/json');
     $matchId = intval($_GET['match_id']);
 
@@ -167,6 +167,96 @@ if ($action == 'verifier_prets' && isset($_GET['match_id'])) {
     } else {
         echo json_encode(['blanc' => false, 'noir' => false]);
     }
+    exit;
+}
+
+// 5. ENREGISTRER UN COUP
+if ($action === 'jouer') {
+
+    $matchId = (int)($_POST['match_id'] ?? 0);
+    $depart = $_POST['depart'] ?? '';
+    $arrivee = $_POST['arrivee'] ?? '';
+    $couleur = $_POST['couleur'] ?? '';
+
+    if (!$matchId || !$depart || !$arrivee) {
+        echo json_encode([
+            'statut' => 'erreur',
+            'message' => 'Données invalides'
+        ]);
+        exit;
+    }
+
+    // prochain numéro de coup
+    $req = $bdd->prepare("
+        SELECT COALESCE(MAX(num_coup),0)+1
+        FROM mouvements_jcj
+        WHERE match_id = ?
+    ");
+
+    $req->execute([$matchId]);
+
+    $numCoup = (int)$req->fetchColumn();
+
+    $ins = $bdd->prepare("
+        INSERT INTO mouvements_jcj
+        (
+            match_id,
+            num_coup,
+            couleur,
+            case_depart,
+            case_arrivee
+        )
+        VALUES (?, ?, ?, ?, ?)
+    ");
+
+    $ins->execute([
+        $matchId,
+        $numCoup,
+        $couleur,
+        $depart,
+        $arrivee
+    ]);
+
+    echo json_encode([
+        'statut' => 'succes',
+        'num_coup' => $numCoup
+    ]);
+
+    exit;
+}
+
+// 6. CHARGER LE DERNIER COUP
+if ($action === 'charger_dernier_coup') {
+
+    $matchId = (int)($_GET['match_id'] ?? 0);
+
+    $req = $bdd->prepare("
+        SELECT
+            num_coup,
+            couleur,
+            case_depart,
+            case_arrivee
+        FROM mouvements_jcj
+        WHERE match_id = ?
+        ORDER BY num_coup DESC
+        LIMIT 1
+    ");
+
+    $req->execute([$matchId]);
+
+    $coup = $req->fetch(PDO::FETCH_ASSOC);
+
+    if (!$coup) {
+
+        echo json_encode([
+            'num_coup' => 0
+        ]);
+
+        exit;
+    }
+
+    echo json_encode($coup);
+
     exit;
 }
 
