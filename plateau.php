@@ -5,7 +5,7 @@ declare(strict_types=1);
 session_start();
 require_once 'config.php';
 
-header('Content-Type: application/json; charset=utf-8');
+header('Content-Type: text/html; charset=utf-8');
 
 if (empty($_SESSION['user_id'])) {
     http_response_code(401);
