@@ -23,34 +23,58 @@ $defaites = 0;
     <meta charset="UTF-8">
     <title>Tableau de Bord - Jeu de Dames</title>
     <style>
-        /* --- Styles Généraux & Thème Bois Sombre --- */
+        /* ==========================================================================
+           1. LE FOND D'ÉCRAN BRUN BOISÉ ET SON QUADRILLAGE ANIMÉ
+           ========================================================================== */
         body {
-            /* Effet texture bois subtil généré en CSS pour coller à la capture */
-            background-color: #2b1d12;
-            background-image: radial-gradient(rgba(255,255,255,0.05) 15%, transparent 16%),
-                              radial-gradient(rgba(0,0,0,0.3) 50%, transparent 52%);
-            background-size: 60px 60px;
-            background-position: 0 0, 30px 30px;
-            color: #bababa;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
             display: flex;
             min-height: 100vh;
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #f0d9b5; /* Écritures crème style échecs/dames */
+            overflow-x: hidden;
+            background: radial-gradient(circle, #4a321f, #2b1d12);
+            position: relative;
         }
 
-        /* --- Barre Latérale Gauche (Style Chess.com) --- */
+        /* Effet de grille animée en arrière-plan */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background-image: 
+                linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%), 
+                linear-gradient(-45deg, rgba(0,0,0,0.1) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.1) 75%), 
+                linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.1) 75%);
+            background-size: 100px 100px;
+            z-index: 0;
+            animation: move 60s linear infinite;
+        }
+
+        @keyframes move {
+            from { transform: translate(-25%, -25%); }
+            to { transform: translate(0, 0); }
+        }
+
+        /* ==========================================================================
+           2. BARRE LATÉRALE DE NAVIGATION (Marron sombre)
+           ========================================================================== */
         .sidebar {
             width: 240px;
-            background-color: #21150d;
+            background-color: rgba(27, 18, 11, 0.9);
+            backdrop-filter: blur(12px);
             display: flex;
             flex-direction: column;
             padding: 20px 10px;
-            border-right: 1px solid #332216;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
             position: fixed;
             height: 100vh;
             box-sizing: border-box;
+            z-index: 10;
         }
 
         .sidebar-brand {
@@ -75,7 +99,7 @@ $defaites = 0;
             display: flex;
             align-items: center;
             gap: 15px;
-            color: #bababa;
+            color: #c4b49c;
             text-decoration: none;
             padding: 12px 15px;
             border-radius: 6px;
@@ -84,35 +108,40 @@ $defaites = 0;
         }
 
         .sidebar-link:hover {
-            background-color: #2c1d13;
+            background-color: rgba(255, 255, 255, 0.05);
             color: #fff;
         }
 
         .sidebar-link.active {
-            background-color: #312116;
+            background-color: rgba(255, 255, 255, 0.1);
             color: #fff;
-            border-left: 4px solid #81b64c; /* Ligne verte comme Chess.com */
+            border-left: 4px solid #81b64c;
             padding-left: 11px;
         }
 
-        /* --- Conteneur Principal --- */
+        /* ==========================================================================
+           3. CONTENU PRINCIPAL & CARTES FLOTTANTES MARRONS
+           ========================================================================== */
         .main-content {
             margin-left: 240px;
             flex-grow: 1;
             padding: 40px;
             max-width: 1200px;
+            z-index: 1;
         }
 
-        /* --- En-tête Profil --- */
+        /* En-tête Profil */
         .user-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(27, 18, 11, 0.8);
             padding: 20px;
-            border-radius: 8px;
+            border-radius: 12px;
             margin-bottom: 30px;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         .user-profile-info {
@@ -124,8 +153,8 @@ $defaites = 0;
         .user-avatar {
             width: 50px;
             height: 50px;
-            background-color: #4a3525;
-            border-radius: 4px;
+            background-color: #5d3a1a;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -133,29 +162,10 @@ $defaites = 0;
             color: #fff;
         }
 
-        .user-stats-summary {
-            display: flex;
-            gap: 20px;
-            margin-top: 5px;
-            font-size: 14px;
-        }
-
-        .streak-badge {
-            background-color: #e74c3c;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* --- Grille des fonctionnalités --- */
+        /* Grille principale */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr; /* Structure asymétrique style Chess.com */
+            grid-template-columns: 2fr 1fr;
             gap: 30px;
         }
 
@@ -171,17 +181,17 @@ $defaites = 0;
             gap: 20px;
         }
 
-        /* --- Cartes et Panneaux --- */
+        /* Style des Cartes "Glow & Blur" version bois sombre */
         .card {
-            background-color: rgba(33, 21, 13, 0.5);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 8px;
+            background-color: rgba(33, 21, 13, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
             padding: 25px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            backdrop-filter: blur(5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
         }
 
         .card h2 {
@@ -199,16 +209,18 @@ $defaites = 0;
             margin: 0 0 20px 0;
             font-size: 14px;
             line-height: 1.6;
-            color: #a3a3a3;
+            color: #c4b49c;
         }
 
-        /* Zone Jouer (Mise en valeur) */
+        /* La carte principale avec un dégradé boisé plus prononcé */
         .card-play {
-            background: linear-gradient(135deg, #2d1e13 0%, #1c110a 100%);
-            border: 1px solid #4a321f;
+            background: linear-gradient(135deg, rgba(62, 37, 16, 0.95) 0%, rgba(28, 17, 10, 0.95) 100%);
+            border: 1px solid #7a4a28;
         }
 
-        /* --- Boutons Style Chess.com --- */
+        /* ==========================================================================
+           4. BOUTONS STYLE CHESS.COM
+           ========================================================================== */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -231,36 +243,42 @@ $defaites = 0;
         }
 
         .btn-primary {
-            background-color: #453124;
-            border-bottom: 3px solid #2d1f16;
+            background-color: #5d3a1a;
+            border-bottom: 3px solid #3e2510;
         }
-        .btn-primary:hover { filter: brightness(1.2); }
+        .btn-primary:hover {
+            background-color: #7a4a28; 
+        }
 
         .btn-play {
-            background-color: #81b64c; /* Vert Chess.com */
+            background-color: #81b64c;
             border-bottom: 4px solid #68943b;
             font-size: 18px;
             text-transform: uppercase;
             padding: 16px 30px;
         }
-        .btn-play:hover { background-color: #95cc5a; }
+        .btn-play:hover { 
+            background-color: #95cc5a; 
+        }
 
         .btn-logout {
-            background-color: #312116;
-            color: #c0392b;
+            background-color: rgba(62, 37, 16, 0.5);
+            color: #e74c3c;
             margin-top: auto;
         }
-        .btn-logout:hover { background-color: #c0392b; color: #fff; }
+        .sidebar-link.btn-logout:hover { 
+            background-color: #c0392b; color: #fff; 
+        }
 
-        /* Bloc des statistiques */
+        /* Bloc Statistiques */
         .stat-box {
             display: flex;
             gap: 15px;
-            background-color: #1a1009;
+            background-color: rgba(0, 0, 0, 0.3);
             padding: 15px;
             border-radius: 6px;
             margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.03);
         }
 
         .stat-item {
@@ -275,13 +293,12 @@ $defaites = 0;
         }
         .stat-lbl {
             font-size: 12px;
-            color: #757575;
+            color: #a8947a;
             text-transform: uppercase;
         }
 
-        /* Liste d'amis vide */
         .empty-state {
-            color: #635246;
+            color: #a8947a;
             font-style: italic;
             text-align: center;
             padding: 20px 0;
@@ -296,13 +313,13 @@ $defaites = 0;
         </div>
         <div class="sidebar-menu">
             <a href="#" class="sidebar-link active">🏠 Accueil</a>
-            <a href="plateau.php" class="sidebar-link">⚔️ Jouer</a>
-            <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
-            <a href="amis.php" class="sidebar-link">👥 Amis</a>
-            <a href="clans.php" class="sidebar-link">🛡️ Clans</a>
-            <a href="profil.php" class="sidebar-link">⚙️ Profil</a>
+            <a href="jeu.php" class="sidebar-link">⚔️ Jouer</a>
+            <a href="#" class="sidebar-link">💬 Salon Public</a>
+            <a href="#" class="sidebar-link">👥 Amis</a>
+            <a href="#" class="sidebar-link">🛡️ Clans</a>
+            <a href="#" class="sidebar-link">⚙️ Profil</a>
             
-            <a href="deconnexion.php" class="sidebar-link btn-logout">🚪 Déconnexion</a>
+            <a href="logout.php" class="sidebar-link btn-logout">🚪 Déconnexion</a>
         </div>
     </div>
 
@@ -313,10 +330,9 @@ $defaites = 0;
                 <div class="user-avatar">👤</div>
                 <div>
                     <h1 style="margin:0; font-size: 24px; color:#fff;"><?php echo htmlspecialchars($user['pseudo']); ?></h1>
-                    <span class="streak-badge">🔥 54 Jours de série</span>
                 </div>
             </div>
-            <div style="font-size: 13px; color: #757575;">
+            <div style="font-size: 13px; color: #a8947a;">
                 Inscrit le <?php echo date('d/m/Y', strtotime($user['date_inscription'])); ?>
             </div>
         </div>
@@ -326,14 +342,14 @@ $defaites = 0;
             <div class="left-column">
                 <div class="card card-play">
                     <h2>Prêt à en découdre ?</h2>
-                    <p>Défiez des joueurs en ligne, peaufinez vos tactiques et grimpez dans le classement du jeu de dames.</p>
-                    <a href="plateau.php" class="btn btn-play">Lancer une partie</a>
+                    <p style="color: #f0d9b5; opacity: 0.8;">Défiez des joueurs en ligne, peaufinez vos tactiques et grimpez dans le classement du jeu de dames.</p>
+                    <a href="jeu.php" class="btn btn-play">Lancer une partie</a>
                 </div>
 
                 <div class="card">
                     <h2>💬 Salon Public & Chat</h2>
                     <p>Rejoignez le Hub pour discuter avec les joueurs connectés en temps réel et voir l'activité de la communauté globale.</p>
-                    <a href="hub.php" class="btn btn-primary">Accéder au Hub</a>
+                    <a href="#" class="btn btn-primary">Accéder au Hub</a>
                 </div>
             </div>
 
@@ -350,66 +366,23 @@ $defaites = 0;
                             <span class="stat-lbl">Défaites</span>
                         </div>
                     </div>
-                    <a href="profil.php" class="btn btn-primary">Détail du profil</a>
+                    <a href="#" class="btn btn-primary">Détail du profil</a>
                 </div>
 
                 <div class="card">
                     <h2>👥 Liste d'amis</h2>
                     <p class="empty-state">Aucun ami en ligne pour le moment.</p>
-                    <a href="amis.php" class="btn btn-primary">Gérer mes amis</a>
+                    <a href="#" class="btn btn-primary">Gérer mes amis</a>
                 </div>
 
                 <div class="card">
                     <h2>🛡️ Mon Clan</h2>
                     <p>Créez une alliance, arborez un tag unique et participez au classement général des clans.</p>
-                    <a href="clans.php" class="btn btn-primary">Accéder aux Clans</a>
+                    <a href="#" class="btn btn-primary">Accéder aux Clans</a>
                 </div>
             </div>
 
         </div>
     </div>
-
-    <div id="pop-up-defi" style="display:none; position:fixed; bottom:20px; right:20px; background-color:#21150d; border:2px solid #81b64c; padding:20px; border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,0.6); z-index:9999; color:white; min-width: 250px;">
-        <p id="texte-defi" style="margin:0 0 15px 0; font-weight:bold;"></p>
-        <div style="display:flex; gap:10px;">
-            <button id="btn-accepter-defi" class="btn" style="background-color:#81b64c; flex:1; padding: 8px;">Accepter</button>
-            <button id="btn-refuser-defi" class="btn" style="background-color:#c0392b; flex:1; padding: 8px;">Refuser</button>
-        </div>
-    </div>
-
-    <script>
-    let ID_MATCH_ACTUEL = null;
-
-    function ecouterDefis() {
-        fetch('./jcj_ajax.php?action=verifier_defis')
-        .then(r => r.json())
-        .then(data => {
-            if(data.type === 'recu') {
-                ID_MATCH_ACTUEL = data.match_id;
-                document.getElementById('texte-defi').innerText = `⚔️ ${data.adversaire} vous défie !`;
-                document.getElementById('pop-up-defi').style.display = 'block';
-            }
-        });
-    }
-
-    document.getElementById('btn-accepter-defi').addEventListener('click', () => { repondreDefi('accepte'); });
-    document.getElementById('btn-refuser-defi').addEventListener('click', () => { repondreDefi('refuse'); });
-
-    function repondreDefi(decision) {
-        const data = new FormData();
-        data.append('match_id', ID_MATCH_ACTUEL);
-        data.append('decision', decision);
-
-        fetch('./jcj_ajax.php?action=repondre', { method: 'POST', body: data })
-        .then(() => {
-            document.getElementById('pop-up-defi').style.display = 'none';
-            if(decision === 'accepte') {
-                window.location.href = './plateau.php?match_id=' + ID_MATCH_ACTUEL;
-            }
-        });
-    }
-
-    setInterval(ecouterDefis, 3000);
-    </script>
 </body>
 </html>
