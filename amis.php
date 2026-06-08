@@ -389,13 +389,13 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
 
     <div class="sidebar">
         <div class="sidebar-brand">
-            🟫 Jeu de Dames
+            ⚪ Jeu de Dames
         </div>
         <div class="sidebar-menu">
-            <a href="accueil.php" class="sidebar-link">🏠 Accueil</a>
-            <a href="jouer.php" class="sidebar-link">⚔️ Jouer</a>
-            <a href="salon.php" class="sidebar-link">💬 Salon Public</a>
-            <a href="#" class="sidebar-link active">👥 Amis</a>
+            <a href="dashboard.php" class="sidebar-link">🏠 Accueil</a>
+            <a href="plateau.php" class="sidebar-link">⚔️ Jouer</a>
+            <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
+            <a href="amis.php" class="sidebar-link active">👥 Amis</a>
         </div>
         <a href="deconnexion.php" class="sidebar-link btn-logout">🚪 Déconnexion</a>
     </div>
