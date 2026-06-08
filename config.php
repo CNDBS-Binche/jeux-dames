@@ -8,7 +8,7 @@
 $host     = getenv('DB_HOST')     ?: 'maxcore981.mysql.db';
 $dbname   = getenv('DB_NAME')     ?: 'maxcore981';
 $username = getenv('DB_USER')     ?: 'maxcore981';
-$password = getenv('DB_PASSWORD') ?: '';   // ← NE PAS mettre le mot de passe ici
+$password = 'Antonio64';   
 
 try {
     $bdd = new PDO(
