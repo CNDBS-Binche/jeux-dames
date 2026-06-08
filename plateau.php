@@ -1,11 +1,26 @@
 <?php
+
+declare(strict_types=1);
+
 session_start();
 require_once 'config.php';
 
-if (!isset($_SESSION['user_id'])) { header('Location: connexion.php'); exit(); }
+header('Content-Type: application/json; charset=utf-8');
 
-$userId = $_SESSION['user_id'];
-$matchId = isset($_GET['match_id']) ? intval($_GET['match_id']) : 0;
+if (empty($_SESSION['user_id'])) {
+    http_response_code(401);
+
+    echo json_encode([
+        'statut' => 'erreur',
+        'message' => 'Accès refusé'
+    ]);
+
+    exit;
+}
+
+$userId = (int)$_SESSION['user_id'];
+$matchId = (int)($_GET['match_id'] ?? 0);
+$action = $_GET['action'] ?? '';
 
 $monRole = 'spectateur'; 
 
