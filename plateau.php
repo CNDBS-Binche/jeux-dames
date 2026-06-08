@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let partieTerminee = false;
     let partieCommencee = false;
 
-    // --- GESTION DU SYSTÈME "PRÊT" ---
+    // --- GESTION DU SYSTÈME "PRÊT" EN RESEAU ---
     let blancPret = false;
     let noirPret = false;
 
@@ -154,40 +154,94 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnPretNoir = document.getElementById('btn-pret-noir');
     const btnAbandon = document.getElementById('btn-abandon');
     const btnNulle = document.getElementById('btn-nulle');
+    let intervallePret = null;
 
-    // Compteur de coups local pour la synchronisation JcJ
-    let dernierCoupCompteur = 0;
+    // Désactiver le bouton qui ne correspond pas au rôle du joueur
+    if (MON_ROLE === 'blanc') {
+        btnPretNoir.disabled = true;
+        btnPretNoir.style.cursor = 'not-allowed';
+    } else if (MON_ROLE === 'noir') {
+        btnPretBlanc.disabled = true;
+        btnPretBlanc.style.cursor = 'not-allowed';
+    } else { // Spectateur
+        btnPretBlanc.disabled = true;
+        btnPretNoir.disabled = true;
+    }
 
-    btnPretBlanc.addEventListener('click', function() {
-        if(blancPret) return;
+    // Clic sur le bouton Prêt
+    function envoyerDeclarationPret() {
+        if (MATCH_ID <= 0) return;
+        
+        const formData = new FormData();
+        formData.append('match_id', MATCH_ID);
+
+        fetch('jcj_ajax.php?action=se_declarer_pret', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.statut === 'succes') {
+                if (MON_ROLE === 'blanc') {
+                    marquerBoutonBlancPret();
+                } else if (MON_ROLE === 'noir') {
+                    marquerBoutonNoirPret();
+                }
+            }
+        });
+    }
+
+    btnPretBlanc.addEventListener('click', envoyerDeclarationPret);
+    btnPretNoir.addEventListener('click', envoyerDeclarationPret);
+
+    function marquerBoutonBlancPret() {
         blancPret = true;
-        this.classList.add('pret-valide');
-        this.innerText = "🤍 Blancs : PRÊT !";
-        verifierDemarragePartie();
-    });
+        btnPretBlanc.classList.add('pret-valide');
+        btnPretBlanc.innerText = "🤍 Blancs : PRÊT !";
+        btnPretBlanc.disabled = true;
+    }
 
-    btnPretNoir.addEventListener('click', function() {
-        if(noirPret) return;
+    function marquerBoutonNoirPret() {
         noirPret = true;
-        this.classList.add('pret-valide');
-        this.innerText = "🖤 Noirs : PRÊT !";
-        verifierDemarragePartie();
-    });
+        btnPretNoir.classList.add('pret-valide');
+        btnPretNoir.innerText = "🖤 Noirs : PRÊT !";
+        btnPretNoir.disabled = true;
+    }
 
-    function verifierDemarragePartie() {
-        if (blancPret && noirPret) {
-            overlayPrep.style.opacity = "0";
-            setTimeout(() => { overlayPrep.style.display = "none"; }, 400);
+    // Fonction qui lance la partie visuellement
+    function demarrerLaPartie() {
+        clearInterval(intervallePret); // On arrête de demander au serveur si les joueurs sont prêts
+        
+        overlayPrep.style.opacity = "0";
+        setTimeout(() => { overlayPrep.style.display = "none"; }, 400);
 
-            partieCommencee = true;
-            damierTable.classList.remove('jeu-verrouille');
-            btnAbandon.disabled = false;
-            btnNulle.disabled = false;
-            statutJeuEl.innerText = "Partie en cours";
-            
-            elTimerBlancBox.classList.add('actif');
-            lancerTimer();
-        }
+        partieCommencee = true;
+        damierTable.classList.remove('jeu-verrouille');
+        btnAbandon.disabled = false;
+        btnNulle.disabled = false;
+        statutJeuEl.innerText = "Partie en cours";
+        
+        elTimerBlancBox.classList.add('actif');
+        lancerTimer();
+    }
+
+    // Boucle automatique (toutes les 1.5 secondes) pour vérifier si l'autre est prêt
+    if (MATCH_ID > 0) {
+        intervallePret = setInterval(function() {
+            if (partieCommencee) return;
+
+            fetch(`jcj_ajax.php?action=verifier_prets&match_id=${MATCH_ID}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.blanc && !blancPret) marquerBoutonBlancPret();
+                    if (data.noir && !noirPret) marquerBoutonNoirPret();
+
+                    if (blancPret && noirPret) {
+                        demarrerLaPartie();
+                    }
+                })
+                .catch(err => console.error("Erreur synchro Prêt :", err));
+        }, 1500);
     }
 
     // --- GESTION DES CHRONOMÈTRES & ANIMATION VICTOIRE ---
@@ -650,23 +704,25 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // --- SYNCHRONISATION PAR POLLING (PULL) ---
-    if (MATCH_ID > 0) {
-        setInterval(function() {
-            if (tourActuel === MON_ROLE) return;
+    // --- SYNCHRONISATION PAR POLLING (PULL) ---
+if (MATCH_ID > 0) {
+    setInterval(function() {
+        if (tourActuel === MON_ROLE) return;
 
-            fetch(`jcj_ajax.php?action=charger_dernier_coup&match_id=${MATCH_ID}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data && data.num_coup > dernierCoupCompteur) {
-                        dernierCoupCompteur = data.num_coup;
-                        const [depL, depC] = data.depart.split(',').map(Number);
-                        const [arrL, arrC] = data.arrivee.split(',').map(Number);
-                        executerDeplacementGraphique(depL, depC, arrL, arrC);
-                    }
-                })
-                .catch(err => console.error("Erreur polling :", err));
-        }, 2000);
-    }
+        fetch(`jcj_ajax.php?action=charger_dernier_coup&match_id=${MATCH_ID}`)
+            .then(response => response.json())
+            .then(data => {
+                // CORRECTION ICI : Utilisation de case_depart et case_arrivee
+                if (data && data.num_coup > dernierCoupCompteur) {
+                    dernierCoupCompteur = data.num_coup;
+                    const [depL, depC] = data.case_depart.split(',').map(Number);
+                    const [arrL, arrC] = data.case_arrivee.split(',').map(Number);
+                    executerDeplacementGraphique(depL, depC, arrL, arrC);
+                }
+            })
+            .catch(err => console.error("Erreur polling :", err));
+    }, 2000);
+}
 });
 </script>
 </body>

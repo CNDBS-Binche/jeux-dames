@@ -60,4 +60,90 @@ if ($action == 'repondre' && isset($_POST['match_id']) && isset($_POST['decision
     echo json_encode(['statut' => 'succes']);
     exit;
 }
+
+// 3. SE DÉCLARER PRÊT
+if ($action == 'se_declarer_pret' && isset($_POST['match_id'])) {
+    header('Content-Type: application/json');
+    $matchId = intval($_POST['match_id']);
+    
+    // On cherche le rôle du joueur connecté pour savoir quelle colonne mettre à jour
+    $req = $bdd->prepare('SELECT id_challengeur, id_defie FROM parties_jcj WHERE id = ?');
+    $req->execute([$matchId]);
+    $partie = $req->fetch(PDO::FETCH_ASSOC);
+
+    if ($partie) {
+        if ($partie['id_challengeur'] == $userId) {
+            $bdd->prepare('UPDATE parties_jcj SET pret_challengeur = 1 WHERE id = ?')->execute([$matchId]);
+        } elseif ($partie['id_defie'] == $userId) {
+            $bdd->prepare('UPDATE parties_jcj SET pret_defie = 1 WHERE id = ?')->execute([$matchId]);
+        }
+        echo json_encode(['statut' => 'succes']);
+    } else {
+        echo json_encode(['statut' => 'erreur', 'message' => 'Partie introuvable']);
+    }
+    exit;
+}
+
+// 3. SE DÉCLARER PRÊT
+if ($action == 'se_declarer_pret' && isset($_POST['match_id'])) {
+    header('Content-Type: application/json');
+    $matchId = intval($_POST['match_id']);
+    
+    // On cherche le rôle du joueur connecté pour savoir quelle colonne mettre à jour
+    $req = $bdd->prepare('SELECT id_challengeur, id_defie FROM parties_jcj WHERE id = ?');
+    $req->execute([$matchId]);
+    $partie = $req->fetch(PDO::FETCH_ASSOC);
+
+    if ($partie) {
+        if ($partie['id_challengeur'] == $userId) {
+            $bdd->prepare('UPDATE parties_jcj SET pret_challengeur = 1 WHERE id = ?')->execute([$matchId]);
+        } elseif ($partie['id_defie'] == $userId) {
+            $bdd->prepare('UPDATE parties_jcj SET pret_defie = 1 WHERE id = ?')->execute([$matchId]);
+        }
+        echo json_encode(['statut' => 'succes']);
+    } else {
+        echo json_encode(['statut' => 'erreur', 'message' => 'Partie introuvable']);
+    }
+    exit;
+}
+
+// 4. VÉRIFIER L'ÉTAT DES PRÊTS (Pour l'overlay)
+if ($action == 'verifier_prets' && isset($_GET['match_id'])) {
+    header('Content-Type: application/json');
+    $matchId = intval($_GET['match_id']);
+
+    $req = $bdd->prepare('SELECT pret_challengeur, pret_defie FROM parties_jcj WHERE id = ?');
+    $req->execute([$matchId]);
+    $etat = $req->fetch(PDO::FETCH_ASSOC);
+
+    if ($etat) {
+        echo json_encode([
+            'blanc' => (int)$etat['pret_challengeur'] === 1,
+            'noir' => (int)$etat['pret_defie'] === 1
+        ]);
+    } else {
+        echo json_encode(['blanc' => false, 'noir' => false]);
+    }
+    exit;
+}
+
+// 4. VÉRIFIER L'ÉTAT DES PRÊTS (Pour l'overlay)
+if ($action == 'verifier_prets' && isset($_GET['match_id'])) {
+    header('Content-Type: application/json');
+    $matchId = intval($_GET['match_id']);
+
+    $req = $bdd->prepare('SELECT pret_challengeur, pret_defie FROM parties_jcj WHERE id = ?');
+    $req->execute([$matchId]);
+    $etat = $req->fetch(PDO::FETCH_ASSOC);
+
+    if ($etat) {
+        echo json_encode([
+            'blanc' => (int)$etat['pret_challengeur'] === 1,
+            'noir' => (int)$etat['pret_defie'] === 1
+        ]);
+    } else {
+        echo json_encode(['blanc' => false, 'noir' => false]);
+    }
+    exit;
+}
 ?>
