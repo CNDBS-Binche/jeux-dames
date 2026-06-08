@@ -319,12 +319,12 @@ $defaites = 7;
             ⚪ Jeu de Dames
         </div>
         <div class="sidebar-menu">
-            <a href="#" class="sidebar-link active">🏠 Accueil</a>
+            <a href="dashboard.php" class="sidebar-link active">🏠 Accueil</a>
             <a href="plateau.php" class="sidebar-link">⚔️ Jouer</a>
-            <a href="#" class="sidebar-link">💬 Salon Public</a>
-            <a href="#" class="sidebar-link">⚙️ Profil</a>
+            <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
+            <a href="profil.php" class="sidebar-link">⚙️ Profil</a>
             
-            <a href="#" class="sidebar-link btn-logout">🚪 Déconnexion</a>
+            <a href="connexion.php" class="sidebar-link btn-logout">🚪 Déconnexion</a>
         </div>
     </div>
 
@@ -360,7 +360,7 @@ $defaites = 7;
                 <div class="card">
                     <h2>💬 Salon Public & Chat</h2>
                     <p>Rejoignez le Hub pour discuter avec les joueurs connectés en temps réel et voir l'activité de la communauté globale.</p>
-                    <a href="#" class="btn btn-primary">Accéder au Hub</a>
+                    <a href="hub.php" class="btn btn-primary">Accéder au Hub</a>
                 </div>
             </div>
 
@@ -377,19 +377,19 @@ $defaites = 7;
                             <span class="stat-lbl">Défaites</span>
                         </div>
                     </div>
-                    <a href="#" class="btn btn-primary">Détail du profil</a>
+                    <a href="profil.php" class="btn btn-primary">Détail du profil</a>
                 </div>
 
                 <div class="card">
                     <h2>👥 Liste d'amis</h2>
                     <p class="empty-state">Aucun ami en ligne pour le moment.</p>
-                    <a href="#" class="btn btn-primary">Gérer mes amis</a>
+                    <a href="amis.php" class="btn btn-primary">Gérer mes amis</a>
                 </div>
 
                 <div class="card">
                     <h2>🛡️ Mon Clan</h2>
                     <p>Créez une alliance, arborez un tag unique et participez au classement général des clans.</p>
-                    <a href="#" class="btn btn-primary">Accéder aux Clans</a>
+                    <a href="clans.php" class="btn btn-primary">Accéder aux Clans</a>
                 </div>
             </div>
 

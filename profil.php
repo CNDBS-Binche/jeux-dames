@@ -499,7 +499,7 @@ $defaites = 0;
             <a href="dashboard.php" class="sidebar-link">🏠 Accueil</a>
             <a href="index.php" class="sidebar-link">⚔️ Jouer</a>
             <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
-            <a href="#" class="sidebar-link active">⚙️ Profil</a>
+            <a href="profil.php" class="sidebar-link active">⚙️ Profil</a>
         </div>
     </div>
 
