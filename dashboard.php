@@ -313,8 +313,8 @@ $defaites = 0;
         </div>
         <div class="sidebar-menu">
             <a href="index.php" class="sidebar-link active">🏠 Accueil</a>
-            <a href="jeu.php" class="sidebar-link">⚔️ Jouer</a>
-            <a href="salon.php" class="sidebar-link">💬 Salon Public</a>
+            <a href="plateau.php" class="sidebar-link">⚔️ Jouer</a>
+            <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
             <a href="profil.php" class="sidebar-link">⚙️ Profil</a>
             
             <a href="connexion.php" class="sidebar-link btn-logout">🚪 Déconnexion</a>
