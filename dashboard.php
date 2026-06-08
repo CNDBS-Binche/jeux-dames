@@ -1,21 +1,24 @@
 <?php
-// ==========================================================================
-// CONFIGURATION DE TEST (LOCALHOST SANS SESSION)
-// ==========================================================================
+session_start();
+require_once 'config.php';
 
-// 1. Simule les infos de l'utilisateur connecté
-$user = [
-    'pseudo' => 'Joueur_Local',
-    'date_inscription' => '2026-06-08' // Date du jour simulée
-];
+// Sécurité : si l'utilisateur n'est pas connecté, retour à la page de connexion
+if (!isset($_SESSION['user_id'])) {
+    header('Location: connexion.php');
+    exit();
+}
 
-// 2. Écris ici le NOM EXACT de ton fichier image (ex: 'mon_avatar.png' ou 'photo.jpg')
-// Laisse vide '' si tu veux voir l'émoji par défaut 👤
-$photo_test = 'avatar.png'; 
+// Configuration du dossier contenant tes photos de profil
+$dossier_avatar = 'uploads/'; 
 
-// 3. Simule les statistiques du joueur
-$victoires = 15; 
-$defaites = 7;
+// Récupération des infos fraîches de l'utilisateur (avec le champ avatar)
+$query = $bdd->prepare('SELECT pseudo, date_inscription, avatar FROM utilisateurs WHERE id = ?');
+$query->execute([$_SESSION['user_id']]);
+$user = $query->fetch();
+
+// Simulation rapide pour les statistiques en attendant les vraies tables
+$victoires = 0; 
+$defaites = 0;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
