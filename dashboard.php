@@ -2,23 +2,20 @@
 session_start();
 require_once 'config.php';
 
-// Sécurité : si l'utilisateur n'est pas connecté, retour à la page de connexion
+// 1. SÉCURITÉ : Si l'utilisateur n'est pas connecté, redirection
 if (!isset($_SESSION['user_id'])) {
     header('Location: connexion.php');
     exit();
 }
 
-// Configuration du dossier contenant tes photos de profil
-$dossier_avatar = 'uploads/'; 
-
-// Récupération des infos fraîches de l'utilisateur (avec le champ avatar)
+// 2. RÉCUPÉRATION DES INFOS EN DIRECT DE LA BDD
 $query = $bdd->prepare('SELECT pseudo, date_inscription, avatar FROM utilisateurs WHERE id = ?');
 $query->execute([$_SESSION['user_id']]);
 $user = $query->fetch();
 
-// Simulation rapide pour les statistiques en attendant les vraies tables
-$victoires = 0; 
-$defaites = 0;
+// Si les statistiques ne sont pas encore calculées, on initialise à 0
+$victoires = isset($victoires) ? $victoires : 0;
+$defaites = isset($defaites) ? $defaites : 0;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -154,22 +151,24 @@ $defaites = 0;
         }
 
         .user-avatar {
-            width: 50px;
-            height: 50px;
+            width: 55px;
+            height: 55px;
             background-color: #5d3a1a;
-            border-radius: 6px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 28px;
             color: #fff;
-            overflow: hidden; /* Important pour garder l'image dans le carré arrondi */
+            overflow: hidden; /* Conserve l'image arrondie */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .user-avatar img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Recadre proprement sans déformer */
+            object-fit: cover; /* Évite les déformations */
         }
 
         /* Grille principale */
@@ -323,7 +322,7 @@ $defaites = 0;
         </div>
         <div class="sidebar-menu">
             <a href="dashboard.php" class="sidebar-link active">🏠 Accueil</a>
-            <a href="plateau.php" class="sidebar-link">⚔️ Jouer</a>
+            <a href="index.php" class="sidebar-link">⚔️ Jouer</a>
             <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
             <a href="profil.php" class="sidebar-link">⚙️ Profil</a>
             
@@ -336,8 +335,8 @@ $defaites = 0;
         <div class="user-header">
             <div class="user-profile-info">
                 <div class="user-avatar">
-                    <?php if (!empty($photo_test)): ?>
-                        <img src="<?php echo htmlspecialchars($photo_test); ?>" alt="Profil">
+                    <?php if (!empty($user['avatar'])): ?>
+                        <img src="<?php echo $user['avatar']; ?>" alt="Photo de profil">
                     <?php else: ?>
                         👤
                     <?php endif; ?>
@@ -357,7 +356,7 @@ $defaites = 0;
                 <div class="card card-play">
                     <h2>Prêt à en découdre ?</h2>
                     <p style="color: #f0d9b5; opacity: 0.8;">Défiez des joueurs en ligne, peaufinez vos tactiques et grimpez dans le classement du jeu de dames.</p>
-                    <a href="plateau.php" class="btn btn-play">Lancer une partie</a>
+                    <a href="index.php" class="btn btn-play">Lancer une partie</a>
                 </div>
 
                 <div class="card">
