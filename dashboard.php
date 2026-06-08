@@ -8,8 +8,8 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Récupération des infos fraîches de l'utilisateur depuis la brique de config $bdd
-$query = $bdd->prepare('SELECT pseudo, date_inscription FROM utilisateurs WHERE id = ?');
+// Récupération des infos fraîches de l'utilisateur (Ajout du champ 'avatar' dans la requête)
+$query = $bdd->prepare('SELECT pseudo, date_inscription, avatar FROM utilisateurs WHERE id = ?');
 $query->execute([$_SESSION['user_id']]);
 $user = $query->fetch();
 
@@ -160,6 +160,13 @@ $defaites = 0;
             justify-content: center;
             font-size: 24px;
             color: #fff;
+            overflow: hidden; /* Empêche l'image de déborder des coins arrondis */
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ajuste l'image sans la déformer */
         }
 
         /* Grille principale */
@@ -325,7 +332,13 @@ $defaites = 0;
         
         <div class="user-header">
             <div class="user-profile-info">
-                <div class="user-avatar">👤</div>
+                <div class="user-avatar">
+                    <?php if (!empty($user['avatar']) && file_exists('uploads/' . $user['avatar'])): ?>
+                        <img src="uploads/<?php echo htmlspecialchars($user['avatar']); ?>" alt="Photo de profil de <?php echo htmlspecialchars($user['pseudo']); ?>">
+                    <?php else: ?>
+                        👤
+                    <?php endif; ?>
+                </div>
                 <div>
                     <h1 style="margin:0; font-size: 24px; color:#fff;"><?php echo htmlspecialchars($user['pseudo']); ?></h1>
                 </div>
@@ -341,7 +354,7 @@ $defaites = 0;
                 <div class="card card-play">
                     <h2>Prêt à en découdre ?</h2>
                     <p style="color: #f0d9b5; opacity: 0.8;">Défiez des joueurs en ligne, peaufinez vos tactiques et grimpez dans le classement du jeu de dames.</p>
-                    <a href="jeu.php" class="btn btn-play">Lancer une partie</a>
+                    <a href="plateau.php" class="btn btn-play">Lancer une partie</a>
                 </div>
 
                 <div class="card">
