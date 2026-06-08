@@ -8,7 +8,10 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Récupération des infos fraîches de l'utilisateur (Ajout du champ 'avatar' dans la requête)
+// Configuration du dossier contenant tes photos de profil
+$dossier_avatar = 'uploads/'; 
+
+// Récupération des infos fraîches de l'utilisateur (avec le champ avatar)
 $query = $bdd->prepare('SELECT pseudo, date_inscription, avatar FROM utilisateurs WHERE id = ?');
 $query->execute([$_SESSION['user_id']]);
 $user = $query->fetch();
@@ -160,13 +163,13 @@ $defaites = 0;
             justify-content: center;
             font-size: 24px;
             color: #fff;
-            overflow: hidden; /* Empêche l'image de déborder des coins arrondis */
+            overflow: hidden;
         }
 
         .user-avatar img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Ajuste l'image sans la déformer */
+            object-fit: cover;
         }
 
         /* Grille principale */
@@ -333,8 +336,8 @@ $defaites = 0;
         <div class="user-header">
             <div class="user-profile-info">
                 <div class="user-avatar">
-                    <?php if (!empty($user['avatar']) && file_exists('uploads/' . $user['avatar'])): ?>
-                        <img src="uploads/<?php echo htmlspecialchars($user['avatar']); ?>" alt="Photo de profil de <?php echo htmlspecialchars($user['pseudo']); ?>">
+                    <?php if (!empty($user['avatar']) && file_exists($dossier_avatar . $user['avatar'])): ?>
+                        <img src="<?php echo $dossier_avatar . htmlspecialchars($user['avatar']); ?>" alt="Photo de profil de <?php echo htmlspecialchars($user['pseudo']); ?>">
                     <?php else: ?>
                         👤
                     <?php endif; ?>
