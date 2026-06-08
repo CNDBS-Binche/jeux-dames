@@ -496,9 +496,9 @@ $defaites = 0;
     <div class="sidebar">
         <div class="sidebar-brand">⚪ Jeu de Dames</div>
         <div class="sidebar-menu">
-            <a href="#" class="sidebar-link">🏠 Accueil</a>
-            <a href="#" class="sidebar-link">⚔️ Jouer</a>
-            <a href="#" class="sidebar-link">💬 Salon Public</a>
+            <a href="dashboard.php" class="sidebar-link">🏠 Accueil</a>
+            <a href="index.php" class="sidebar-link">⚔️ Jouer</a>
+            <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
             <a href="#" class="sidebar-link active">⚙️ Profil</a>
         </div>
     </div>
