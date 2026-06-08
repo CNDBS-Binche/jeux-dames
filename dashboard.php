@@ -1,24 +1,21 @@
 <?php
-session_start();
-require_once 'config.php';
+// ==========================================================================
+// CONFIGURATION DE TEST (LOCALHOST SANS SESSION)
+// ==========================================================================
 
-// Sécurité : si l'utilisateur n'est pas connecté, retour à la page de connexion
-if (!isset($_SESSION['user_id'])) {
-    header('Location: connexion.php');
-    exit();
-}
+// 1. Simule les infos de l'utilisateur connecté
+$user = [
+    'pseudo' => 'Joueur_Local',
+    'date_inscription' => '2026-06-08' // Date du jour simulée
+];
 
-// Configuration du dossier contenant tes photos de profil
-$dossier_avatar = 'uploads/'; 
+// 2. Écris ici le NOM EXACT de ton fichier image (ex: 'mon_avatar.png' ou 'photo.jpg')
+// Laisse vide '' si tu veux voir l'émoji par défaut 👤
+$photo_test = 'avatar.png'; 
 
-// Récupération des infos fraîches de l'utilisateur (avec le champ avatar)
-$query = $bdd->prepare('SELECT pseudo, date_inscription, avatar FROM utilisateurs WHERE id = ?');
-$query->execute([$_SESSION['user_id']]);
-$user = $query->fetch();
-
-// Simulation rapide pour les statistiques en attendant les vraies tables
-$victoires = 0; 
-$defaites = 0;
+// 3. Simule les statistiques du joueur
+$victoires = 15; 
+$defaites = 7;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -163,13 +160,13 @@ $defaites = 0;
             justify-content: center;
             font-size: 24px;
             color: #fff;
-            overflow: hidden;
+            overflow: hidden; /* Important pour garder l'image dans le carré arrondi */
         }
 
         .user-avatar img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: cover; /* Recadre proprement sans déformer */
         }
 
         /* Grille principale */
@@ -322,12 +319,12 @@ $defaites = 0;
             ⚪ Jeu de Dames
         </div>
         <div class="sidebar-menu">
-            <a href="index.php" class="sidebar-link active">🏠 Accueil</a>
+            <a href="#" class="sidebar-link active">🏠 Accueil</a>
             <a href="plateau.php" class="sidebar-link">⚔️ Jouer</a>
-            <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
-            <a href="profil.php" class="sidebar-link">⚙️ Profil</a>
+            <a href="#" class="sidebar-link">💬 Salon Public</a>
+            <a href="#" class="sidebar-link">⚙️ Profil</a>
             
-            <a href="connexion.php" class="sidebar-link btn-logout">🚪 Déconnexion</a>
+            <a href="#" class="sidebar-link btn-logout">🚪 Déconnexion</a>
         </div>
     </div>
 
@@ -336,8 +333,8 @@ $defaites = 0;
         <div class="user-header">
             <div class="user-profile-info">
                 <div class="user-avatar">
-                    <?php if (!empty($user['avatar']) && file_exists($dossier_avatar . $user['avatar'])): ?>
-                        <img src="<?php echo $dossier_avatar . htmlspecialchars($user['avatar']); ?>" alt="Photo de profil de <?php echo htmlspecialchars($user['pseudo']); ?>">
+                    <?php if (!empty($photo_test)): ?>
+                        <img src="<?php echo htmlspecialchars($photo_test); ?>" alt="Profil">
                     <?php else: ?>
                         👤
                     <?php endif; ?>
@@ -363,7 +360,7 @@ $defaites = 0;
                 <div class="card">
                     <h2>💬 Salon Public & Chat</h2>
                     <p>Rejoignez le Hub pour discuter avec les joueurs connectés en temps réel et voir l'activité de la communauté globale.</p>
-                    <a href="hub.php" class="btn btn-primary">Accéder au Hub</a>
+                    <a href="#" class="btn btn-primary">Accéder au Hub</a>
                 </div>
             </div>
 
@@ -380,19 +377,19 @@ $defaites = 0;
                             <span class="stat-lbl">Défaites</span>
                         </div>
                     </div>
-                    <a href="profil.php" class="btn btn-primary">Détail du profil</a>
+                    <a href="#" class="btn btn-primary">Détail du profil</a>
                 </div>
 
                 <div class="card">
                     <h2>👥 Liste d'amis</h2>
                     <p class="empty-state">Aucun ami en ligne pour le moment.</p>
-                    <a href="amis.php" class="btn btn-primary">Gérer mes amis</a>
+                    <a href="#" class="btn btn-primary">Gérer mes amis</a>
                 </div>
 
                 <div class="card">
                     <h2>🛡️ Mon Clan</h2>
                     <p>Créez une alliance, arborez un tag unique et participez au classement général des clans.</p>
-                    <a href="clans.php" class="btn btn-primary">Accéder aux Clans</a>
+                    <a href="#" class="btn btn-primary">Accéder aux Clans</a>
                 </div>
             </div>
 
