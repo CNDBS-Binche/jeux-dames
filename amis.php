@@ -92,7 +92,7 @@ $reqAmis = $bdd->prepare('
     JOIN utilisateurs u2 ON a.user_id_2 = u2.id
     WHERE (a.user_id_1 = ? OR a.user_id_2 = ?) AND a.statut = "accepte"
 ');
-// CORRECTION ICI : Il y a 4 "?" dans la requête ci-dessus, il faut donc 4 variables dans le tableau.
+// Correction ici : On passe bien les 4 paramètres requis pour les 4 "?" de la requête
 $reqAmis->execute([$userId, $userId, $userId, $userId]);
 $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -396,9 +396,9 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
             <a href="dashboard.php" class="sidebar-link">🏠 Accueil</a>
             <a href="plateau.php" class="sidebar-link">⚔️ Jouer</a>
             <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
-            <a href="profil.php" class="sidebar-link active">⚙️ Profil</a>
+            <a href="profil.php" class="sidebar-link">⚙️ Profil</a>
             <a href="amis.php" class="sidebar-link active">👥 Amis</a>
-            <a href="clans.php" class="sidebar-link active">🛡️ Clans</a>
+            <a href="clans.php" class="sidebar-link">🛡️ Clans</a>
         </div>
         <a href="deconnexion.php" class="sidebar-link btn-logout">🚪 Déconnexion</a>
     </div>
