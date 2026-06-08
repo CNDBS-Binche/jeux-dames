@@ -322,7 +322,7 @@ $defaites = isset($defaites) ? $defaites : 0;
         </div>
         <div class="sidebar-menu">
             <a href="dashboard.php" class="sidebar-link active">🏠 Accueil</a>
-            <a href="index.php" class="sidebar-link">⚔️ Jouer</a>
+            <a href="plateau.php" class="sidebar-link">⚔️ Jouer</a>
             <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
             <a href="profil.php" class="sidebar-link">⚙️ Profil</a>
             
@@ -356,7 +356,7 @@ $defaites = isset($defaites) ? $defaites : 0;
                 <div class="card card-play">
                     <h2>Prêt à en découdre ?</h2>
                     <p style="color: #f0d9b5; opacity: 0.8;">Défiez des joueurs en ligne, peaufinez vos tactiques et grimpez dans le classement du jeu de dames.</p>
-                    <a href="index.php" class="btn btn-play">Lancer une partie</a>
+                    <a href="plateau.php" class="btn btn-play">Lancer une partie</a>
                 </div>
 
                 <div class="card">
