@@ -1,13 +1,21 @@
 <?php
-// Simulation de données utilisateur pour le test en localhost sans session ni BDD
-$user = [
-    'pseudo' => 'Joueur_Test',
-    'date_inscription' => '2026-01-15'
-];
+session_start();
+require_once 'config.php';
 
-// Simulation rapide pour les statistiques
-$victoires = 12; // Modifie cette valeur pour tester l'affichage
-$defaites = 4;   // Modifie cette valeur pour tester l'affichage
+// Sécurité : si l'utilisateur n'est pas connecté, retour à la page de connexion
+if (!isset($_SESSION['user_id'])) {
+    header('Location: connexion.php');
+    exit();
+}
+
+// Récupération des infos fraîches de l'utilisateur depuis la brique de config $bdd
+$query = $bdd->prepare('SELECT pseudo, date_inscription FROM utilisateurs WHERE id = ?');
+$query->execute([$_SESSION['user_id']]);
+$user = $query->fetch();
+
+// Simulation rapide pour les statistiques en attendant les vraies tables
+$victoires = 0; 
+$defaites = 0;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
