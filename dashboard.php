@@ -1,21 +1,13 @@
 <?php
-session_start();
-require_once 'config.php';
+// Simulation de données utilisateur pour le test en localhost sans session ni BDD
+$user = [
+    'pseudo' => 'Joueur_Test',
+    'date_inscription' => '2026-01-15'
+];
 
-// Sécurité : si l'utilisateur n'est pas connecté, retour à la page de connexion
-if (!isset($_SESSION['user_id'])) {
-    header('Location: connexion.php');
-    exit();
-}
-
-// Récupération des infos fraîches de l'utilisateur depuis la brique de config $bdd
-$query = $bdd->prepare('SELECT pseudo, date_inscription FROM utilisateurs WHERE id = ?');
-$query->execute([$_SESSION['user_id']]);
-$user = $query->fetch();
-
-// Simulation rapide pour les statistiques en attendant les vraies tables
-$victoires = 0; 
-$defaites = 0;
+// Simulation rapide pour les statistiques
+$victoires = 12; // Modifie cette valeur pour tester l'affichage
+$defaites = 4;   // Modifie cette valeur pour tester l'affichage
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -312,14 +304,14 @@ $defaites = 0;
             ⚪ Jeu de Dames
         </div>
         <div class="sidebar-menu">
-            <a href="#" class="sidebar-link active">🏠 Accueil</a>
+            <a href="index.php" class="sidebar-link active">🏠 Accueil</a>
             <a href="jeu.php" class="sidebar-link">⚔️ Jouer</a>
-            <a href="#" class="sidebar-link">💬 Salon Public</a>
-            <a href="#" class="sidebar-link">👥 Amis</a>
-            <a href="#" class="sidebar-link">🛡️ Clans</a>
-            <a href="#" class="sidebar-link">⚙️ Profil</a>
+            <a href="salon.php" class="sidebar-link">💬 Salon Public</a>
+            <a href="amis.php" class="sidebar-link">👥 Amis</a>
+            <a href="clans.php" class="sidebar-link">🛡️ Clans</a>
+            <a href="profil.php" class="sidebar-link">⚙️ Profil</a>
             
-            <a href="logout.php" class="sidebar-link btn-logout">🚪 Déconnexion</a>
+            <a href="connexion.php" class="sidebar-link btn-logout">🚪 Déconnexion</a>
         </div>
     </div>
 
@@ -349,7 +341,7 @@ $defaites = 0;
                 <div class="card">
                     <h2>💬 Salon Public & Chat</h2>
                     <p>Rejoignez le Hub pour discuter avec les joueurs connectés en temps réel et voir l'activité de la communauté globale.</p>
-                    <a href="#" class="btn btn-primary">Accéder au Hub</a>
+                    <a href="hub.php" class="btn btn-primary">Accéder au Hub</a>
                 </div>
             </div>
 
@@ -366,19 +358,19 @@ $defaites = 0;
                             <span class="stat-lbl">Défaites</span>
                         </div>
                     </div>
-                    <a href="#" class="btn btn-primary">Détail du profil</a>
+                    <a href="profil.php" class="btn btn-primary">Détail du profil</a>
                 </div>
 
                 <div class="card">
                     <h2>👥 Liste d'amis</h2>
                     <p class="empty-state">Aucun ami en ligne pour le moment.</p>
-                    <a href="#" class="btn btn-primary">Gérer mes amis</a>
+                    <a href="amis.php" class="btn btn-primary">Gérer mes amis</a>
                 </div>
 
                 <div class="card">
                     <h2>🛡️ Mon Clan</h2>
                     <p>Créez une alliance, arborez un tag unique et participez au classement général des clans.</p>
-                    <a href="#" class="btn btn-primary">Accéder aux Clans</a>
+                    <a href="clans.php" class="btn btn-primary">Accéder aux Clans</a>
                 </div>
             </div>
 
