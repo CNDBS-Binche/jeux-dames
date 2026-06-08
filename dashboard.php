@@ -325,6 +325,9 @@ $defaites = isset($defaites) ? $defaites : 0;
             <a href="plateau.php" class="sidebar-link">⚔️ Jouer</a>
             <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
             <a href="profil.php" class="sidebar-link">⚙️ Profil</a>
+            <a href="amis.php" class="sidebar-link">👥 Amis</a>
+            <a href="clans.php" class="sidebar-link">🛡️ Clans</a>
+            
             
             <a href="deconnexion.php" class="sidebar-link btn-logout">🚪 Déconnexion</a>
         </div>

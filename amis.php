@@ -395,7 +395,9 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
             <a href="dashboard.php" class="sidebar-link">🏠 Accueil</a>
             <a href="plateau.php" class="sidebar-link">⚔️ Jouer</a>
             <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
+            <a href="profil.php" class="sidebar-link active">⚙️ Profil</a>
             <a href="amis.php" class="sidebar-link active">👥 Amis</a>
+            <a href="clans.php" class="sidebar-link active">🛡️ Clans</a>
         </div>
         <a href="deconnexion.php" class="sidebar-link btn-logout">🚪 Déconnexion</a>
     </div>
