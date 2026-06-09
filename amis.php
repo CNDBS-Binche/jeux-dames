@@ -1,3 +1,8 @@
+Voici ton fichier `amis.php` complet, nettoyé et mis à jour.
+
+J'ai modifié la requête SQL pour récupérer l'identifiant de ton ami (`id_ami`), injecté dynamiquement cette valeur dans ton bouton HTML, et remplacé la fonction JavaScript pour qu'elle communique directement avec l'action `defier` de ton fichier `jcj_ajax.php`.
+
+```php
 <?php
 session_start();
 require_once 'config.php';
@@ -98,16 +103,17 @@ $reqDemandes = $bdd->prepare('
 $reqDemandes->execute([$userId]);
 $demandes = $reqDemandes->fetchAll(PDO::FETCH_ASSOC);
 
-// Récupération de la liste d'amis acceptés
+// Récupération de la liste d'amis acceptés avec extraction de l'ID de l'ami
 $reqAmis = $bdd->prepare('
     SELECT a.id as relation_id, 
+           CASE WHEN a.user_id_1 = ? THEN u2.id ELSE u1.id END as id_ami,
            CASE WHEN a.user_id_1 = ? THEN u2.pseudo ELSE u1.pseudo END as pseudo_ami
     FROM amis a
     JOIN utilisateurs u1 ON a.user_id_1 = u1.id
     JOIN utilisateurs u2 ON a.user_id_2 = u2.id
     WHERE (a.user_id_1 = ? OR a.user_id_2 = ?) AND a.statut = "accepte"
 ');
-$reqAmis->execute([$userId, $userId, $userId]);
+$reqAmis->execute([$userId, $userId, $userId, $userId]);
 $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -454,7 +460,7 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
                                 <li>
                                     <span>🟢 <strong style="color:#fff;"><?php echo htmlspecialchars($a['pseudo_ami']); ?></strong></span>
                                     <div class="actions-wrapper">
-                                        <button class="btn btn-primary" style="padding: 8px 14px; font-size: 13px;" onclick="lancerDuel()">⚔️ Duel</button>
+                                        <button class="btn btn-primary" style="padding: 8px 14px; font-size: 13px;" onclick="lancerDuel(<?php echo (int)$a['id_ami']; ?>)">⚔️ Duel</button>
                                         
                                         <form method="POST" action="" class="form-inline">
                                             <input type="hidden" name="action" value="supprimer">
@@ -508,10 +514,37 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
 <script>
-function lancerDuel() {
-    alert("Défi envoyé ! Préparez vos pions ⚔️");
+// CORRECTION ICI : Rework complet du système de duel asynchrone via Fetch
+function lancerDuel(idAmi) {
+    if (!idAmi) return;
+
+    const params = new URLSearchParams();
+    params.append('id_ami', idAmi);
+
+    fetch('./jcj_ajax.php?action=defier', {
+        method: 'POST',
+        body: params
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Erreur de communication avec le serveur.");
+        return res.json();
+    })
+    .then(data => {
+        if (data.statut === 'succes') {
+            alert("⚔️ Défi envoyé ! Redirection vers la salle d'attente...");
+            window.location.href = `plateau.php?match_id=${data.match_id}`;
+        } else {
+            alert("Impossible de lancer le défi : " + data.message);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Une erreur réseau est survenue lors du lancement du duel.");
+    });
 }
 </script>
 <?php include 'popup_invitation.php'; ?>
 </body>
 </html>
+
+```
