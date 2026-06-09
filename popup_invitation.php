@@ -1,20 +1,10 @@
-<?php
-// Sécurité : Si l'utilisateur n'est pas connecté, on n'affiche rien et on n'exécute pas le script
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-if (empty($_SESSION['user_id'])) {
-    return;
-}
-?>
-
 <div id="global-popup-invitation" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; font-family: sans-serif;">
     <div style="background: white; padding: 30px; border-radius: 10px; text-align: center; max-width: 400px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-        <h3 style="margin-top: 0; color: #333; font-size: 22px;">⚔️ Nouveau défi reçu !</h3>
-        <p id="popup-texte-defi" style="color: #666; margin: 15px 0; font-size: 16px;">Un joueur vous défie aux dames.</p>
+        <h3 style="margin-top: 0; color: #333;">⚔️ Nouveau défi reçu !</h3>
+        <p id="popup-texte-defi" style="color: #666; margin: 15px 0;">Un joueur vous défie aux dames.</p>
         <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-            <button id="btn-popup-accepter" style="background: #2ecc71; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 15px;">Accepter</button>
-            <button id="btn-popup-refuser" style="background: #e74c3c; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 15px;">Refuser</button>
+            <button id="btn-popup-accepter" style="background: #2ecc71; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">Accepter</button>
+            <button id="btn-popup-refuser" style="background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">Refuser</button>
         </div>
     </div>
 </div>
@@ -25,67 +15,65 @@ document.addEventListener('DOMContentLoaded', function() {
     const textePopup = document.getElementById('popup-texte-defi');
     const btnAccepter = document.getElementById('btn-popup-accepter');
     const btnRefuser = document.getElementById('btn-popup-refuser');
-    
     let matchIdActuel = null;
 
-    function verifierInvitationsEntrantes() {
-        // Sécurité absolue : Si on est DÉJÀ en train de jouer sur plateau.php, 
-        // on coupe l'écoute pour ne pas être interrompu en pleine partie.
+    function verifierDefisGlobaux() {
         if (window.location.href.includes('plateau.php')) return;
 
-        fetch('jcj_ajax.php?action=ecouter_invitations_recues')
-            .then(response => {
-                if (!response.ok) throw new Error("Erreur serveur");
-                return response.json();
-            })
+        // Appel direct vers ton action avec un chemin relatif blindé (./)
+        fetch('./jcj_ajax.php?action=verifier_defis')
+            .then(res => res.json())
             .then(data => {
-                if (data.statut === 'nouveau_defi') {
+                if (data.type === 'recu') {
+                    // Quelqu'un nous défie !
                     matchIdActuel = data.match_id;
-                    textePopup.innerText = `Le joueur ${data.pseudo_adversaire} vous défie pour une partie !`;
-                    popup.style.display = 'flex'; // La popup surgit à l'écran
+                    textePopup.innerText = `Le joueur ${data.adversaire} vous défie !`;
+                    popup.style.display = 'flex';
+                } else if (data.type === 'lance_accepte') {
+                    // Notre défi envoyé a été accepté, on est téléporté sur le plateau !
+                    window.location.href = `plateau.php?match_id=${data.match_id}`;
                 } else {
-                    // Si Timeout (15s sans invitation), on relance l'écoute immédiatement
-                    verifierInvitationsEntrantes();
+                    // Statut "aucun" (timeout des 15s), on relance directement la boucle
+                    verifierDefisGlobaux();
                 }
             })
-            .catch(err => {
-                console.log("Serveur indisponible ou déconnecté, nouvelle tentative dans 3s...");
-                setTimeout(verifierInvitationsEntrantes, 3000);
+            .catch(() => {
+                setTimeout(verifierDefisGlobaux, 3000);
             });
     }
 
-    // Clic sur "Accepter"
     if (btnAccepter) {
         btnAccepter.addEventListener('click', function() {
             if (!matchIdActuel) return;
-            
-            const formData = new FormData();
-            formData.append('match_id', matchIdActuel);
+            const params = new URLSearchParams();
+            params.append('match_id', matchIdActuel);
+            params.append('decision', 'accepte');
 
-            fetch('jcj_ajax.php?action=accepter_defi', { method: 'POST', body: formData })
+            fetch('./jcj_ajax.php?action=repondre', { method: 'POST', body: params })
                 .then(res => res.json())
                 .then(data => {
                     if (data.statut === 'succes') {
-                        // Redirection instantanée sur le plateau de jeu !
                         window.location.href = `plateau.php?match_id=${matchIdActuel}`;
                     }
                 });
         });
     }
 
-    // Clic sur "Refuser"
     if (btnRefuser) {
         btnRefuser.addEventListener('click', function() {
-            popup.style.display = 'none';
-            
-            // Optionnel : Tu peux envoyer une requête à jcj_ajax.php pour supprimer/refuser le défi en BDD ici
-            
-            // On relance la recherche d'invitations après 2 secondes de répit
-            setTimeout(verifierInvitationsEntrantes, 2000);
+            if (!matchIdActuel) return;
+            const params = new URLSearchParams();
+            params.append('match_id', matchIdActuel);
+            params.append('decision', 'refuse');
+
+            fetch('./jcj_ajax.php?action=repondre', { method: 'POST', body: params })
+                .then(() => {
+                    popup.style.display = 'none';
+                    setTimeout(verifierDefisGlobaux, 1000);
+                });
         });
     }
 
-    // Lancement automatique de l'écoute en arrière-plan
-    verifierInvitationsEntrantes();
+    verifierDefisGlobaux();
 });
 </script>
