@@ -16,6 +16,18 @@ $user = $query->fetch();
 // Si les statistiques ne sont pas encore calculées, on initialise à 0
 $victoires = isset($victoires) ? $victoires : 0;
 $defaites = isset($defaites) ? $defaites : 0;
+
+// 3. RÉCUPÉRATION DE L'HISTORIQUE DES 10 DERNIÈRES PARTIES
+// (Ajuste les noms de colonnes/tables selon ta structure de base de données si nécessaire)
+$query_history = $bdd->prepare('
+    SELECT id, adversaire, resultat, date_partie 
+    FROM historique_parties 
+    WHERE user_id = ? 
+    ORDER BY date_partie DESC 
+    LIMIT 10
+');
+$query_history->execute([$_SESSION['user_id']]);
+$historique = $query_history->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -270,14 +282,14 @@ $defaites = isset($defaites) ? $defaites : 0;
         }
 
         /* ==========================================================================
-           CORRECTION ET RENDER DES DEUX DAMIERS (STYLE CHESS.COM)
+           LES DEUX DAMIERS SANS BUG D'AFFICHAGE
            ========================================================================== */
         .boards-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 2 colonnes au lieu de 3 */
+            grid-template-columns: repeat(2, 1fr);
             gap: 40px;
             margin-top: 20px;
-            max-width: 550px; /* Centre et ajuste la taille globale */
+            max-width: 550px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -313,7 +325,6 @@ $defaites = isset($defaites) ? $defaites : 0;
             width: 100%;
         }
 
-        /* Définition stricte des cases */
         .cell {
             flex: 1;
             aspect-ratio: 1 / 1;
@@ -322,18 +333,16 @@ $defaites = isset($defaites) ? $defaites : 0;
             justify-content: center;
         }
 
-        /* Alternance parfaite ligne par ligne */
         .board-row:nth-child(odd) .cell:nth-child(even),
         .board-row:nth-child(even) .cell:nth-child(odd) {
-            background-color: #b58863; /* Cases sombres */
+            background-color: #b58863;
         }
 
         .board-row:nth-child(odd) .cell:nth-child(odd),
         .board-row:nth-child(even) .cell:nth-child(even) {
-            background-color: #f0d9b5; /* Cases claires */
+            background-color: #f0d9b5;
         }
 
-        /* Pions */
         .piece {
             width: 75%;
             height: 75%;
@@ -356,6 +365,72 @@ $defaites = isset($defaites) ? $defaites : 0;
             font-size: 15px;
             font-weight: 600;
             color: #fff;
+        }
+
+        /* ==========================================================================
+           STYLE DE L'HISTORIQUE DES PARTIES
+           ========================================================================== */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 12px 15px;
+            border-radius: 6px;
+            border-left: 4px solid #fff;
+        }
+
+        .history-item.win { border-left-color: #81b64c; }
+        .history-item.lose { border-left-color: #e74c3c; }
+        .history-item.draw { border-left-color: #f39c12; }
+
+        .history-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .history-opponent {
+            font-weight: bold;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .history-date {
+            font-size: 11px;
+            color: #a8947a;
+        }
+
+        .history-badge {
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: #fff;
+        }
+        .win .history-badge { background-color: rgba(129, 182, 76, 0.2); color: #81b64c; }
+        .lose .history-badge { background-color: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+        .draw .history-badge { background-color: rgba(243, 156, 18, 0.2); color: #f39c12; }
+
+        .btn-review {
+            font-size: 12px;
+            padding: 6px 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #f0d9b5;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .btn-review:hover {
+            background-color: rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
@@ -479,9 +554,30 @@ $defaites = isset($defaites) ? $defaites : 0;
                 </div>
 
                 <div class="card">
-                    <h2>💬 Salon Public & Chat</h2>
-                    <p>Rejoignez le Hub pour discuter avec les joueurs connectés en temps réel et voir l'activité de la communauté globale.</p>
-                    <a href="hub.php" class="btn btn-primary">Accéder au Hub</a>
+                    <h2>📜 Historique des parties</h2>
+                    <div class="history-list">
+                        <?php if (!empty($historique)): ?>
+                            <?php foreach ($historique as $partie): 
+                                // On détermine la classe CSS selon le résultat bdd (gagné, perdu, nul)
+                                $res_class = 'draw';
+                                if ($partie['resultat'] === 'victoire') $res_class = 'win';
+                                if ($partie['resultat'] === 'defaite') $res_class = 'lose';
+                            ?>
+                                <div class="history-item <?php echo $res_class; ?>">
+                                    <div class="history-details">
+                                        <span class="history-opponent">Contre <?php echo htmlspecialchars($partie['adversaire']); ?></span>
+                                        <span class="history-date">Le <?php echo date('d/m/Y à H:i', strtotime($partie['date_partie'])); ?></span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 15px;">
+                                        <span class="history-badge"><?php echo htmlspecialchars($partie['resultat']); ?></span>
+                                        <a href="replay.php?id=<?php echo $partie['id']; ?>" class="btn-review">Analyse</a>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="empty-state" style="margin: 0; padding: 10px 0;">Aucune partie enregistrée dans votre historique.</p>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
 
