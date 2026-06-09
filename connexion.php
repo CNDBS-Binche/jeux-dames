@@ -69,5 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         Pas encore de compte ? <a href="inscription.php">S'inscrire</a>
     </div>
 </div>
+<?php include 'popup_invitation.php'; ?>
 </body>
 </html>

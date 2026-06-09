@@ -512,5 +512,6 @@ function lancerDuel() {
     alert("Défi envoyé ! Préparez vos pions ⚔️");
 }
 </script>
+<?php include 'popup_invitation.php'; ?>
 </body>
 </html>

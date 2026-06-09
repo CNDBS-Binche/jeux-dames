@@ -748,5 +748,6 @@ $defaites = 0;
             }
         }
     </script>
+    <?php include 'popup_invitation.php'; ?>
 </body>
 </html>

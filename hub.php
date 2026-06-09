@@ -388,5 +388,6 @@ function repondreDefi(decision) {
 
 setInterval(ecouterDefis, 3000);
 </script>
+<?php include 'popup_invitation.php'; ?>
 </body>
 </html>

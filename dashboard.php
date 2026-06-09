@@ -227,5 +227,6 @@ body::before {
 
         </div>
     </div>
+    <?php include 'popup_invitation.php'; ?>
 </body>
 </html>

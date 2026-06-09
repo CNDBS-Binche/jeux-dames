@@ -1,5 +1,5 @@
 <?php
-// jcj_ajax.php — AJAX pour les parties Joueur contre Joueur
+// jcj_ajax.php — AJAX pour les parties Joueur contre Joueur (Version Fluide Long-Polling)
 declare(strict_types=1);
 session_start();
 require_once 'config.php';
@@ -14,6 +14,9 @@ if (!isset($_SESSION['user_id'])) {
 
 $userId = (int)$_SESSION['user_id'];
 $action = $_GET['action'] ?? '';
+
+// Configuration globale du Long-Polling (15 secondes max)
+$maxAttente = 15;
 
 // ── 1. Envoyer un défi ────────────────────────────────────────────────────────
 if ($action === 'defier' && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -38,33 +41,47 @@ if ($action === 'defier' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// ── 2. Vérifier les défis reçus / acceptés ───────────────────────────────────
+// ── 2. Vérifier les défis reçus / acceptés (LONG-POLLING) ────────────────────
 if ($action === 'verifier_defis') {
-    // A. Un défi nous est envoyé ?
-    $checkRecu = $bdd->prepare('
-        SELECT p.id, u.pseudo
-        FROM parties_jcj p
-        JOIN utilisateurs u ON p.id_challengeur = u.id
-        WHERE p.id_defie = ? AND p.statut = "en_attente"
-        LIMIT 1
-    ');
-    $checkRecu->execute([$userId]);
-    $defiRecu = $checkRecu->fetch();
-    if ($defiRecu) {
-        echo json_encode(['type' => 'recu', 'match_id' => $defiRecu['id'], 'adversaire' => $defiRecu['pseudo']]);
-        exit;
+    // On libère la session en écriture pour que l'utilisateur puisse naviguer ailleurs en même temps
+    session_write_close(); 
+
+    $debut = time();
+    while ((time() - $debut) < $maxAttente) {
+        
+        // A. Un défi nous est envoyé ?
+        $checkRecu = $bdd->prepare('
+            SELECT p.id, u.pseudo
+            FROM parties_jcj p
+            JOIN utilisateurs u ON p.id_challengeur = u.id
+            WHERE p.id_defie = ? AND p.statut = "en_attente"
+            LIMIT 1
+        ');
+        $checkRecu->execute([$userId]);
+        $defiRecu = $checkRecu->fetch();
+        
+        if ($defiRecu) {
+            echo json_encode(['type' => 'recu', 'match_id' => $defiRecu['id'], 'adversaire' => $defiRecu['pseudo']]);
+            exit;
+        }
+
+        // B. Notre défi a-t-il été accepté ?
+        $checkLance = $bdd->prepare('SELECT id FROM parties_jcj WHERE id_challengeur = ? AND statut = "accepte" LIMIT 1');
+        $checkLance->execute([$userId]);
+        $defiAccepte = $checkLance->fetch();
+        
+        if ($defiAccepte) {
+            // Reconnexion rapide pour changer le statut à "en_cours"
+            $bdd->prepare('UPDATE parties_jcj SET statut = "en_cours" WHERE id = ?')->execute([$defiAccepte['id']]);
+            echo json_encode(['type' => 'lance_accepte', 'match_id' => $defiAccepte['id']]);
+            exit;
+        }
+
+        // Rien de neuf ? On attend un quart de seconde avant la prochaine vérification
+        usleep(250000);
     }
 
-    // B. Notre défi a-t-il été accepté ?
-    $checkLance = $bdd->prepare('SELECT id FROM parties_jcj WHERE id_challengeur = ? AND statut = "accepte" LIMIT 1');
-    $checkLance->execute([$userId]);
-    $defiAccepte = $checkLance->fetch();
-    if ($defiAccepte) {
-        $bdd->prepare('UPDATE parties_jcj SET statut = "en_cours" WHERE id = ?')->execute([$defiAccepte['id']]);
-        echo json_encode(['type' => 'lance_accepte', 'match_id' => $defiAccepte['id']]);
-        exit;
-    }
-
+    // Passé 15s, on dit au JS qu'il n'y a rien pour qu'il relance sa boucle proprement
     echo json_encode(['type' => 'aucun']);
     exit;
 }
@@ -168,15 +185,30 @@ if ($action === 'jouer' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// ── 7. Charger le dernier coup ────────────────────────────────────────────────
+// ── 7. Charger le dernier coup (LONG-POLLING) ────────────────────────────────
 if ($action === 'charger_dernier_coup') {
     $matchId = (int)($_GET['match_id'] ?? 0);
+    $dernierCoupLocal = (int)($_GET['dernier_compteur'] ?? 0); // Requis pour savoir s'il y a du nouveau
 
-    $req = $bdd->prepare('SELECT num_coup, couleur, case_depart, case_arrivee FROM mouvements_jcj WHERE match_id = ? ORDER BY num_coup DESC LIMIT 1');
-    $req->execute([$matchId]);
-    $coup = $req->fetch();
+    session_write_close();
 
-    echo json_encode($coup ?: ['num_coup' => 0]);
+    $debut = time();
+    while ((time() - $debut) < $maxAttente) {
+        $req = $bdd->prepare('SELECT num_coup, couleur, case_depart, case_arrivee FROM mouvements_jcj WHERE match_id = ? ORDER BY num_coup DESC LIMIT 1');
+        $req->execute([$matchId]);
+        $coup = $req->fetch();
+
+        // Si la base contient un coup plus récent que celui affiché sur le PC du joueur
+        if ($coup && (int)$coup['num_coup'] > $dernierCoupLocal) {
+            echo json_encode($coup);
+            exit;
+        }
+
+        usleep(250000);
+    }
+
+    // Timeout après 15 secondes sans action
+    echo json_encode(['num_coup' => $dernierCoupLocal, 'statut' => 'timeout']);
     exit;
 }
 
