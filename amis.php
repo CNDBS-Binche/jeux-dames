@@ -84,16 +84,16 @@ $reqDemandes = $bdd->prepare('
 $reqDemandes->execute([$userId]);
 $demandes = $reqDemandes->fetchAll(PDO::FETCH_ASSOC);
 
+// CORRECTION : Utilisation de CASE WHEN et passage de 3 paramètres correspondants aux 3 "?"
 $reqAmis = $bdd->prepare('
     SELECT a.id as relation_id, 
-           IF(a.user_id_1 = ?, u2.pseudo, u1.pseudo) as pseudo_ami
+           CASE WHEN a.user_id_1 = ? THEN u2.pseudo ELSE u1.pseudo END as pseudo_ami
     FROM amis a
     JOIN utilisateurs u1 ON a.user_id_1 = u1.id
     JOIN utilisateurs u2 ON a.user_id_2 = u2.id
     WHERE (a.user_id_1 = ? OR a.user_id_2 = ?) AND a.statut = "accepte"
 ');
-// Correction ici : On passe bien les 4 paramètres requis pour les 4 "?" de la requête
-$reqAmis->execute([$userId, $userId, $userId, $userId]);
+$reqAmis->execute([$userId, $userId, $userId]);
 $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
