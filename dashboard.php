@@ -26,120 +26,121 @@ $defaites = isset($defaites) ? $defaites : 0;
         /* ==========================================================================
            1. LE FOND D'ÉCRAN BRUN BOISÉ ET SON QUADRILLAGE ANIMÉ (FIXE)
            ========================================================================== */
-        body {
-            display: flex;
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            color: #f0d9b5; 
-            background: radial-gradient(circle, #4a321f, #2b1d12);
-            position: relative;
-            /* Le navigateur gérera automatiquement l'unique barre à droite */
-        }
+body {
+    display: flex;
+    height: 100vh; /* MODIFIÉ : On force la hauteur à 100% de la zone visible */
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #f0d9b5; 
+    background: radial-gradient(circle, #4a321f, #2b1d12);
+    position: relative;
+    overflow-x: hidden; /* AJOUTÉ : Empêche la barre de défilement horizontale du bas */
+}
 
-        body::before {
-            content: "";
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background-image: 
-                linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%), 
-                linear-gradient(-45deg, rgba(0,0,0,0.1) 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.1) 75%), 
-                linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.1) 75%);
-            background-size: 100px 100px;
-            z-index: 0;
-            animation: move 60s linear infinite;
-        }
+body::before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background-image: 
+        linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%), 
+        linear-gradient(-45deg, rgba(0,0,0,0.1) 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.1) 75%), 
+        linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.1) 75%);
+    background-size: 100px 100px;
+    z-index: 0;
+    animation: move 60s linear infinite;
+}
 
-        @keyframes move {
-            from { transform: translate(-25%, -25%); }
-            to { transform: translate(0, 0); }
-        }
+@keyframes move {
+    from { transform: translate(-25%, -25%); }
+    to { transform: translate(0, 0); }
+}
 
-        /* ==========================================================================
+/* ==========================================================================
            2. BARRE LATÉRALE DE NAVIGATION (Marron sombre)
            ========================================================================== */
-        .sidebar {
-            width: 240px;
-            background-color: rgba(27, 18, 11, 0.9);
-            backdrop-filter: blur(12px);
-            display: flex;
-            flex-direction: column;
-            padding: 20px 10px;
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-            position: fixed;
-            height: 100vh;
-            box-sizing: border-box;
-            z-index: 10;
-        }
+.sidebar {
+    width: 240px;
+    background-color: rgba(27, 18, 11, 0.9);
+    backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 10px;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    position: fixed;
+    height: 100vh;
+    box-sizing: border-box;
+    z-index: 10;
+}
 
-        .sidebar-brand {
-            font-size: 22px;
-            font-weight: bold;
-            color: #fff;
-            margin-bottom: 30px;
-            padding-left: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+.sidebar-brand {
+    font-size: 22px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 30px;
+    padding-left: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
-        .sidebar-menu {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            flex-grow: 1;
-        }
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex-grow: 1;
+}
 
-        .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: #c4b49c;
-            text-decoration: none;
-            padding: 12px 15px;
-            border-radius: 6px;
-            font-weight: 600;
-            transition: background 0.2s, color 0.2s;
-        }
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: #c4b49c;
+    text-decoration: none;
+    padding: 12px 15px;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s;
+}
 
-        .sidebar-link:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: #fff;
-        }
+.sidebar-link:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
 
-        .sidebar-link.active {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-left: 4px solid #81b64c;
-            padding-left: 11px;
-        }
+.sidebar-link.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-left: 4px solid #81b64c;
+    padding-left: 11px;
+}
 
-        .btn-logout {
-            background-color: rgba(62, 37, 16, 0.5);
-            color: #e74c3c;
-            margin-top: auto;
-        }
-        .sidebar-link.btn-logout:hover { 
-            background-color: #c0392b; color: #fff; 
-        }
+.btn-logout {
+    background-color: rgba(62, 37, 16, 0.5);
+    color: #e74c3c;
+    margin-top: auto;
+}
+.sidebar-link.btn-logout:hover { 
+    background-color: #c0392b; color: #fff; 
+}
 
-        /* ==========================================================================
+/* ==========================================================================
            3. CONTENU PRINCIPAL CADRÉ 
            ========================================================================== */
-        .main-content {
-            margin-left: 240px;
-            flex-grow: 1;
-            padding: 40px;
-            max-width: 1200px;
-            width: calc(100% - 240px);
-            /* Suppression de height: 100vh et overflow-y: auto pour éviter les doublons */
-            box-sizing: border-box;
-            z-index: 1;
-        }
+.main-content {
+    margin-left: 240px;
+    flex-grow: 1;
+    padding: 40px;
+    max-width: 1200px;
+    width: calc(100% - 240px);
+    max-height: 100vh; /* AJOUTÉ : Limite le contenu à la hauteur de l'écran */
+    overflow-y: auto;  /* AJOUTÉ : Si le contenu dépasse *vraiment*, le scroll se fera proprement uniquement dans cette zone, sans casser le design global */
+    box-sizing: border-box;
+    z-index: 1;
+}
     </style>
 </head>
 <body>
