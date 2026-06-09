@@ -2,6 +2,7 @@
 session_start();
 require_once 'config.php';
 
+// Vérification de la session
 if (!isset($_SESSION['user_id'])) {
     header('Location: connexion.php');
     exit();
@@ -9,66 +10,78 @@ if (!isset($_SESSION['user_id'])) {
 
 $userId = $_SESSION['user_id'];
 
-/* ==========================================================================
-   TRAITEMENT DES ACTIONS (Ajouter, Accepter, Refuser, Retirer)
-   ========================================================================== */
+// Génération du jeton CSRF s'il n'existe pas
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $message = "";
 $messageType = "";
 
+/* ==========================================================================
+   TRAITEMENT DES ACTIONS (Ajouter, Accepter, Refuser, Retirer)
+   ========================================================================== */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    $action = $_POST['action'];
+    
+    // Vérification stricte du jeton CSRF
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $message = "Erreur de sécurité : action non autorisée.";
+        $messageType = "danger";
+    } else {
+        $action = $_POST['action'];
 
-    // 1. AJOUTER UN AMI
-    if ($action === 'ajouter' && !empty($_POST['pseudo_recherche'])) {
-        $pseudoRecherche = trim($_POST['pseudo_recherche']);
-        
-        $reqUser = $bdd->prepare('SELECT id FROM utilisateurs WHERE pseudo = ?');
-        $reqUser->execute([$pseudoRecherche]);
-        $cible = $reqUser->fetch();
+        // 1. AJOUTER UN AMI
+        if ($action === 'ajouter' && !empty($_POST['pseudo_recherche'])) {
+            $pseudoRecherche = trim($_POST['pseudo_recherche']);
+            
+            $reqUser = $bdd->prepare('SELECT id FROM utilisateurs WHERE pseudo = ?');
+            $reqUser->execute([$pseudoRecherche]);
+            $cible = $reqUser->fetch();
 
-        if (!$cible) {
-            $message = "Ce joueur n'existe pas.";
-            $messageType = "danger";
-        } elseif ($cible['id'] == $userId) {
-            $message = "Vous ne pouvez pas vous ajouter vous-même.";
-            $messageType = "danger";
-        } else {
-            $reqVerif = $bdd->prepare('SELECT id, statut FROM amis WHERE (user_id_1 = ? AND user_id_2 = ?) OR (user_id_1 = ? AND user_id_2 = ?)');
-            $reqVerif->execute([$userId, $cible['id'], $cible['id'], $userId]);
-            $relation = $reqVerif->fetch();
-
-            if ($relation) {
-                if ($relation['statut'] === 'en_attente') {
-                    $message = "Une invitation est déjà en attente avec ce joueur.";
-                } else {
-                    $message = "Vous êtes déjà ami avec ce joueur.";
-                }
+            if (!$cible) {
+                $message = "Ce joueur n'existe pas.";
+                $messageType = "danger";
+            } elseif ($cible['id'] == $userId) {
+                $message = "Vous ne pouvez pas vous ajouter vous-même.";
                 $messageType = "danger";
             } else {
-                $reqIns = $bdd->prepare('INSERT INTO amis (user_id_1, user_id_2, statut) VALUES (?, ?, "en_attente")');
-                $reqIns->execute([$userId, $cible['id']]);
-                $message = "Invitation envoyée avec succès à " . htmlspecialchars($pseudoRecherche) . " !";
-                $messageType = "success";
+                $reqVerif = $bdd->prepare('SELECT id, statut FROM amis WHERE (user_id_1 = ? AND user_id_2 = ?) OR (user_id_1 = ? AND user_id_2 = ?)');
+                $reqVerif->execute([$userId, $cible['id'], $cible['id'], $userId]);
+                $relation = $reqVerif->fetch();
+
+                if ($relation) {
+                    if ($relation['statut'] === 'en_attente') {
+                        $message = "Une invitation est déjà en attente avec ce joueur.";
+                    } else {
+                        $message = "Vous êtes déjà ami avec ce joueur.";
+                    }
+                    $messageType = "danger";
+                } else {
+                    $reqIns = $bdd->prepare('INSERT INTO amis (user_id_1, user_id_2, statut) VALUES (?, ?, "en_attente")');
+                    $reqIns->execute([$userId, $cible['id']]);
+                    $message = "Invitation envoyée avec succès à " . htmlspecialchars($pseudoRecherche) . " !";
+                    $messageType = "success";
+                }
             }
         }
-    }
 
-    // 2. ACCEPTER UNE DEMANDE
-    if ($action === 'accepter' && isset($_POST['relation_id'])) {
-        $relationId = (int)$_POST['relation_id'];
-        $reqUp = $bdd->prepare('UPDATE amis SET statut = "accepte" WHERE id = ? AND user_id_2 = ?');
-        $reqUp->execute([$relationId, $userId]);
-        header('Location: ' . $_SERVER['PHP_SELF']);
-        exit();
-    }
+        // 2. ACCEPTER UNE DEMANDE
+        if ($action === 'accepter' && isset($_POST['relation_id'])) {
+            $relationId = (int)$_POST['relation_id'];
+            $reqUp = $bdd->prepare('UPDATE amis SET statut = "accepte" WHERE id = ? AND user_id_2 = ?');
+            $reqUp->execute([$relationId, $userId]);
+            header('Location: ' . $_SERVER['PHP_SELF']);
+            exit();
+        }
 
-    // 3. REFUSER UNE DEMANDE OU SUPPRIMER UN AMI
-    if ($action === 'supprimer' && isset($_POST['relation_id'])) {
-        $relationId = (int)$_POST['relation_id'];
-        $reqDel = $bdd->prepare('DELETE FROM amis WHERE id = ? AND (user_id_1 = ? OR user_id_2 = ?)');
-        $reqDel->execute([$relationId, $userId, $userId]);
-        header('Location: ' . $_SERVER['PHP_SELF']);
-        exit();
+        // 3. REFUSER UNE DEMANDE OU SUPPRIMER UN AMI
+        if ($action === 'supprimer' && isset($_POST['relation_id'])) {
+            $relationId = (int)$_POST['relation_id'];
+            $reqDel = $bdd->prepare('DELETE FROM amis WHERE id = ? AND (user_id_1 = ? OR user_id_2 = ?)');
+            $reqDel->execute([$relationId, $userId, $userId]);
+            header('Location: ' . $_SERVER['PHP_SELF']);
+            exit();
+        }
     }
 }
 
@@ -84,7 +97,6 @@ $reqDemandes = $bdd->prepare('
 $reqDemandes->execute([$userId]);
 $demandes = $reqDemandes->fetchAll(PDO::FETCH_ASSOC);
 
-// CORRECTION : Utilisation de CASE WHEN et passage de 3 paramètres correspondants aux 3 "?"
 $reqAmis = $bdd->prepare('
     SELECT a.id as relation_id, 
            CASE WHEN a.user_id_1 = ? THEN u2.pseudo ELSE u1.pseudo END as pseudo_ami
@@ -421,6 +433,8 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
 
                     <form method="POST" action="" class="form-inline">
                         <input type="hidden" name="action" value="ajouter">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                        
                         <div class="search-box">
                             <input type="text" name="pseudo_recherche" placeholder="Entrez le pseudo du joueur..." required>
                             <button type="submit" class="btn btn-play" style="width: auto;">Inviter</button>
@@ -443,6 +457,8 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
                                         <form method="POST" action="" class="form-inline">
                                             <input type="hidden" name="action" value="supprimer">
                                             <input type="hidden" name="relation_id" value="<?php echo $a['relation_id']; ?>">
+                                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                            
                                             <button type="submit" class="btn btn-danger" style="padding: 8px 14px; font-size: 13px;">Retirer</button>
                                         </form>
                                     </div>
@@ -468,12 +484,16 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
                                         <form method="POST" action="" class="form-inline" style="flex: 1;">
                                             <input type="hidden" name="action" value="accepter">
                                             <input type="hidden" name="relation_id" value="<?php echo $d['relation_id']; ?>">
+                                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                            
                                             <button type="submit" class="btn btn-play" style="padding: 6px 12px; font-size: 13px; width: 100%;">Accepter</button>
                                         </form>
 
                                         <form method="POST" action="" class="form-inline" style="flex: 1;">
                                             <input type="hidden" name="action" value="supprimer">
                                             <input type="hidden" name="relation_id" value="<?php echo $d['relation_id']; ?>">
+                                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                            
                                             <button type="submit" class="btn btn-danger" style="padding: 6px 12px; font-size: 13px; width: 100%;">Refuser</button>
                                         </form>
                                     </div>

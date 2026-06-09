@@ -8,12 +8,15 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$success_msg = "";
-$error_msg = "";
+// Utilisation des sessions pour afficher les messages après redirection (Pattern PRG)
+$success_msg = $_SESSION['success_msg'] ?? "";
+$error_msg = $_SESSION['error_msg'] ?? "";
+unset($_SESSION['success_msg'], $_SESSION['error_msg']);
 
-// 2. TRAITEMENT DU FORMULAIRE DE MISE À JOUR (POST AJAX ou Standard)
+// 2. TRAITEMENT DU FORMULAIRE DE MISE À JOUR
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Cas de la mise à jour des paramètres texte (Pseudo, Bio, Drapeau, Mot de passe)
+    
+    // Cas de la mise à jour des paramètres texte
     if (isset($_POST['action']) && $_POST['action'] === 'update_profile') {
         $new_pseudo = trim($_POST['pseudo']);
         $new_bio = trim($_POST['biographie']);
@@ -23,30 +26,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!empty($new_pseudo)) {
             try {
-                // Gestion du mot de passe si rempli
                 if (!empty($password)) {
                     if ($password === $confirm_password) {
                         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
                         $update = $bdd->prepare('UPDATE utilisateurs SET pseudo = ?, biographie = ?, code_drapeau = ?, mot_de_passe = ? WHERE id = ?');
                         $update->execute([$new_pseudo, $new_bio, $new_flag, $hashed_password, $_SESSION['user_id']]);
-                        $success_msg = "Profil et mot de passe mis à jour !";
+                        $_SESSION['success_msg'] = "Profil et mot de passe mis à jour !";
                     } else {
-                        $error_msg = "Les mots de passe ne correspondent pas.";
+                        $_SESSION['error_msg'] = "Les mots de passe ne correspondent pas.";
                     }
                 } else {
-                    // Mise à jour sans toucher au mot de passe
                     $update = $bdd->prepare('UPDATE utilisateurs SET pseudo = ?, biographie = ?, code_drapeau = ? WHERE id = ?');
                     $update->execute([$new_pseudo, $new_bio, $new_flag, $_SESSION['user_id']]);
-                    $success_msg = "Profil mis à jour avec succès !";
+                    $_SESSION['success_msg'] = "Profil mis à jour avec succès !";
                 }
             } catch (Exception $e) {
                 error_log('Profile update: ' . $e->getMessage());
-                $error_msg = "Erreur lors de la mise à jour. Veuillez réessayer.";
+                $_SESSION['error_msg'] = "Erreur lors de la mise à jour. Veuillez réessayer.";
             }
         }
+        // Redirection pour éviter le renvoi du formulaire au rafraîchissement
+        header('Location: profil.php');
+        exit();
     }
 
-    // Cas du changement dynamique de Thème (via JavaScript/Fetch)
+    // Cas du changement dynamique de Thème (Fetch)
     if (isset($_POST['action']) && $_POST['action'] === 'update_theme') {
         $light = preg_match('/^#[0-9a-fA-F]{6}$/', $_POST['theme_light'] ?? '') ? $_POST['theme_light'] : '#f0d9b5';
         $dark  = preg_match('/^#[0-9a-fA-F]{6}$/', $_POST['theme_dark']  ?? '') ? $_POST['theme_dark']  : '#b58863';
@@ -56,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // Cas du téléversement de la Photo de profil en Base64
+    // Cas du téléversement de la Photo de profil en Base64 (Fetch)
     if (isset($_POST['action']) && $_POST['action'] === 'update_avatar') {
         $avatar_data = $_POST['avatar_base64'];
         $update = $bdd->prepare('UPDATE utilisateurs SET avatar = ? WHERE id = ?');
@@ -71,13 +75,14 @@ $query = $bdd->prepare('SELECT pseudo, date_inscription, biographie, code_drapea
 $query->execute([$_SESSION['user_id']]);
 $user = $query->fetch();
 
-// Valeurs par défaut si les champs de la BDD sont vides
+// Valeurs par défaut sécurisées
 $user_bio = !empty($user['biographie']) ? $user['biographie'] : "Bienvenue sur mon profil ! Passionné de jeu de dames et de stratégie.";
 $user_flag = !empty($user['code_drapeau']) ? $user['code_drapeau'] : "un";
-$theme_light = !empty($user['theme_light']) ? $user['theme_light'] : "#f0d9b5";
-$theme_dark = !empty($user['theme_dark']) ? $user['theme_dark'] : "#b58863";
 
-// Simulation rapide pour les statistiques
+// Validation stricte des couleurs récupérées de la BDD pour le bloc CSS :root
+$theme_light = (isset($user['theme_light']) && preg_match('/^#[0-9a-fA-F]{6}$/', $user['theme_light'])) ? $user['theme_light'] : "#f0d9b5";
+$theme_dark = (isset($user['theme_dark']) && preg_match('/^#[0-9a-fA-F]{6}$/', $user['theme_dark'])) ? $user['theme_dark'] : "#b58863";
+
 $victoires = 0; 
 $defaites = 0;
 ?>
@@ -85,17 +90,13 @@ $defaites = 0;
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title><?php echo htmlspecialchars($user['pseudo']); ?> - Profil - Jeu de Dames</title>
+    <title><?php echo htmlspecialchars($user['pseudo'] ?? 'Mon Profil'); ?> - Profil - Jeu de Dames</title>
     <style>
-        /* Déclaration des variables dynamiques pour le thème du damier */
         :root {
             --light-square: <?php echo $theme_light; ?>;
             --dark-square: <?php echo $theme_dark; ?>;
         }
 
-        /* ==========================================================================
-           1. FOND BOISÉ D'ORIGINE ET STYLE GÉNÉRAL
-           ========================================================================== */
         body {
             display: flex;
             min-height: 100vh;
@@ -129,9 +130,6 @@ $defaites = 0;
             to { transform: translate(0, 0); }
         }
 
-        /* ==========================================================================
-           2. BARRE LATÉRALE DE NAVIGATION
-           ========================================================================== */
         .sidebar {
             width: 240px;
             background-color: rgba(27, 18, 11, 0.9);
@@ -177,18 +175,14 @@ $defaites = 0;
             color: #fff;
         }
 
-        /* Modification ici pour intégrer la ligne verte de repère à gauche */
         .sidebar-link.active {
             background-color: rgba(255, 255, 255, 0.1);
             color: #fff;
             border-left: 4px solid #81b64c;
-            border-radius: 0 6px 6px 0; /* Garde l'arrondi uniquement à droite */
-            padding-left: 11px; /* Compense les 4px de bordure pour l'alignement des icônes */
+            border-radius: 0 6px 6px 0;
+            padding-left: 11px;
         }
 
-        /* ==========================================================================
-           3. ZONE PRINCIPALE ET EN-TÊTE DU PROFIL
-           ========================================================================== */
         .main-content {
             margin-left: 240px;
             flex-grow: 1;
@@ -250,6 +244,7 @@ $defaites = 0;
             padding: 5px;
             box-sizing: border-box;
         }
+        
         .big-avatar:hover .avatar-overlay {
             opacity: 1;
         }
@@ -335,6 +330,7 @@ $defaites = 0;
             cursor: pointer;
             font-weight: 600;
         }
+        
         .btn-modifier-profil:hover {
             background-color: rgba(255, 255, 255, 0.15);
         }
@@ -360,9 +356,6 @@ $defaites = 0;
             border-bottom: 3px solid #81b64c;
         }
 
-        /* ==========================================================================
-           4. DISPOSITION DU BAS (GRILLE)
-           ========================================================================== */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -395,15 +388,10 @@ $defaites = 0;
             cursor: pointer;
             transition: background 0.2s, border-color 0.2s;
         }
+        
         .card-right-item.clickable:hover {
             background-color: rgba(53, 34, 21, 0.95);
             border-color: #81b64c;
-        }
-
-        .card-right-item.vertical {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
         }
 
         .item-title {
@@ -427,9 +415,6 @@ $defaites = 0;
         .mini-board-preview div.light { background-color: var(--light-square); }
         .mini-board-preview div.dark { background-color: var(--dark-square); }
 
-        /* ==========================================================================
-           5. MODALES ET COMPOSANTS DE FORMULAIRE
-           ========================================================================== */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -506,7 +491,6 @@ $defaites = 0;
 
     <div class="sidebar">
         <div class="sidebar-brand">⚪ Jeu de Dames</div>
-        
         <div class="sidebar-menu">
             <a href="dashboard.php" class="sidebar-link">🏠 Accueil</a>
             <a href="plateau.php" class="sidebar-link">⚔️ Jouer</a>
@@ -515,29 +499,27 @@ $defaites = 0;
             <a href="amis.php" class="sidebar-link">👥 Amis</a>
             <a href="clans.php" class="sidebar-link">🛡️ Clans</a>
         </div>
-
         <a href="deconnexion.php" class="sidebar-link" style="margin-top: auto; color: #e74c3c;">🚪 Déconnexion</a>
     </div>
 
     <div class="main-content">
         
         <?php if(!empty($success_msg)): ?>
-            <div class="alert-success"><?php echo $success_msg; ?></div>
+            <div class="alert-success"><?php echo htmlspecialchars($success_msg); ?></div>
         <?php endif; ?>
         <?php if(!empty($error_msg)): ?>
-            <div class="alert-error" style="display:block;"><?php echo $error_msg; ?></div>
+            <div class="alert-error"><?php echo htmlspecialchars($error_msg); ?></div>
         <?php endif; ?>
 
         <div class="profile-header">
             <button class="btn-modifier-profil" onclick="openModal('editModal')">Modifier le profil</button>
             
             <div class="profile-main-info">
-                
                 <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="uploadAvatar(event)">
                 
                 <div class="big-avatar" id="avatarContainer" onclick="triggerAvatarUpload()" title="Cliquez pour changer votre photo de profil">
                     <?php if(!empty($user['avatar'])): ?>
-                        <img src="<?php echo htmlspecialchars($user['avatar']); ?>" class="avatar-img" id="avatarImg">
+                        <img src="<?php echo htmlspecialchars($user['avatar']); ?>" class="avatar-img" id="avatarImg" alt="Avatar">
                     <?php else: ?>
                         <span id="avatarPlaceholder">♙</span>
                     <?php endif; ?>
@@ -546,9 +528,9 @@ $defaites = 0;
                 
                 <div class="user-details">
                     <div class="username-row">
-                        <h1 id="displayPseudo"><?php echo htmlspecialchars($user['pseudo']); ?></h1>
+                        <h1 id="displayPseudo"><?php echo htmlspecialchars($user['pseudo'] ?? ''); ?></h1>
                         <span id="flagContainer">
-                            <img class="flag-img" src="https://flagcdn.com/w40/<?php echo $user_flag; ?>.png" alt="Drapeau">
+                            <img class="flag-img" src="https://flagcdn.com/w40/<?php echo htmlspecialchars($user_flag); ?>.png" alt="Drapeau">
                         </span>
                         <button class="badge-btn">Ajouter un badge</button>
                     </div>
@@ -558,7 +540,7 @@ $defaites = 0;
                     </div>
                     
                     <div class="meta-info">
-                        <span>Inscription le <strong><?php echo htmlspecialchars($user['date_inscription']); ?></strong></span>
+                        <span>Inscription le <strong><?php echo htmlspecialchars($user['date_inscription'] ?? 'Inconnue'); ?></strong></span>
                         <span>•</span>
                         <span><strong>2</strong> amis</span>
                         <span>•</span>
@@ -578,7 +560,6 @@ $defaites = 0;
         </div>
 
         <div class="dashboard-grid">
-            
             <div class="card-left-placeholder">
                 <p>Vous n'avez pas de parties actives.</p>
                 <div style="font-size: 12px; margin-top: 10px;">Historique des affrontements (0)</div>
@@ -602,7 +583,6 @@ $defaites = 0;
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -610,19 +590,18 @@ $defaites = 0;
         <div class="modal-card">
             <button class="btn-close-modal" onclick="closeModal('editModal')">×</button>
             <h2>⚙️ Paramètres du Profil</h2>
-            
             <div class="alert-error" id="modalErrorAlert" style="display:none;"></div>
             
             <form action="profil.php" method="POST" onsubmit="return validatePasswordMatch(event)">
                 <input type="hidden" name="action" value="update_profile">
 
                 <div class="form-group">
-                    <label>Votre Pseudo</label>
-                    <input type="text" name="pseudo" id="inputPseudo" class="form-control" value="<?php echo htmlspecialchars($user['pseudo']); ?>" required>
+                    <label for="inputPseudo">Votre Pseudo</label>
+                    <input type="text" name="pseudo" id="inputPseudo" class="form-control" value="<?php echo htmlspecialchars($user['pseudo'] ?? ''); ?>" required>
                 </div>
                 
                 <div class="form-group">
-                    <label>Biographie / Présentation</label>
+                    <label for="inputBio">Biographie / Présentation</label>
                     <textarea name="biographie" id="inputBio" class="form-control" rows="3"><?php echo htmlspecialchars($user_bio); ?></textarea>
                 </div>
 
@@ -644,12 +623,12 @@ $defaites = 0;
                 <div class="password-section-title">Sécurisation (Mot de passe)</div>
                 
                 <div class="form-group">
-                    <label>Nouveau mot de passe</label>
+                    <label for="inputPassword">Nouveau mot de passe</label>
                     <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Laisser vide si inchangé">
                 </div>
 
                 <div class="form-group">
-                    <label>Confirmer le nouveau mot de passe</label>
+                    <label for="inputConfirmPassword">Confirmer le nouveau mot de passe</label>
                     <input type="password" name="confirm_password" id="inputConfirmPassword" class="form-control" placeholder="Ressaisir le mot de passe">
                 </div>
 
@@ -721,6 +700,7 @@ $defaites = 0;
                                 img = document.createElement('img');
                                 img.id = 'avatarImg';
                                 img.classList.add('avatar-img');
+                                img.alt = "Avatar";
                                 container.insertBefore(img, container.firstChild);
                             }
                             img.src = base64Data;

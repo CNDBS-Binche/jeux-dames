@@ -24,22 +24,21 @@ $defaites = isset($defaites) ? $defaites : 0;
     <title>Tableau de Bord - Jeu de Dames</title>
     <style>
         /* ==========================================================================
-           1. LE FOND D'ÉCRAN BRUN BOISÉ ET SON QUADRILLAGE ANIMÉ
+           1. LE FOND D'ÉCRAN BRUN BOISÉ ET SON QUADRILLAGE ANIMÉ (FIXE)
            ========================================================================== */
         body {
             display: flex;
-            min-height: 100vh;
+            height: 100vh; /* Bloque la hauteur à l'écran */
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            color: #f0d9b5; /* Écritures crème style échecs/dames */
-            overflow-x: hidden;
+            color: #f0d9b5; 
+            overflow: hidden; /* Supprime le scroll de la page entière */
             background: radial-gradient(circle, #4a321f, #2b1d12);
             position: relative;
         }
 
-        /* Effet de grille animée en arrière-plan */
         body::before {
             content: "";
             position: absolute;
@@ -119,14 +118,27 @@ $defaites = isset($defaites) ? $defaites : 0;
             padding-left: 11px;
         }
 
+        .btn-logout {
+            background-color: rgba(62, 37, 16, 0.5);
+            color: #e74c3c;
+            margin-top: auto;
+        }
+        .sidebar-link.btn-logout:hover { 
+            background-color: #c0392b; color: #fff; 
+        }
+
         /* ==========================================================================
-           3. CONTENU PRINCIPAL & CARTES FLOTTANTES MARRONS
+           3. CONTENU PRINCIPAL CADRÉ ET AUTORISÉ AU SCROLL INTERNE
            ========================================================================== */
         .main-content {
             margin-left: 240px;
             flex-grow: 1;
             padding: 40px;
             max-width: 1200px;
+            width: calc(100% - 240px);
+            height: 100vh; /* Prend la hauteur exacte de l'écran */
+            box-sizing: border-box;
+            overflow-y: auto; /* Permet le scroll uniquement ici si nécessaire */
             z-index: 1;
         }
 
@@ -160,7 +172,7 @@ $defaites = isset($defaites) ? $defaites : 0;
             justify-content: center;
             font-size: 28px;
             color: #fff;
-            overflow: hidden; /* Conserve l'image arrondie */
+            overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.4);
             border: 1px solid rgba(255,255,255,0.1);
         }
@@ -168,7 +180,7 @@ $defaites = isset($defaites) ? $defaites : 0;
         .user-avatar img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Évite les déformations */
+            object-fit: cover;
         }
 
         /* Grille principale */
@@ -176,6 +188,7 @@ $defaites = isset($defaites) ? $defaites : 0;
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 30px;
+            margin-bottom: 20px;
         }
 
         @media (max-width: 900px) {
@@ -190,7 +203,7 @@ $defaites = isset($defaites) ? $defaites : 0;
             gap: 20px;
         }
 
-        /* Style des Cartes "Glow & Blur" version bois sombre */
+        /* Style des Cartes */
         .card {
             background-color: rgba(33, 21, 13, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -221,7 +234,6 @@ $defaites = isset($defaites) ? $defaites : 0;
             color: #c4b49c;
         }
 
-        /* La carte principale avec un dégradé boisé plus prononcé */
         .card-play {
             background: linear-gradient(135deg, rgba(62, 37, 16, 0.95) 0%, rgba(28, 17, 10, 0.95) 100%);
             border: 1px solid #7a4a28;
@@ -268,15 +280,6 @@ $defaites = isset($defaites) ? $defaites : 0;
         }
         .btn-play:hover { 
             background-color: #95cc5a; 
-        }
-
-        .btn-logout {
-            background-color: rgba(62, 37, 16, 0.5);
-            color: #e74c3c;
-            margin-top: auto;
-        }
-        .sidebar-link.btn-logout:hover { 
-            background-color: #c0392b; color: #fff; 
         }
 
         /* Bloc Statistiques */
@@ -327,10 +330,8 @@ $defaites = isset($defaites) ? $defaites : 0;
             <a href="profil.php" class="sidebar-link">⚙️ Profil</a>
             <a href="amis.php" class="sidebar-link">👥 Amis</a>
             <a href="clans.php" class="sidebar-link">🛡️ Clans</a>
-            
-            
-            <a href="deconnexion.php" class="sidebar-link btn-logout">🚪 Déconnexion</a>
         </div>
+        <a href="deconnexion.php" class="sidebar-link btn-logout">🚪 Déconnexion</a>
     </div>
 
     <div class="main-content">
