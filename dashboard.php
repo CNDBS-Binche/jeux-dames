@@ -270,13 +270,16 @@ $defaites = isset($defaites) ? $defaites : 0;
         }
 
         /* ==========================================================================
-           MODIFICATIONS NOUVELLES : LES TROIS DAMIERS STYLE CHESS.COM
+           CORRECTION ET RENDER DES DEUX DAMIERS (STYLE CHESS.COM)
            ========================================================================== */
         .boards-container {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            grid-template-columns: repeat(2, 1fr); /* 2 colonnes au lieu de 3 */
+            gap: 40px;
             margin-top: 20px;
+            max-width: 550px; /* Centre et ajuste la taille globale */
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .board-wrapper {
@@ -296,29 +299,38 @@ $defaites = isset($defaites) ? $defaites : 0;
         .mini-board {
             width: 100%;
             aspect-ratio: 1 / 1;
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            grid-template-rows: repeat(10, 1fr);
+            display: flex;
+            flex-direction: column;
             border: 4px solid #312115;
             border-radius: 4px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
             box-sizing: border-box;
-            background-color: #f0d9b5; /* Case claire */
         }
 
-        /* Génération des cases sombres */
-        .mini-board div {
-            box-sizing: border-box;
+        .board-row {
+            display: flex;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* Définition stricte des cases */
+        .cell {
+            flex: 1;
+            aspect-ratio: 1 / 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
         }
 
-        /* Logique d'alternance des cases pour un damier 10x10 */
-        .mini-board div:nth-child(20n+2), .mini-board div:nth-child(20n+4), .mini-board div:nth-child(20n+6), .mini-board div:nth-child(20n+8), .mini-board div:nth-child(20n+10),
-        .mini-board div:nth-child(20n+11), .mini-board div:nth-child(20n+13), .mini-board div:nth-child(20n+15), .mini-board div:nth-child(20n+17), .mini-board div:nth-child(20n+19) {
-            background-color: #b58863; /* Case sombre */
+        /* Alternance parfaite ligne par ligne */
+        .board-row:nth-child(odd) .cell:nth-child(even),
+        .board-row:nth-child(even) .cell:nth-child(odd) {
+            background-color: #b58863; /* Cases sombres */
+        }
+
+        .board-row:nth-child(odd) .cell:nth-child(odd),
+        .board-row:nth-child(even) .cell:nth-child(even) {
+            background-color: #f0d9b5; /* Cases claires */
         }
 
         /* Pions */
@@ -326,22 +338,22 @@ $defaites = isset($defaites) ? $defaites : 0;
             width: 75%;
             height: 75%;
             border-radius: 50%;
-            box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.4);
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .piece.white {
-            background-color: #ffffff;
-            border: 1px solid #ccc;
+            background-color: #eaeaea;
+            border: 1px solid #bcbcbc;
         }
 
         .piece.black {
-            background-color: #1e1e1e;
-            border: 1px solid #000;
+            background-color: #2b2b2b;
+            border: 1px solid #111;
         }
 
         .board-label {
-            margin-top: 12px;
-            font-size: 14px;
+            margin-top: 15px;
+            font-size: 15px;
             font-weight: 600;
             color: #fff;
         }
@@ -351,7 +363,7 @@ $defaites = isset($defaites) ? $defaites : 0;
 
     <div class="sidebar">
         <div class="sidebar-brand">
-             White Pawn ⚪ Jeu de Dames
+             ⚪ Jeu de Dames
         </div>
         <div class="sidebar-menu">
             <a href="dashboard.php" class="sidebar-link active">🏠 Accueil</a>
@@ -394,50 +406,74 @@ $defaites = isset($defaites) ? $defaites : 0;
                     <div class="boards-container">
                         <a href="plateau.php" class="board-wrapper">
                             <div class="mini-board">
-                                <div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div>
-                                <div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div>
-                                <div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div>
-                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-                                <div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div>
-                                <div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div>
-                                <div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div>
+                                <div class="board-row">
+                                    <div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div>
+                                </div>
                             </div>
                             <div class="board-label">Lancer une partie</div>
                         </a>
 
                         <a href="plateau.php?mode=ia" class="board-wrapper">
                             <div class="mini-board">
-                                <div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div>
-                                <div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div>
-                                <div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div>
-                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-                                <div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div>
-                                <div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div>
-                                <div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div>
+                                <div class="board-row">
+                                    <div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div>
+                                </div>
+                                <div class="board-row">
+                                    <div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div>
+                                </div>
                             </div>
                             <div class="board-label">Jouer contre un ordinateur</div>
-                        </a>
-
-                        <a href="problemes.php" class="board-wrapper">
-                            <div class="mini-board">
-                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-                                <div></div><div></div><div></div><div class="piece black"></div><div></div><div></div><div></div><div class="piece black"></div><div></div><div></div>
-                                <div></div><div></div><div></div><div></div><div></div><div class="piece black"></div><div></div><div></div><div></div><div></div>
-                                <div></div><div></div><div></div><div class="piece white"></div><div></div><div></div><div></div><div></div><div></div><div></div>
-                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div class="piece black"></div><div></div><div></div>
-                                <div></div><div class="piece white"></div><div></div><div></div><div></div><div class="piece white"></div><div></div><div></div><div></div><div></div>
-                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-                            </div>
-                            <div class="board-label">Résoudre des problèmes</div>
                         </a>
                     </div>
                 </div>
