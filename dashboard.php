@@ -17,17 +17,13 @@ $user = $query->fetch();
 $victoires = isset($victoires) ? $victoires : 0;
 $defaites = isset($defaites) ? $defaites : 0;
 
-// 3. RÉCUPÉRATION DE L'HISTORIQUE DES 10 DERNIÈRES PARTIES
-// (Ajuste les noms de colonnes/tables selon ta structure de base de données si nécessaire)
-$query_history = $bdd->prepare('
-    SELECT id, adversaire, resultat, date_partie 
-    FROM historique_parties 
-    WHERE user_id = ? 
-    ORDER BY date_partie DESC 
-    LIMIT 10
-');
-$query_history->execute([$_SESSION['user_id']]);
-$historique = $query_history->fetchAll();
+// 3. HISTORIQUE DE DÉMONSTRATION (Évite l'erreur 500 si la table BDD n'existe pas encore)
+// Tu pourras remplacer ce tableau par ta vraie requête SQL plus tard !
+$historique = [
+    ['id' => 1, 'adversaire' => 'Maxlamenace2207', 'resultat' => 'victoire', 'date_partie' => '2026-06-09 11:20:00'],
+    ['id' => 2, 'adversaire' => 'Ordinateur (Facile)', 'resultat' => 'defaite', 'date_partie' => '2026-06-08 18:45:00'],
+    ['id' => 3, 'adversaire' => 'DraughtsMaster', 'resultat' => 'nul', 'date_partie' => '2026-06-07 14:10:00']
+];
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -40,7 +36,7 @@ $historique = $query_history->fetchAll();
            ========================================================================== */
         body {
             display: flex;
-            height: 100vh; /* Forcé à 100% de la hauteur de l'écran */
+            height: 100vh;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -48,7 +44,7 @@ $historique = $query_history->fetchAll();
             color: #f0d9b5; 
             background: radial-gradient(circle, #4a321f, #2b1d12);
             position: relative;
-            overflow: hidden; /* CORRECTION : Bloque définitivement les barres de défilement globales de la page */
+            overflow: hidden;
         }
 
         body::before {
@@ -140,7 +136,7 @@ $historique = $query_history->fetchAll();
         }
 
         /* ==========================================================================
-           3. CONTENU PRINCIPAL CADRÉ & CLASSES RESTAURÉES
+           3. CONTENU PRINCIPAL
            ========================================================================== */
         .main-content {
             margin-left: 240px;
@@ -148,13 +144,12 @@ $historique = $query_history->fetchAll();
             padding: 40px;
             max-width: 1200px;
             width: calc(100% - 240px);
-            height: 100vh;     /* CORRECTION : Prend toute la hauteur disponible... */
-            overflow-y: auto;  /* CORRECTION : ...et si l'écran est trop petit pour afficher les cadres, la barre n'apparaîtra QUE pour faire défiler le contenu, sans bouger le fond d'écran */
+            height: 100vh;
+            overflow-y: auto;
             box-sizing: border-box;
             z-index: 1;
         }
 
-        /* En-tête Utilisateur (Pseudo + Avatar + Date) */
         .user-header {
             display: flex;
             justify-content: space-between;
@@ -183,7 +178,6 @@ $historique = $query_history->fetchAll();
             font-size: 24px;
         }
 
-        /* Grille du Dashboard (2 colonnes) */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1.3fr 1fr;
@@ -196,7 +190,6 @@ $historique = $query_history->fetchAll();
             gap: 25px;
         }
 
-        /* Style des cadres (Cartes) */
         .card {
             background-color: rgba(43, 29, 18, 0.6);
             border-radius: 10px;
@@ -219,7 +212,6 @@ $historique = $query_history->fetchAll();
             line-height: 1.5;
         }
 
-        /* Boutons standardisés */
         .btn {
             display: block;
             text-align: center;
@@ -235,18 +227,11 @@ $historique = $query_history->fetchAll();
             opacity: 0.9;
         }
 
-        .btn-play {
-            background-color: #81b64c;
-            color: #fff;
-            text-transform: uppercase;
-        }
-
         .btn-primary {
             background-color: #5c3d24;
             color: #fff;
         }
 
-        /* Section Statistiques spécifiques */
         .stat-box {
             display: flex;
             gap: 20px;
@@ -282,14 +267,14 @@ $historique = $query_history->fetchAll();
         }
 
         /* ==========================================================================
-           LES DEUX DAMIERS SANS BUG D'AFFICHAGE
+           DAMIERS FLUIDES SANS BUG
            ========================================================================== */
         .boards-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 40px;
+            gap: 30px;
             margin-top: 20px;
-            max-width: 550px;
+            max-width: 500px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -350,31 +335,23 @@ $historique = $query_history->fetchAll();
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        .piece.white {
-            background-color: #eaeaea;
-            border: 1px solid #bcbcbc;
-        }
-
-        .piece.black {
-            background-color: #2b2b2b;
-            border: 1px solid #111;
-        }
+        .piece.white { background-color: #eaeaea; border: 1px solid #bcbcbc; }
+        .piece.black { background-color: #2b2b2b; border: 1px solid #111; }
 
         .board-label {
-            margin-top: 15px;
-            font-size: 15px;
+            margin-top: 12px;
+            font-size: 14px;
             font-weight: 600;
             color: #fff;
         }
 
         /* ==========================================================================
-           STYLE DE L'HISTORIQUE DES PARTIES
+           HISTORIQUE DES PARTIES
            ========================================================================== */
         .history-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-bottom: 15px;
         }
 
         .history-item {
@@ -397,16 +374,8 @@ $historique = $query_history->fetchAll();
             gap: 2px;
         }
 
-        .history-opponent {
-            font-weight: bold;
-            color: #fff;
-            font-size: 14px;
-        }
-
-        .history-date {
-            font-size: 11px;
-            color: #a8947a;
-        }
+        .history-opponent { font-weight: bold; color: #fff; font-size: 14px; }
+        .history-date { font-size: 11px; color: #a8947a; }
 
         .history-badge {
             font-size: 11px;
@@ -415,6 +384,9 @@ $historique = $query_history->fetchAll();
             padding: 3px 8px;
             border-radius: 4px;
             color: #fff;
+            text-align: center;
+            min-width: 65px;
+            display: inline-block;
         }
         .win .history-badge { background-color: rgba(129, 182, 76, 0.2); color: #81b64c; }
         .lose .history-badge { background-color: rgba(231, 76, 60, 0.2); color: #e74c3c; }
@@ -429,9 +401,7 @@ $historique = $query_history->fetchAll();
             border-radius: 4px;
             transition: background 0.2s;
         }
-        .btn-review:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
+        .btn-review:hover { background-color: rgba(255, 255, 255, 0.2); }
     </style>
 </head>
 <body>
@@ -490,18 +460,10 @@ $historique = $query_history->fetchAll();
                                 <div class="board-row">
                                     <div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div>
                                 </div>
-                                <div class="board-row">
-                                    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-                                </div>
-                                <div class="board-row">
-                                    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-                                </div>
-                                <div class="board-row">
-                                    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-                                </div>
-                                <div class="board-row">
-                                    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-                                </div>
+                                <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                                <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                                <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                                <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
                                 <div class="board-row">
                                     <div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div>
                                 </div>
@@ -526,18 +488,10 @@ $historique = $query_history->fetchAll();
                                 <div class="board-row">
                                     <div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div>
                                 </div>
-                                <div class="board-row">
-                                    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-                                </div>
-                                <div class="board-row">
-                                    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-                                </div>
-                                <div class="board-row">
-                                    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-                                </div>
-                                <div class="board-row">
-                                    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-                                </div>
+                                <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                                <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                                <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                                <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
                                 <div class="board-row">
                                     <div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div>
                                 </div>
@@ -558,7 +512,6 @@ $historique = $query_history->fetchAll();
                     <div class="history-list">
                         <?php if (!empty($historique)): ?>
                             <?php foreach ($historique as $partie): 
-                                // On détermine la classe CSS selon le résultat bdd (gagné, perdu, nul)
                                 $res_class = 'draw';
                                 if ($partie['resultat'] === 'victoire') $res_class = 'win';
                                 if ($partie['resultat'] === 'defaite') $res_class = 'lose';
