@@ -99,7 +99,7 @@ $defaites = 0;
 
         body {
             display: flex;
-            min-height: 100vh;
+            height: 100vh; /* CORRECTION : Forcé à 100% de la hauteur de l'écran */
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -107,7 +107,7 @@ $defaites = 0;
             color: #f0d9b5;
             background: radial-gradient(circle, #4a321f, #2b1d12);
             position: relative;
-            overflow-x: hidden;
+            overflow: hidden; /* CORRECTION : Bloque les barres de défilement globales provoquées par l'animation du fond */
         }
 
         body::before {
@@ -188,6 +188,9 @@ $defaites = 0;
             flex-grow: 1;
             padding: 40px;
             max-width: 1200px;
+            width: calc(100% - 240px);
+            height: 100vh;     /* CORRECTION : Occupe toute la hauteur disponible de la fenêtre */
+            overflow-y: auto;  /* CORRECTION : Permet le défilement du contenu de profil de façon isolée */
             z-index: 1;
             box-sizing: border-box;
         }

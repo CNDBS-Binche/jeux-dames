@@ -2,7 +2,7 @@
 session_start();
 require_once 'config.php';
 
-// Vérification de la session
+// 1. VÉRIFICATION DE LA SESSION
 if (!isset($_SESSION['user_id'])) {
     header('Location: connexion.php');
     exit();
@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $userId = $_SESSION['user_id'];
 
-// Génération du jeton CSRF s'il n'existe pas
+// 2. GÉNÉRATION DU JETON CSRF
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     } else {
         $action = $_POST['action'];
 
-        // 1. AJOUTER UN AMI
+        // ACTION : AJOUTER UN AMI
         if ($action === 'ajouter' && !empty($_POST['pseudo_recherche'])) {
             $pseudoRecherche = trim($_POST['pseudo_recherche']);
             
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             }
         }
 
-        // 2. ACCEPTER UNE DEMANDE
+        // ACTION : ACCEPTER UNE DEMANDE
         if ($action === 'accepter' && isset($_POST['relation_id'])) {
             $relationId = (int)$_POST['relation_id'];
             $reqUp = $bdd->prepare('UPDATE amis SET statut = "accepte" WHERE id = ? AND user_id_2 = ?');
@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             exit();
         }
 
-        // 3. REFUSER UNE DEMANDE OU SUPPRIMER UN AMI
+        // ACTION : REFUSER OU SUPPRIMER UNE DEMANDE
         if ($action === 'supprimer' && isset($_POST['relation_id'])) {
             $relationId = (int)$_POST['relation_id'];
             $reqDel = $bdd->prepare('DELETE FROM amis WHERE id = ? AND (user_id_1 = ? OR user_id_2 = ?)');
@@ -88,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 /* ==========================================================================
    RÉCUPÉRATION DES DONNÉES POUR L'AFFICHAGE
    ========================================================================== */
+// Récupération des invitations en attente
 $reqDemandes = $bdd->prepare('
     SELECT a.id as relation_id, u.pseudo 
     FROM amis a 
@@ -97,6 +98,7 @@ $reqDemandes = $bdd->prepare('
 $reqDemandes->execute([$userId]);
 $demandes = $reqDemandes->fetchAll(PDO::FETCH_ASSOC);
 
+// Récupération de la liste d'amis acceptés
 $reqAmis = $bdd->prepare('
     SELECT a.id as relation_id, 
            CASE WHEN a.user_id_1 = ? THEN u2.pseudo ELSE u1.pseudo END as pseudo_ami
@@ -115,7 +117,7 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
     <title>Mes Amis - Jeu de Dames</title>
     <style>
         /* ==========================================================================
-           1. LE FOND D'ÉCRAN BRUN BOISÉ ET SON QUADRILLAGE ANIMÉ
+           1. FOND D'ÉCRAN ET QUADRILLAGE
            ========================================================================== */
         body {
             display: flex;
@@ -151,7 +153,7 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
         }
 
         /* ==========================================================================
-           2. BARRE LATÉRALE DE NAVIGATION (Marron sombre)
+           2. BARRE LATÉRALE DE NAVIGATION
            ========================================================================== */
         .sidebar {
             width: 240px;
@@ -210,7 +212,7 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
         }
 
         /* ==========================================================================
-           3. CONTENU PRINCIPAL & CARTES FLOTTANTES MARRONS
+           3. CONTENU PRINCIPAL ET GRILLE
            ========================================================================== */
         .main-content {
             margin-left: 240px;
@@ -270,7 +272,7 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
         }
 
         /* ==========================================================================
-           4. BOUTONS STYLE CHESS.COM & FORMULAIRES
+           4. BOUTONS STYLE CHESS.COM & ELEMENTS FORMULAIRES
            ========================================================================== */
         .btn {
             display: inline-flex;
@@ -458,7 +460,6 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
                                             <input type="hidden" name="action" value="supprimer">
                                             <input type="hidden" name="relation_id" value="<?php echo $a['relation_id']; ?>">
                                             <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                                            
                                             <button type="submit" class="btn btn-danger" style="padding: 8px 14px; font-size: 13px;">Retirer</button>
                                         </form>
                                     </div>
@@ -485,7 +486,6 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
                                             <input type="hidden" name="action" value="accepter">
                                             <input type="hidden" name="relation_id" value="<?php echo $d['relation_id']; ?>">
                                             <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                                            
                                             <button type="submit" class="btn btn-play" style="padding: 6px 12px; font-size: 13px; width: 100%;">Accepter</button>
                                         </form>
 
@@ -493,9 +493,9 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
                                             <input type="hidden" name="action" value="supprimer">
                                             <input type="hidden" name="relation_id" value="<?php echo $d['relation_id']; ?>">
                                             <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                                            
                                             <button type="submit" class="btn btn-danger" style="padding: 6px 12px; font-size: 13px; width: 100%;">Refuser</button>
                                         </form>
+                                        
                                     </div>
                                 </li>
                             <?php endforeach; ?>
