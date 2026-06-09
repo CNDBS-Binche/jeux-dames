@@ -28,7 +28,7 @@ $defaites = isset($defaites) ? $defaites : 0;
            ========================================================================== */
         body {
             display: flex;
-            min-height: 100vh;
+            height: 100vh; /* Forcé à 100% de la hauteur de l'écran */
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -36,7 +36,7 @@ $defaites = isset($defaites) ? $defaites : 0;
             color: #f0d9b5; 
             background: radial-gradient(circle, #4a321f, #2b1d12);
             position: relative;
-            overflow-x: hidden; /* Supprime la barre horizontale du bas due au fond animé sans bloquer le scroll vertical si nécessaire */
+            overflow: hidden; /* CORRECTION : Bloque définitivement les barres de défilement globales de la page */
         }
 
         body::before {
@@ -136,6 +136,8 @@ $defaites = isset($defaites) ? $defaites : 0;
             padding: 40px;
             max-width: 1200px;
             width: calc(100% - 240px);
+            height: 100vh;     /* CORRECTION : Prend toute la hauteur disponible... */
+            overflow-y: auto;  /* CORRECTION : ...et si l'écran est trop petit pour afficher les cadres, la barre n'apparaîtra QUE pour faire défiler le contenu, sans bouger le fond d'écran */
             box-sizing: border-box;
             z-index: 1;
         }
