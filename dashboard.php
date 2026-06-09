@@ -16,14 +16,6 @@ $user = $query->fetch();
 // Si les statistiques ne sont pas encore calculées, on initialise à 0
 $victoires = isset($victoires) ? $victoires : 0;
 $defaites = isset($defaites) ? $defaites : 0;
-
-// 3. HISTORIQUE DE DÉMONSTRATION (Évite l'erreur 500 si la table BDD n'existe pas encore)
-// Tu pourras remplacer ce tableau par ta vraie requête SQL plus tard !
-$historique = [
-    ['id' => 1, 'adversaire' => 'Maxlamenace2207', 'resultat' => 'victoire', 'date_partie' => '2026-06-09 11:20:00'],
-    ['id' => 2, 'adversaire' => 'Ordinateur (Facile)', 'resultat' => 'defaite', 'date_partie' => '2026-06-08 18:45:00'],
-    ['id' => 3, 'adversaire' => 'DraughtsMaster', 'resultat' => 'nul', 'date_partie' => '2026-06-07 14:10:00']
-];
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -267,7 +259,7 @@ $historique = [
         }
 
         /* ==========================================================================
-           DAMIERS FLUIDES SANS BUG
+           DEUX DAMIERS SANS BUG D'AFFICHAGE
            ========================================================================== */
         .boards-container {
             display: grid;
@@ -346,7 +338,7 @@ $historique = [
         }
 
         /* ==========================================================================
-           HISTORIQUE DES PARTIES
+           HISTORIQUE DES PARTIES (VISUEL SEUL)
            ========================================================================== */
         .history-list {
             display: flex;
@@ -366,7 +358,6 @@ $historique = [
 
         .history-item.win { border-left-color: #81b64c; }
         .history-item.lose { border-left-color: #e74c3c; }
-        .history-item.draw { border-left-color: #f39c12; }
 
         .history-details {
             display: flex;
@@ -390,7 +381,6 @@ $historique = [
         }
         .win .history-badge { background-color: rgba(129, 182, 76, 0.2); color: #81b64c; }
         .lose .history-badge { background-color: rgba(231, 76, 60, 0.2); color: #e74c3c; }
-        .draw .history-badge { background-color: rgba(243, 156, 18, 0.2); color: #f39c12; }
 
         .btn-review {
             font-size: 12px;
@@ -508,28 +498,29 @@ $historique = [
                 </div>
 
                 <div class="card">
-                    <h2>📜 Historique des parties</h2>
+                    <h2>📜 Historique des dernières parties</h2>
                     <div class="history-list">
-                        <?php if (!empty($historique)): ?>
-                            <?php foreach ($historique as $partie): 
-                                $res_class = 'draw';
-                                if ($partie['resultat'] === 'victoire') $res_class = 'win';
-                                if ($partie['resultat'] === 'defaite') $res_class = 'lose';
-                            ?>
-                                <div class="history-item <?php echo $res_class; ?>">
-                                    <div class="history-details">
-                                        <span class="history-opponent">Contre <?php echo htmlspecialchars($partie['adversaire']); ?></span>
-                                        <span class="history-date">Le <?php echo date('d/m/Y à H:i', strtotime($partie['date_partie'])); ?></span>
-                                    </div>
-                                    <div style="display: flex; align-items: center; gap: 15px;">
-                                        <span class="history-badge"><?php echo htmlspecialchars($partie['resultat']); ?></span>
-                                        <a href="replay.php?id=<?php echo $partie['id']; ?>" class="btn-review">Analyse</a>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <p class="empty-state" style="margin: 0; padding: 10px 0;">Aucune partie enregistrée dans votre historique.</p>
-                        <?php endif; ?>
+                        <div class="history-item win">
+                            <div class="history-details">
+                                <span class="history-opponent">Contre Maxlamenace2207</span>
+                                <span class="history-date">Le 09/06/2026 à 11:20</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span class="history-badge">Victoire</span>
+                                <a href="#" class="btn-review">Analyse</a>
+                            </div>
+                        </div>
+
+                        <div class="history-item lose">
+                            <div class="history-details">
+                                <span class="history-opponent">Contre Ordinateur (Facile)</span>
+                                <span class="history-date">Le 08/06/2026 à 18:45</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span class="history-badge">Défaite</span>
+                                <a href="#" class="btn-review">Analyse</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
