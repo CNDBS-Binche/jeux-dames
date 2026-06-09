@@ -268,13 +268,90 @@ $defaites = isset($defaites) ? $defaites : 0;
             text-align: center;
             opacity: 0.6;
         }
+
+        /* ==========================================================================
+           MODIFICATIONS NOUVELLES : LES TROIS DAMIERS STYLE CHESS.COM
+           ========================================================================== */
+        .boards-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .board-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s;
+        }
+
+        .board-wrapper:hover {
+            transform: translateY(-5px);
+        }
+
+        .mini-board {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            border: 4px solid #312115;
+            border-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-sizing: border-box;
+            background-color: #f0d9b5; /* Case claire */
+        }
+
+        /* Génération des cases sombres */
+        .mini-board div {
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Logique d'alternance des cases pour un damier 10x10 */
+        .mini-board div:nth-child(20n+2), .mini-board div:nth-child(20n+4), .mini-board div:nth-child(20n+6), .mini-board div:nth-child(20n+8), .mini-board div:nth-child(20n+10),
+        .mini-board div:nth-child(20n+11), .mini-board div:nth-child(20n+13), .mini-board div:nth-child(20n+15), .mini-board div:nth-child(20n+17), .mini-board div:nth-child(20n+19) {
+            background-color: #b58863; /* Case sombre */
+        }
+
+        /* Pions */
+        .piece {
+            width: 75%;
+            height: 75%;
+            border-radius: 50%;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.4);
+        }
+
+        .piece.white {
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+        }
+
+        .piece.black {
+            background-color: #1e1e1e;
+            border: 1px solid #000;
+        }
+
+        .board-label {
+            margin-top: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
         <div class="sidebar-brand">
-            ⚪ Jeu de Dames
+             White Pawn ⚪ Jeu de Dames
         </div>
         <div class="sidebar-menu">
             <a href="dashboard.php" class="sidebar-link active">🏠 Accueil</a>
@@ -313,7 +390,56 @@ $defaites = isset($defaites) ? $defaites : 0;
                 <div class="card card-play">
                     <h2>Prêt à en découdre ?</h2>
                     <p style="color: #f0d9b5; opacity: 0.8;">Défiez des joueurs en ligne, peaufinez vos tactiques et grimpez dans le classement du jeu de dames.</p>
-                    <a href="plateau.php" class="btn btn-play">Lancer une partie</a>
+                    
+                    <div class="boards-container">
+                        <a href="plateau.php" class="board-wrapper">
+                            <div class="mini-board">
+                                <div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div>
+                                <div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div>
+                                <div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div>
+                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                                <div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div>
+                                <div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div>
+                                <div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div>
+                            </div>
+                            <div class="board-label">Lancer une partie</div>
+                        </a>
+
+                        <a href="plateau.php?mode=ia" class="board-wrapper">
+                            <div class="mini-board">
+                                <div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div>
+                                <div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div>
+                                <div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div><div></div><div class="piece black"></div>
+                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                                <div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div>
+                                <div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div>
+                                <div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div><div class="piece white"></div><div></div>
+                            </div>
+                            <div class="board-label">Jouer contre un ordinateur</div>
+                        </a>
+
+                        <a href="problemes.php" class="board-wrapper">
+                            <div class="mini-board">
+                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                                <div></div><div></div><div></div><div class="piece black"></div><div></div><div></div><div></div><div class="piece black"></div><div></div><div></div>
+                                <div></div><div></div><div></div><div></div><div></div><div class="piece black"></div><div></div><div></div><div></div><div></div>
+                                <div></div><div></div><div></div><div class="piece white"></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div class="piece black"></div><div></div><div></div>
+                                <div></div><div class="piece white"></div><div></div><div></div><div></div><div class="piece white"></div><div></div><div></div><div></div><div></div>
+                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                            </div>
+                            <div class="board-label">Résoudre des problèmes</div>
+                        </a>
+                    </div>
                 </div>
 
                 <div class="card">
