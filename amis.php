@@ -1,8 +1,3 @@
-Voici ton fichier `amis.php` complet, nettoyé et mis à jour.
-
-J'ai modifié la requête SQL pour récupérer l'identifiant de ton ami (`id_ami`), injecté dynamiquement cette valeur dans ton bouton HTML, et remplacé la fonction JavaScript pour qu'elle communique directement avec l'action `defier` de ton fichier `jcj_ajax.php`.
-
-```php
 <?php
 session_start();
 require_once 'config.php';
@@ -123,7 +118,7 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
     <title>Mes Amis - Jeu de Dames</title>
     <style>
         /* ==========================================================================
-           1. FOND D'ÉCRAN ET QUADRILLAGE
+           1. FOND D'ÉCRAN FIXE (EMPÊCHE LA PAGE DE DESCENDRE À L'INFINI)
            ========================================================================== */
         body {
             display: flex;
@@ -140,9 +135,11 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
 
         body::before {
             content: "";
-            position: absolute;
-            width: 200%;
-            height: 200%;
+            position: fixed; /* Fixé à l'écran pour ne pas agrandir la page */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background-image: 
                 linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%), 
                 linear-gradient(-45deg, rgba(0,0,0,0.1) 25%, transparent 25%), 
@@ -153,9 +150,10 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
             animation: move 60s linear infinite;
         }
 
+        /* Déplacement du motif interne au lieu du conteneur global */
         @keyframes move {
-            from { transform: translate(-25%, -25%); }
-            to { transform: translate(0, 0); }
+            from { background-position: 0 0; }
+            to { background-position: 100px 100px; }
         }
 
         /* ==========================================================================
@@ -514,7 +512,6 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
 <script>
-// CORRECTION ICI : Rework complet du système de duel asynchrone via Fetch
 function lancerDuel(idAmi) {
     if (!idAmi) return;
 
@@ -546,5 +543,3 @@ function lancerDuel(idAmi) {
 <?php include 'popup_invitation.php'; ?>
 </body>
 </html>
-
-```
