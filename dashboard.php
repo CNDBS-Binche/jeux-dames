@@ -28,13 +28,13 @@ $defaites = isset($defaites) ? $defaites : 0;
            ========================================================================== */
         body {
             display: flex;
-            height: 100vh; /* Bloque la hauteur à l'écran */
+            min-height: 100vh; /* Permet à la page de grandir si le contenu dépasse */
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: #f0d9b5; 
-            overflow: hidden; /* Supprime le scroll de la page entière */
+            /* overflow: hidden; <- Supprimé pour réactiver la barre de défilement à droite */
             background: radial-gradient(circle, #4a321f, #2b1d12);
             position: relative;
         }
@@ -136,9 +136,8 @@ $defaites = isset($defaites) ? $defaites : 0;
             padding: 40px;
             max-width: 1200px;
             width: calc(100% - 240px);
-            height: 100vh; /* Prend la hauteur exacte de l'écran */
+            min-height: 100vh; /* Utilisation de min-height plutôt que height fixe */
             box-sizing: border-box;
-            overflow-y: auto; /* Permet le scroll uniquement ici si nécessaire */
             z-index: 1;
         }
 
