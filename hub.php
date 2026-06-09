@@ -14,17 +14,17 @@ $username = $_SESSION['pseudo'] ?? 'Joueur';
     <title>Hub - Jeu de Dames</title>
     <style>
         /* ==========================================================================
-           1. LE FOND D'ÉCRAN BRUN BOISÉ ET SON QUADRILLAGE ANIMÉ
+           1. LE FOND D'ÉCRAN BRUN BOISÉ ET SON QUADRILLAGE ANIMÉ (FIXE)
            ========================================================================== */
         body {
             display: flex;
-            min-height: 100vh;
+            height: 100vh; /* CORRECTION : Hauteur stricte à 100% de l'écran */
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: #f0d9b5;
-            overflow-x: hidden;
+            overflow: hidden; /* CORRECTION : Supprime totalement la barre de défilement de la page */
             background: radial-gradient(circle, #4a321f, #2b1d12);
             position: relative;
         }
@@ -118,7 +118,7 @@ $username = $_SESSION['pseudo'] ?? 'Joueur';
         }
 
         /* ==========================================================================
-           3. CONTENU PRINCIPAL & GRILLE
+           3. CONTENU PRINCIPAL BIEN CADRÉ (Pas de scroll global)
            ========================================================================== */
         .main-content {
             margin-left: 240px;
@@ -126,6 +126,10 @@ $username = $_SESSION['pseudo'] ?? 'Joueur';
             padding: 40px;
             max-width: 1200px;
             width: calc(100% - 240px);
+            height: 100vh; /* CORRECTION : Aligné sur la hauteur de la fenêtre */
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
             z-index: 1;
         }
 
@@ -133,14 +137,9 @@ $username = $_SESSION['pseudo'] ?? 'Joueur';
             display: grid;
             grid-template-columns: 1fr 2fr;
             gap: 30px;
-            height: 65vh;
-        }
-
-        @media (max-width: 950px) {
-            .hub-grid {
-                grid-template-columns: 1fr;
-                height: auto;
-            }
+            flex-grow: 1; /* CORRECTION : Prend tout l'espace restant de manière dynamique */
+            min-height: 0; /* TRUC CSS IMPORTANT : Permet aux enfants d'avoir un overflow interne fonctionnel */
+            margin-bottom: 20px;
         }
 
         .panel {
@@ -152,6 +151,8 @@ $username = $_SESSION['pseudo'] ?? 'Joueur';
             flex-direction: column;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(8px);
+            box-sizing: border-box;
+            min-height: 0; /* Permet au panel de ne pas s'agrandir au-delà de la grille */
         }
         
         .panel h2 {
@@ -171,7 +172,7 @@ $username = $_SESSION['pseudo'] ?? 'Joueur';
         }
         
         /* ==========================================================================
-           4. CHAT ET BOUTONS
+           4. CHAT ET BOUTONS (Défilement uniquement ici !)
            ========================================================================== */
         #chat-box {
             flex: 1;
@@ -179,7 +180,7 @@ $username = $_SESSION['pseudo'] ?? 'Joueur';
             border: 1px solid #5d3a1a;
             border-radius: 6px;
             padding: 15px;
-            overflow-y: auto;
+            overflow-y: auto; /* Seul le chat possède une barre de défilement si trop de messages */
             margin-bottom: 15px;
             font-size: 14px;
         }
@@ -238,7 +239,7 @@ $username = $_SESSION['pseudo'] ?? 'Joueur';
             width: 100%;
             box-sizing: border-box;
             text-align: center;
-            margin-top: auto;
+            margin-top: auto; /* Pousse le bouton en bas de sa zone */
         }
         .btn-play:hover { 
             background-color: #95cc5a; 
@@ -271,14 +272,14 @@ $username = $_SESSION['pseudo'] ?? 'Joueur';
     </div>
 
     <div class="main-content">
-        <h1 style="color: #fff; margin-top: 0; margin-bottom: 30px; font-weight: 600;">Bienvenue sur le chat public, <?php echo htmlspecialchars($username); ?> !</h1>
+        <h1 style="color: #fff; margin-top: 0; margin-bottom: 30px; font-weight: 600;">Bienvenue sur le Hub, <?php echo htmlspecialchars($username); ?> !</h1>
 
         <div class="hub-grid">
             <div class="panel">
                 <h2>Menu principal</h2>
                 <p>Clan : Aucun (Bientôt disponible)</p>
                 
-                <a href="plateau.php" class="btn btn-play">Jouer</a>
+                <a href="plateau.php" class="btn btn-play">Jouer (Local)</a>
             </div>
 
             <div class="panel">
