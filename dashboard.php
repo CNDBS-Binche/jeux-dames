@@ -400,5 +400,6 @@ $defaites = isset($defaites) ? $defaites : 0;
 
         </div>
     </div>
+    <?php include 'popup_invitation.php'; ?>
 </body>
 </html>
