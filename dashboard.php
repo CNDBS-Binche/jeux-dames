@@ -36,8 +36,7 @@ $defaites = isset($defaites) ? $defaites : 0;
             color: #f0d9b5; 
             background: radial-gradient(circle, #4a321f, #2b1d12);
             position: relative;
-            /* Le navigateur gérera automatiquement l'unique barre à droite */
-            overflow: hidden; /* AJOUTÉ : C'est cette ligne qui supprime les deux barres de défilement */
+            overflow-x: hidden; /* Supprime la barre horizontale du bas due au fond animé sans bloquer le scroll vertical si nécessaire */
         }
 
         body::before {
@@ -129,7 +128,7 @@ $defaites = isset($defaites) ? $defaites : 0;
         }
 
         /* ==========================================================================
-           3. CONTENU PRINCIPAL CADRÉ 
+           3. CONTENU PRINCIPAL CADRÉ & CLASSES RESTAURÉES
            ========================================================================== */
         .main-content {
             margin-left: 240px;
@@ -137,9 +136,135 @@ $defaites = isset($defaites) ? $defaites : 0;
             padding: 40px;
             max-width: 1200px;
             width: calc(100% - 240px);
-            /* Suppression de height: 100vh et overflow-y: auto pour éviter les doublons */
             box-sizing: border-box;
             z-index: 1;
+        }
+
+        /* En-tête Utilisateur (Pseudo + Avatar + Date) */
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(43, 29, 18, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .user-profile-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar img, .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            font-size: 24px;
+        }
+
+        /* Grille du Dashboard (2 colonnes) */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 30px;
+        }
+
+        .left-column, .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* Style des cadres (Cartes) */
+        .card {
+            background-color: rgba(43, 29, 18, 0.6);
+            border-radius: 10px;
+            padding: 25px;
+            box-sizing: border-box;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .card p {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #c4b49c;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Boutons standardisés */
+        .btn {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 15px;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-play {
+            background-color: #81b64c;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background-color: #5c3d24;
+            color: #fff;
+        }
+
+        /* Section Statistiques spécifiques */
+        .stat-box {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            background-color: rgba(0, 0, 0, 0.15);
+            padding: 15px;
+            border-radius: 6px;
+            justify-content: space-around;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-val {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .stat-lbl {
+            font-size: 12px;
+            color: #a8947a;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .empty-state {
+            font-style: italic;
+            text-align: center;
+            opacity: 0.6;
         }
     </style>
 </head>
