@@ -28,15 +28,15 @@ $defaites = isset($defaites) ? $defaites : 0;
            ========================================================================== */
         body {
             display: flex;
-            min-height: 100vh; /* Permet à la page de grandir si le contenu dépasse */
+            min-height: 100vh;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: #f0d9b5; 
-            /* overflow: hidden; <- Supprimé pour réactiver la barre de défilement à droite */
             background: radial-gradient(circle, #4a321f, #2b1d12);
             position: relative;
+            /* Le navigateur gérera automatiquement l'unique barre à droite */
         }
 
         body::before {
@@ -128,7 +128,7 @@ $defaites = isset($defaites) ? $defaites : 0;
         }
 
         /* ==========================================================================
-           3. CONTENU PRINCIPAL CADRÉ ET AUTORISÉ AU SCROLL INTERNE
+           3. CONTENU PRINCIPAL CADRÉ 
            ========================================================================== */
         .main-content {
             margin-left: 240px;
@@ -136,183 +136,9 @@ $defaites = isset($defaites) ? $defaites : 0;
             padding: 40px;
             max-width: 1200px;
             width: calc(100% - 240px);
-            min-height: 100vh; /* Utilisation de min-height plutôt que height fixe */
+            /* Suppression de height: 100vh et overflow-y: auto pour éviter les doublons */
             box-sizing: border-box;
             z-index: 1;
-        }
-
-        /* En-tête Profil */
-        .user-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(27, 18, 11, 0.8);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(8px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .user-profile-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .user-avatar {
-            width: 55px;
-            height: 55px;
-            background-color: #5d3a1a;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: #fff;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .user-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Grille principale */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 30px;
-            margin-bottom: 20px;
-        }
-
-        @media (max-width: 900px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .left-column, .right-column {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* Style des Cartes */
-        .card {
-            background-color: rgba(33, 21, 13, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-        }
-
-        .card h2 {
-            margin-top: 0;
-            color: #fff;
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card p {
-            margin: 0 0 20px 0;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #c4b49c;
-        }
-
-        .card-play {
-            background: linear-gradient(135deg, rgba(62, 37, 16, 0.95) 0%, rgba(28, 17, 10, 0.95) 100%);
-            border: 1px solid #7a4a28;
-        }
-
-        /* ==========================================================================
-           4. BOUTONS STYLE CHESS.COM
-           ========================================================================== */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            text-decoration: none;
-            padding: 12px 20px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 15px;
-            border: none;
-            transition: filter 0.2s, transform 0.1s;
-            cursor: pointer;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.2);
-        }
-
-        .btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 rgba(0,0,0,0.2);
-        }
-
-        .btn-primary {
-            background-color: #5d3a1a;
-            border-bottom: 3px solid #3e2510;
-        }
-        .btn-primary:hover {
-            background-color: #7a4a28; 
-        }
-
-        .btn-play {
-            background-color: #81b64c;
-            border-bottom: 4px solid #68943b;
-            font-size: 18px;
-            text-transform: uppercase;
-            padding: 16px 30px;
-        }
-        .btn-play:hover { 
-            background-color: #95cc5a; 
-        }
-
-        /* Bloc Statistiques */
-        .stat-box {
-            display: flex;
-            gap: 15px;
-            background-color: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.03);
-        }
-
-        .stat-item {
-            flex: 1;
-            text-align: center;
-        }
-        .stat-val {
-            display: block;
-            font-size: 20px;
-            font-weight: bold;
-            color: #fff;
-        }
-        .stat-lbl {
-            font-size: 12px;
-            color: #a8947a;
-            text-transform: uppercase;
-        }
-
-        .empty-state {
-            color: #a8947a;
-            font-style: italic;
-            text-align: center;
-            padding: 20px 0;
         }
     </style>
 </head>
