@@ -166,6 +166,20 @@ $defaites = isset($defaites) ? $defaites : 0;
             gap: 15px;
         }
 
+        /* Style pour les liens de l'en-tête utilisateur */
+        .user-profile-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+            color: inherit;
+            transition: opacity 0.2s;
+        }
+        
+        .user-profile-link:hover {
+            opacity: 0.85;
+        }
+
         .user-avatar img, .user-avatar {
             width: 50px;
             height: 50px;
@@ -271,9 +285,9 @@ $defaites = isset($defaites) ? $defaites : 0;
            ========================================================================== */
         .boards-container {
             display: grid;
-            grid-template-columns: 1fr; /* Changé à 1 colonne pour centrer le damier restant */
+            grid-template-columns: 1fr;
             margin-top: 20px;
-            max-width: 250px; /* Réduit la largeur pour un seul damier */
+            max-width: 250px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -388,17 +402,6 @@ $defaites = isset($defaites) ? $defaites : 0;
         }
         .win .history-badge { background-color: rgba(129, 182, 76, 0.2); color: #81b64c; }
         .lose .history-badge { background-color: rgba(231, 76, 60, 0.2); color: #e74c3c; }
-
-        .btn-review {
-            font-size: 12px;
-            padding: 6px 10px;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #f0d9b5;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
-        .btn-review:hover { background-color: rgba(255, 255, 255, 0.2); }
     </style>
 </head>
 <body>
@@ -422,18 +425,20 @@ $defaites = isset($defaites) ? $defaites : 0;
         <div class="main-container">
             
             <div class="user-header">
-                <div class="user-profile-info">
-                    <div class="user-avatar">
-                        <?php if (!empty($user['avatar'])): ?>
-                            <img src="<?php echo htmlspecialchars($user['avatar']); ?>" alt="Photo de profil">
-                        <?php else: ?>
-                            👤
-                        <?php endif; ?>
+                <a href="profil.php" class="user-profile-link">
+                    <div class="user-profile-info">
+                        <div class="user-avatar">
+                            <?php if (!empty($user['avatar'])): ?>
+                                <img src="<?php echo htmlspecialchars($user['avatar']); ?>" alt="Photo de profil">
+                            <?php else: ?>
+                                👤
+                            <?php endif; ?>
+                        </div>
+                        <div>
+                            <h1 style="margin:0; font-size: 24px; color:#fff;"><?php echo htmlspecialchars($user['pseudo']); ?></h1>
+                        </div>
                     </div>
-                    <div>
-                        <h1 style="margin:0; font-size: 24px; color:#fff;"><?php echo htmlspecialchars($user['pseudo']); ?></h1>
-                    </div>
-                </div>
+                </a>
                 <div style="font-size: 13px; color: #a8947a;">
                     Inscrit le <?php echo date('d/m/Y', strtotime($user['date_inscription'])); ?>
                 </div>
@@ -487,7 +492,6 @@ $defaites = isset($defaites) ? $defaites : 0;
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 15px;">
                                     <span class="history-badge">Victoire</span>
-                                    <a href="#" class="btn-review">Analyse</a>
                                 </div>
                             </div>
 
@@ -498,7 +502,6 @@ $defaites = isset($defaites) ? $defaites : 0;
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 15px;">
                                     <span class="history-badge">Défaite</span>
-                                    <a href="#" class="btn-review">Analyse</a>
                                 </div>
                             </div>
                         </div>
