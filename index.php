@@ -2,33 +2,63 @@
 session_start();
 require_once 'config.php';
 
-// Si l'utilisateur est déjà connecté, on peut charger ses vrais infos, sinon on simule un compte invité
+$erreur = '';
+
+// On vérifie si l'on a explicitement demandé de masquer l'overlay de connexion en arrière-plan
+$hideOverlay = isset($_GET['hide_overlay']) && $_GET['hide_overlay'] == '1';
+
+// 1. TRAITEMENT DE LA CONNEXION (Si le formulaire est soumis)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_SESSION['user_id'])) {
+    $identifiant = trim($_POST['identifiant'] ?? '');
+    $password    = $_POST['password'] ?? '';
+
+    if ($identifiant === '' || $password === '') {
+        $erreur = 'Veuillez remplir tous les champs.';
+    } else {
+        $req = $bdd->prepare('SELECT id, pseudo, mot_de_passe FROM utilisateurs WHERE email = ? OR pseudo = ? LIMIT 1');
+        $req->execute([$identifiant, $identifiant]);
+        $user_data = $req->fetch();
+
+        if ($user_data && password_verify($password, $user_data['mot_de_passe'])) {
+            session_regenerate_id(true);
+            $_SESSION['user_id'] = $user_data['id'];
+            $_SESSION['pseudo']  = $user_data['pseudo'];
+            
+            // Redirection pour rafraîchir la page et enlever l'overlay
+            header('Location: dashboard.php');
+            exit();
+        } else {
+            $erreur = 'Identifiant ou mot de passe incorrect.';
+        }
+    }
+}
+
+// 2. CHARGEMENT DES DONNÉES UTILISATEUR (Affiche "Invité" si non connecté)
 if (isset($_SESSION['user_id'])) {
     $query = $bdd->prepare('SELECT pseudo, date_inscription, avatar FROM utilisateurs WHERE id = ?');
     $query->execute([$_SESSION['user_id']]);
     $user = $query->fetch();
+    
+    // À adapter selon tes colonnes de statistiques réelles
+    $victoires = $user['victoires'] ?? 0;
+    $defaites = $user['defaites'] ?? 0;
 } else {
-    // Profil générique pour les visiteurs non connectés
     $user = [
         'pseudo' => 'Invité',
-        'date_inscription' => date('Y-m-d'),
+        'date_inscription' => '11/06/2026',
         'avatar' => ''
     ];
+    $victoires = 0;
+    $defaites = 0;
 }
-
-// Initialisation des statistiques par défaut pour la page vitrine
-$victoires = 0;
-$defaites = 0;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jeux de Dames - Menu Principal</title>
     <style>
-       /* ==========================================================================
-           1. LE FOND D'ÉCRAN BRUN BOISÉ ET SON QUADRILLAGE ANIMÉ (FIXE)
-           ========================================================================== */
         body {
             display: flex;
             height: 100vh;
@@ -48,10 +78,10 @@ $defaites = 0;
             width: 200%;
             height: 200%;
             background-image: 
-                linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%), 
-                linear-gradient(-45deg, rgba(0,0,0,0.1) 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.1) 75%), 
-                linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.1) 75%);
+                linear-gradient(45deg, rgba(0,0,0,0.15) 25%, transparent 25%), 
+                linear-gradient(-45deg, rgba(0,0,0,0.15) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.15) 75%), 
+                linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.15) 75%);
             background-size: 100px 100px;
             z-index: 0;
             animation: move 60s linear infinite;
@@ -62,13 +92,9 @@ $defaites = 0;
             to { transform: translate(0, 0); }
         }
 
-        /* ==========================================================================
-           2. BARRE LATÉRALE DE NAVIGATION (Marron sombre)
-           ========================================================================== */
         .sidebar {
             width: 240px;
-            background-color: rgba(27, 18, 11, 0.9);
-            backdrop-filter: blur(12px);
+            background-color: rgba(27, 18, 11, 0.95);
             display: flex;
             flex-direction: column;
             padding: 20px 10px;
@@ -121,7 +147,6 @@ $defaites = 0;
             padding-left: 11px;
         }
 
-        /* ZONE D'AUTHENTIFICATION AGRANDIE */
         .sidebar-auth-zone {
             margin-top: auto;
             display: flex;
@@ -133,13 +158,13 @@ $defaites = 0;
         .btn-sidebar-auth {
             display: flex;
             align-items: center;
-            justify-content: center; /* Centrage du texte pour un aspect plus propre */
+            justify-content: center;
             gap: 10px;
             text-decoration: none;
-            padding: 14px 15px; /* Augmenté pour agrandir le cadre verticalement */
+            padding: 14px 15px;
             border-radius: 6px;
             font-weight: bold;
-            font-size: 15px; /* Légèrement plus grand */
+            font-size: 15px;
             transition: background-color 0.2s, color 0.2s, transform 0.1s;
             box-sizing: border-box;
             width: 100%;
@@ -169,9 +194,16 @@ $defaites = 0;
             color: #fff;
         }
 
-        /* ==========================================================================
-           3. CONTENU PRINCIPAL
-           ========================================================================== */
+        .btn-logout {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.4);
+        }
+        .btn-logout:hover {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+
         .main-content {
             margin-left: 240px;
             flex-grow: 1;
@@ -195,7 +227,7 @@ $defaites = 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: rgba(43, 29, 18, 0.6);
+            background-color: rgba(43, 29, 18, 0.5);
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 30px;
@@ -207,20 +239,7 @@ $defaites = 0;
             gap: 15px;
         }
 
-        .user-profile-link {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            text-decoration: none;
-            color: inherit;
-            transition: opacity 0.2s;
-        }
-        
-        .user-profile-link:hover {
-            opacity: 0.85;
-        }
-
-        .user-avatar img, .user-avatar {
+        .user-avatar {
             width: 50px;
             height: 50px;
             border-radius: 8px;
@@ -246,7 +265,7 @@ $defaites = 0;
         }
 
         .card {
-            background-color: rgba(43, 29, 18, 0.6);
+            background-color: rgba(43, 29, 18, 0.5);
             border-radius: 10px;
             padding: 25px;
             box-sizing: border-box;
@@ -276,6 +295,10 @@ $defaites = 0;
             font-weight: bold;
             font-size: 15px;
             transition: opacity 0.2s;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .btn:hover {
@@ -318,17 +341,15 @@ $defaites = 0;
         .empty-state {
             font-style: italic;
             text-align: center;
-            opacity: 0.6;
+            color: #a8947a;
+            font-size: 14px;
         }
 
-        /* ==========================================================================
-           4. UN SEUL DAMIER CENTRÉ
-           ========================================================================== */
         .boards-container {
             display: grid;
             grid-template-columns: 1fr;
             margin-top: 20px;
-            max-width: 250px;
+            max-width: 230px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -340,11 +361,6 @@ $defaites = 0;
             text-align: center;
             text-decoration: none;
             color: inherit;
-            transition: transform 0.2s;
-        }
-
-        .board-wrapper:hover {
-            transform: translateY(-5px);
         }
 
         .mini-board {
@@ -373,22 +389,11 @@ $defaites = 0;
         }
 
         .board-row:nth-child(odd) .cell:nth-child(even),
-        .board-row:nth-child(even) .cell:nth-child(odd) {
-            background-color: #b58863;
-        }
-
+        .board-row:nth-child(even) .cell:nth-child(odd) { background-color: #b58863; }
         .board-row:nth-child(odd) .cell:nth-child(odd),
-        .board-row:nth-child(even) .cell:nth-child(even) {
-            background-color: #f0d9b5;
-        }
+        .board-row:nth-child(even) .cell:nth-child(even) { background-color: #f0d9b5; }
 
-        .piece {
-            width: 75%;
-            height: 75%;
-            border-radius: 50%;
-            box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.5);
-        }
-
+        .piece { width: 75%; height: 75%; border-radius: 50%; }
         .piece.white { background-color: #eaeaea; border: 1px solid #bcbcbc; }
         .piece.black { background-color: #2b2b2b; border: 1px solid #111; }
 
@@ -399,9 +404,6 @@ $defaites = 0;
             color: #fff;
         }
 
-        /* ==========================================================================
-           5. HISTORIQUE DES PARTIES
-           ========================================================================== */
         .history-list {
             display: flex;
             flex-direction: column;
@@ -421,12 +423,7 @@ $defaites = 0;
         .history-item.win { border-left-color: #81b64c; }
         .history-item.lose { border-left-color: #e74c3c; }
 
-        .history-details {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
+        .history-details { display: flex; flex-direction: column; gap: 2px; }
         .history-opponent { font-weight: bold; color: #fff; font-size: 14px; }
         .history-date { font-size: 11px; color: #a8947a; }
 
@@ -437,12 +434,111 @@ $defaites = 0;
             padding: 3px 8px;
             border-radius: 4px;
             color: #fff;
-            text-align: center;
-            min-width: 65px;
-            display: inline-block;
         }
         .win .history-badge { background-color: rgba(129, 182, 76, 0.2); color: #81b64c; }
         .lose .history-badge { background-color: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 240px; 
+            width: calc(100% - 240px);
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); 
+            backdrop-filter: blur(5px); 
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background-color: rgba(43, 29, 18, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 35px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            box-sizing: border-box;
+        }
+
+        .login-container h1 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 26px;
+            color: #fff;
+            text-align: center;
+        }
+
+        .subtitle {
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: #a8947a;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #c4b49c;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            background-color: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(122, 74, 40, 0.5);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 15px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: #81b64c;
+        }
+
+        .alert.error {
+            background-color: rgba(231, 76, 60, 0.2);
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .btn-submit-login {
+            background-color: #81b64c;
+            color: #fff;
+        }
+
+        .switch-mode {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #c4b49c;
+        }
+
+        .switch-mode a {
+            color: #81b64c;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .switch-mode a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -452,7 +548,7 @@ $defaites = 0;
              ⚪ Jeu de Dames
         </div>
         <div class="sidebar-menu">
-            <a href="index.php" class="sidebar-link active">🏠 Accueil</a>
+            <a href="dashboard.php" class="sidebar-link active">🏠 Accueil</a>
             <a href="plateau.php" class="sidebar-link">⚔️ Jouer</a>
             <a href="hub.php" class="sidebar-link">💬 Salon Public</a>
             <a href="profil.php" class="sidebar-link">⚙️ Profil</a>
@@ -461,69 +557,61 @@ $defaites = 0;
         </div>
         
         <div class="sidebar-auth-zone">
-            <a href="connexion.php" class="btn-sidebar-auth btn-login">👤 Connexion</a>
-            <a href="inscription.php" class="btn-sidebar-auth btn-register">📝 Inscription</a>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="deconnexion.php" class="btn-sidebar-auth btn-logout">🚪 Déconnexion</a>
+            <?php else: ?>
+                <a href="dashboard.php" class="btn-sidebar-auth btn-login">👤 Connexion</a>
+                <a href="inscription.php" class="btn-sidebar-auth btn-register">📝 Inscription</a>
+            <?php endif; ?>
         </div>
     </div>
 
     <div class="main-content">
         <div class="main-container">
-            
             <div class="user-header">
-                <div class="user-profile-link">
-                    <div class="user-profile-info">
-                        <div class="user-avatar">
-                            <?php if (!empty($user['avatar'])): ?>
-                                <img src="<?php echo htmlspecialchars($user['avatar']); ?>" alt="Photo de profil">
-                            <?php else: ?>
-                                👤
-                            <?php endif; ?>
-                        </div>
-                        <div>
-                            <h1 style="margin:0; font-size: 24px; color:#fff;"><?php echo htmlspecialchars($user['pseudo']); ?></h1>
-                        </div>
+                <div class="user-profile-info">
+                    <div class="user-avatar">👤</div>
+                    <div>
+                        <h1 style="margin:0; font-size: 24px; color:#fff;"><?php echo htmlspecialchars($user['pseudo']); ?></h1>
                     </div>
                 </div>
                 <div style="font-size: 13px; color: #a8947a;">
-                    Visiteur ou membre depuis le <?php echo date('d/m/Y', strtotime($user['date_inscription'])); ?>
+                    Visiteur ou membre depuis le <?php echo htmlspecialchars($user['date_inscription']); ?>
                 </div>
             </div>
 
             <div class="dashboard-grid">
-                
                 <div class="left-column">
-                    <div class="card card-play">
+                    <div class="card">
                         <h2>Prêt à en découdre ?</h2>
-                        <p style="color: #f0d9b5; opacity: 0.8;">Défiez des joueurs en ligne, peaufinez vos tactiques et grimpez dans le classement du jeu de dames.</p>
+                        <p>Défiez des joueurs en ligne, peaufinez vos tactiques et grimpez dans le classement du jeu de dames.</p>
                         
                         <div class="boards-container">
-                            <a href="plateau.php" class="board-wrapper">
+                            <div class="board-wrapper">
                                 <div class="mini-board">
                                     <div class="board-row">
-                                        <div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div>
+                                        <div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div>
                                     </div>
                                     <div class="board-row">
-                                        <div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div>
+                                        <div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div>
                                     </div>
                                     <div class="board-row">
-                                        <div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div>
+                                        <div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div>
                                     </div>
-                                    <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
-                                    <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
-                                    <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
-                                    <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                                    <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                                    <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
                                     <div class="board-row">
-                                        <div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div>
+                                        <div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div>
                                     </div>
                                     <div class="board-row">
-                                        <div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div>
+                                        <div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div>
                                     </div>
                                     <div class="board-row">
-                                        <div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div>
+                                        <div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div>
                                     </div>
                                 </div>
                                 <div class="board-label">Lancer une partie</div>
-                            </a>
+                            </div>
                         </div>
                     </div>
 
@@ -535,19 +623,14 @@ $defaites = 0;
                                     <span class="history-opponent">Contre Maxlamenace2207</span>
                                     <span class="history-date">Le 09/06/2026 à 11:20</span>
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 15px;">
-                                    <span class="history-badge">Victoire</span>
-                                </div>
+                                <span class="history-badge">Victoire</span>
                             </div>
-
                             <div class="history-item lose">
                                 <div class="history-details">
                                     <span class="history-opponent">Contre Ordinateur (Facile)</span>
                                     <span class="history-date">Le 08/06/2026 à 18:45</span>
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 15px;">
-                                    <span class="history-badge">Défaite</span>
-                                </div>
+                                <span class="history-badge">Défaite</span>
                             </div>
                         </div>
                     </div>
@@ -566,24 +649,55 @@ $defaites = 0;
                                 <span class="stat-lbl">Défaites</span>
                             </div>
                         </div>
-                        <a href="profil.php" class="btn btn-primary">Détail du profil</a>
+                        <a href="#" class="btn btn-primary">Détail du profil</a>
                     </div>
 
                     <div class="card">
                         <h2>👥 Liste d'amis</h2>
                         <p class="empty-state">Connectez-vous pour voir vos amis en ligne.</p>
-                        <a href="amis.php" class="btn btn-primary">Gérer mes amis</a>
+                        <a href="#" class="btn btn-primary">Gérer mes amis</a>
                     </div>
 
                     <div class="card">
                         <h2>🛡️ Mon Clan</h2>
                         <p>Créez une alliance, arborez un tag unique et participez au classement général des clans.</p>
-                        <a href="clans.php" class="btn btn-primary">Accéder aux Clans</a>
+                        <a href="#" class="btn btn-primary">Accéder aux Clans</a>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
+
+    <?php if (!isset($_SESSION['user_id']) && !$hideOverlay): ?>
+        <div class="overlay">
+            <div class="login-container">
+                <h1>Connexion</h1>
+                <p class="subtitle">Heureux de vous revoir !</p>
+
+                <?php if (!empty($erreur)): ?>
+                    <div class="alert error"><?php echo htmlspecialchars($erreur); ?></div>
+                <?php endif; ?>
+
+                <form method="POST" novalidate>
+                    <div class="input-group">
+                        <label for="identifiant">Email ou nom d'utilisateur</label>
+                        <input type="text" id="identifiant" name="identifiant" required
+                               placeholder="Votre pseudo ou email"
+                               value="<?php echo htmlspecialchars($_POST['identifiant'] ?? ''); ?>">
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Mot de passe</label>
+                        <input type="password" id="password" name="password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-submit-login">Se connecter</button>
+                </form>
+
+                <div class="switch-mode">
+                    Pas encore de compte ? <a href="inscription.php">S'inscrire</a>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
 </body>
 </html>

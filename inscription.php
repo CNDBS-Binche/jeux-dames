@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $ins = $bdd->prepare('INSERT INTO utilisateurs (pseudo, email, mot_de_passe) VALUES (?, ?, ?)');
             $ins->execute([$pseudo, $email, $mdp_hache]);
-            $message = 'Compte créé ! <a href="connexion.php">Connectez-vous</a>';
+            $message = 'Compte créé ! <a href="dashboard.php">Connectez-vous</a>';
             $status  = 'success';
         } catch (PDOException $e) {
             $message = 'Ce nom d\'utilisateur ou cet email est déjà pris.';
@@ -61,7 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             position: relative;
         }
 
-        /* L'iframe qui charge ton vrai dashboard en fond d'écran */
         .background-dashboard {
             position: absolute;
             top: 0;
@@ -73,7 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             pointer-events: none;
         }
 
-        /* Filtre sombre arrière-plan */
         .overlay {
             position: absolute;
             top: 0;
@@ -81,16 +79,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(2px);
+            backdrop-filter: blur(5px); /* Ajusté à 5px pour correspondre à ton dashboard */
             z-index: 2;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* Cadre d'inscription au milieu */
         .login-container {
-            background-color: rgba(43, 29, 18, 0.9);
+            background-color: rgba(43, 29, 18, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.08);
             padding: 40px;
             border-radius: 12px;
@@ -214,7 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 
-    <iframe src="dashboard.php" class="background-dashboard"></iframe>
+    <iframe src="dashboard.php?hide_overlay=1" class="background-dashboard"></iframe>
 
     <div class="overlay">
         <div class="login-container">
@@ -245,6 +242,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <button type="submit" class="btn">S'inscrire</button>
             </form>
+            
+            <div class="switch-mode">
+                Déjà inscrit ? <a href="dashboard.php">Se connecter</a>
+            </div>
         </div>
     </div>
 </body>
