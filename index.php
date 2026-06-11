@@ -121,29 +121,38 @@ $defaites = 0;
             padding-left: 11px;
         }
 
+        /* ZONE D'AUTHENTIFICATION AGRANDIE */
         .sidebar-auth-zone {
             margin-top: auto;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
+            padding: 0 5px;
         }
 
         .btn-sidebar-auth {
             display: flex;
             align-items: center;
-            gap: 15px;
+            justify-content: center; /* Centrage du texte pour un aspect plus propre */
+            gap: 10px;
             text-decoration: none;
-            padding: 12px 15px;
+            padding: 14px 15px; /* Augmenté pour agrandir le cadre verticalement */
             border-radius: 6px;
-            font-weight: 600;
-            font-size: 14px;
-            transition: background-color 0.2s, color 0.2s;
+            font-weight: bold;
+            font-size: 15px; /* Légèrement plus grand */
+            transition: background-color 0.2s, color 0.2s, transform 0.1s;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .btn-sidebar-auth:active {
+            transform: scale(0.98);
         }
 
         .btn-login {
-            background-color: rgba(129, 182, 76, 0.15);
+            background-color: rgba(129, 182, 76, 0.2);
             color: #81b64c;
-            border: 1px solid rgba(129, 182, 76, 0.3);
+            border: 1px solid rgba(129, 182, 76, 0.4);
         }
         .btn-login:hover {
             background-color: #81b64c;
@@ -151,9 +160,9 @@ $defaites = 0;
         }
 
         .btn-register {
-            background-color: rgba(122, 74, 40, 0.4);
-            color: #c4b49c;
-            border: 1px solid rgba(122, 74, 40, 0.6);
+            background-color: rgba(122, 74, 40, 0.5);
+            color: #f0d9b5;
+            border: 1px solid rgba(122, 74, 40, 0.7);
         }
         .btn-register:hover {
             background-color: #7a4a28;
@@ -223,7 +232,6 @@ $defaites = 0;
             font-size: 24px;
         }
 
-        /* AJOUT DE ALIGN-ITEMS: START POUR EVITER QUE LA COLONNE DROITE GLISSE */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1.3fr 1fr;
