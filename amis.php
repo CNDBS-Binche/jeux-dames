@@ -216,21 +216,36 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
         }
 
         /* ==========================================================================
-           3. CONTENU PRINCIPAL ET GRILLE
+           3. CONTENU PRINCIPAL ET GRILLE CENTRÉE
            ========================================================================== */
         .main-content {
             margin-left: 240px;
             flex-grow: 1;
             padding: 40px;
-            max-width: 1200px;
             width: calc(100% - 240px);
             z-index: 1;
+            box-sizing: border-box;
+        }
+
+        /* Conteneur parent ajouté pour gérer le centrage global horizontal */
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* Bloc interne de contenu qui englobe le titre et les cartes */
+        .dashboard-inner {
+            width: 100%;
+            max-width: 1100px; /* Aligné sur la largeur de tes autres pages */
         }
 
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1.6fr 1.1fr;
             gap: 30px;
+            width: 100%;
         }
 
         @media (max-width: 950px) {
@@ -422,92 +437,97 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <div class="main-content">
-        <h1 style="color: #fff; margin-top: 0; margin-bottom: 30px; font-weight: 600;">Gestion de la Communauté</h1>
+        <div class="dashboard-container">
+            <div class="dashboard-inner">
+                
+                <h1 style="color: #fff; margin-top: 0; margin-bottom: 30px; font-weight: 600;">Gestion de la Communauté</h1>
 
-        <div class="dashboard-grid">
-            
-            <div class="left-column">
-                <div class="card">
-                    <h2>🤝 Ajouter un ami</h2>
-                    <p>Recherchez un joueur à l'aide de son pseudonyme exact pour l'ajouter à votre liste de contacts.</p>
+                <div class="dashboard-grid">
                     
-                    <?php if (!empty($message)): ?>
-                        <div class="alert alert-<?php echo $messageType; ?>">
-                            <?php echo $message; ?>
-                        </div>
-                    <?php endif; ?>
+                    <div class="left-column">
+                        <div class="card">
+                            <h2>🤝 Ajouter un ami</h2>
+                            <p>Recherchez un joueur à l'aide de son pseudonyme exact pour l'ajouter à votre liste de contacts.</p>
+                            
+                            <?php if (!empty($message)): ?>
+                                <div class="alert alert-<?php echo $messageType; ?>">
+                                    <?php echo $message; ?>
+                                </div>
+                            <?php endif; ?>
 
-                    <form method="POST" action="" class="form-inline">
-                        <input type="hidden" name="action" value="ajouter">
-                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                        
-                        <div class="search-box">
-                            <input type="text" name="pseudo_recherche" placeholder="Entrez le pseudo du joueur..." required>
-                            <button type="submit" class="btn btn-play" style="width: auto;">Inviter</button>
+                            <form method="POST" action="" class="form-inline">
+                                <input type="hidden" name="action" value="ajouter">
+                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                
+                                <div class="search-box">
+                                    <input type="text" name="pseudo_recherche" placeholder="Entrez le pseudo du joueur..." required>
+                                    <button type="submit" class="btn btn-play" style="width: auto;">Inviter</button>
+                                </div>
+                            </form>
                         </div>
-                    </form>
-                </div>
 
-                <div class="card">
-                    <h2>👥 Mes Amis (<?php echo count($amis); ?>)</h2>
-                    <ul class="liste-joueurs">
-                        <?php if(empty($amis)): ?>
-                            <p class="empty-state">Vous n'avez pas encore d'amis dans votre liste.</p>
-                        <?php else: ?>
-                            <?php foreach($amis as $a): ?>
-                                <li>
-                                    <span>🟢 <strong style="color:#fff;"><?php echo htmlspecialchars($a['pseudo_ami']); ?></strong></span>
-                                    <div class="actions-wrapper">
-                                        <button class="btn btn-primary" style="padding: 8px 14px; font-size: 13px;" onclick="lancerDuel(<?php echo (int)$a['id_ami']; ?>)">⚔️ Duel</button>
-                                        
-                                        <form method="POST" action="" class="form-inline">
-                                            <input type="hidden" name="action" value="supprimer">
-                                            <input type="hidden" name="relation_id" value="<?php echo $a['relation_id']; ?>">
-                                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                                            <button type="submit" class="btn btn-danger" style="padding: 8px 14px; font-size: 13px;">Retirer</button>
-                                        </form>
-                                    </div>
-                                </li>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </ul>
+                        <div class="card">
+                            <h2>👥 Mes Amis (<?php echo count($amis); ?>)</h2>
+                            <ul class="liste-joueurs">
+                                <?php if(empty($amis)): ?>
+                                    <p class="empty-state">Vous n'avez pas encore d'amis dans votre liste.</p>
+                                <?php else: ?>
+                                    <?php foreach($amis as $a): ?>
+                                        <li>
+                                            <span>🟢 <strong style="color:#fff;"><?php echo htmlspecialchars($a['pseudo_ami']); ?></strong></span>
+                                            <div class="actions-wrapper">
+                                                <button class="btn btn-primary" style="padding: 8px 14px; font-size: 13px;" onclick="lancerDuel(<?php echo (int)$a['id_ami']; ?>)">⚔️ Duel</button>
+                                                
+                                                <form method="POST" action="" class="form-inline">
+                                                    <input type="hidden" name="action" value="supprimer">
+                                                    <input type="hidden" name="relation_id" value="<?php echo $a['relation_id']; ?>">
+                                                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                                    <button type="submit" class="btn btn-danger" style="padding: 8px 14px; font-size: 13px;">Retirer</button>
+                                                </form>
+                                            </div>
+                                        </li>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="right-column">
+                        <div class="card">
+                            <h2>📩 Demandes reçues (<?php echo count($demandes); ?>)</h2>
+                            <ul class="liste-joueurs">
+                                <?php if(empty($demandes)): ?>
+                                    <p class="empty-state">Aucune invitation en attente.</p>
+                                <?php else: ?>
+                                    <?php foreach($demandes as $d): ?>
+                                        <li style="flex-direction: column; align-items: flex-start; gap: 10px;">
+                                            <span style="font-size: 14px;"><strong style="color: #fff;"><?php echo htmlspecialchars($d['pseudo']); ?></strong> veut être votre ami</span>
+                                            <div class="actions-wrapper" style="width: 100%;">
+                                                
+                                                <form method="POST" action="" class="form-inline" style="flex: 1;">
+                                                    <input type="hidden" name="action" value="accepter">
+                                                    <input type="hidden" name="relation_id" value="<?php echo $d['relation_id']; ?>">
+                                                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                                    <button type="submit" class="btn btn-play" style="padding: 6px 12px; font-size: 13px; width: 100%;">Accepter</button>
+                                                </form>
+
+                                                <form method="POST" action="" class="form-inline" style="flex: 1;">
+                                                    <input type="hidden" name="action" value="supprimer">
+                                                    <input type="hidden" name="relation_id" value="<?php echo $d['relation_id']; ?>">
+                                                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                                    <button type="submit" class="btn btn-danger" style="padding: 6px 12px; font-size: 13px; width: 100%;">Refuser</button>
+                                                </form>
+                                                
+                                            </div>
+                                        </li>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </ul>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-
-            <div class="right-column">
-                <div class="card">
-                    <h2>📩 Demandes reçues (<?php echo count($demandes); ?>)</h2>
-                    <ul class="liste-joueurs">
-                        <?php if(empty($demandes)): ?>
-                            <p class="empty-state">Aucune invitation en attente.</p>
-                        <?php else: ?>
-                            <?php foreach($demandes as $d): ?>
-                                <li style="flex-direction: column; align-items: flex-start; gap: 10px;">
-                                    <span style="font-size: 14px;"><strong style="color: #fff;"><?php echo htmlspecialchars($d['pseudo']); ?></strong> veut être votre ami</span>
-                                    <div class="actions-wrapper" style="width: 100%;">
-                                        
-                                        <form method="POST" action="" class="form-inline" style="flex: 1;">
-                                            <input type="hidden" name="action" value="accepter">
-                                            <input type="hidden" name="relation_id" value="<?php echo $d['relation_id']; ?>">
-                                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                                            <button type="submit" class="btn btn-play" style="padding: 6px 12px; font-size: 13px; width: 100%;">Accepter</button>
-                                        </form>
-
-                                        <form method="POST" action="" class="form-inline" style="flex: 1;">
-                                            <input type="hidden" name="action" value="supprimer">
-                                            <input type="hidden" name="relation_id" value="<?php echo $d['relation_id']; ?>">
-                                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                                            <button type="submit" class="btn btn-danger" style="padding: 6px 12px; font-size: 13px; width: 100%;">Refuser</button>
-                                        </form>
-                                        
-                                    </div>
-                                </li>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </ul>
-                </div>
-            </div>
-
         </div>
     </div>
 
