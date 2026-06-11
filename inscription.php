@@ -51,51 +51,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription – Dames</title>
     <style>
-       /* ==========================================================================
-           1. LE FOND EXACT DU DASHBOARD (EFFET LOSANGES / SANS ANIMATION)
-           ========================================================================== */
-        body {
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* L'iframe qui charge ton vrai dashboard en fond d'écran */
+        .background-dashboard {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Filtre sombre arrière-plan */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(2px);
+            z-index: 2;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            color: #f0d9b5; 
-            background: radial-gradient(circle, #4a321f, #2b1d12);
-            position: relative;
-            overflow: hidden;
         }
 
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: 
-                linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%), 
-                linear-gradient(-45deg, rgba(0,0,0,0.1) 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.1) 75%), 
-                linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.1) 75%);
-            background-size: 100px 100px;
-            z-index: 0;
-        }
-
-        /* ==========================================================================
-           2. CADRE D'INSCRIPTION ASSORTI
-           ========================================================================== */
+        /* Cadre d'inscription au milieu */
         .login-container {
-            background-color: rgba(43, 29, 18, 0.6); /* Même opacité que le dashboard */
-            backdrop-filter: blur(12px);
+            background-color: rgba(43, 29, 18, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             padding: 40px;
-            border-radius: 10px;
+            border-radius: 12px;
             width: 100%;
             max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            z-index: 1;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
             box-sizing: border-box;
+            color: #f0d9b5;
         }
 
         .login-container h1 {
@@ -134,8 +137,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .input-group input {
             width: 100%;
             padding: 12px;
-            background-color: rgba(0, 0, 0, 0.25);
-            border: 1px solid rgba(122, 74, 40, 0.4);
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(122, 74, 40, 0.6);
             border-radius: 6px;
             color: #fff;
             font-size: 15px;
@@ -159,20 +162,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         .alert.error {
             background-color: rgba(231, 76, 60, 0.2);
-            border: 1px solid rgba(231, 76, 60, 0.4);
+            border: 1px solid #e74c3c;
             color: #e74c3c;
         }
 
         .alert.success {
             background-color: rgba(129, 182, 76, 0.2);
-            border: 1px solid rgba(129, 182, 76, 0.4);
+            border: 1px solid #81b64c;
             color: #81b64c;
         }
         
         .alert.success a {
             color: #fff;
             text-decoration: underline;
-            font-weight: bold;
         }
 
         .btn {
@@ -185,15 +187,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-weight: bold;
             font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
+            transition: background-color 0.2s;
         }
 
         .btn:hover {
             background-color: #6a9b3c;
-        }
-
-        .btn:active {
-            transform: scale(0.98);
         }
 
         .switch-mode {
@@ -215,38 +213,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
-<div class="login-container">
-    <h1>Inscription</h1>
-    <p class="subtitle">Rejoignez l'élite des joueurs.</p>
 
-    <?php if ($message): ?>
-        <div class="alert <?php echo htmlspecialchars($status); ?>"><?php echo $message; ?></div>
-    <?php endif; ?>
+    <iframe src="dashboard.php" class="background-dashboard"></iframe>
 
-    <form method="POST" novalidate>
-        <div class="input-group">
-            <label for="pseudo">Nom d'utilisateur</label>
-            <input type="text" id="pseudo" name="pseudo" required minlength="3" maxlength="30"
-                   placeholder="Ex: PionMagique"
-                   value="<?php echo htmlspecialchars($_POST['pseudo'] ?? ''); ?>">
-        </div>
-        <div class="input-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" required
-                   placeholder="joueur@mail.com"
-                   value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
-        </div>
-        <div class="input-group">
-            <label for="password">Mot de passe <small>(8 caractères min.)</small></label>
-            <input type="password" id="password" name="password" required minlength="8"
-                   placeholder="••••••••">
-        </div>
-        <button type="submit" class="btn">S'inscrire</button>
-    </form>
+    <div class="overlay">
+        <div class="login-container">
+            <h1>Inscription</h1>
+            <p class="subtitle">Rejoignez l'élite des joueurs.</p>
 
-    <div class="switch-mode">
-        Déjà inscrit ? <a href="connexion.php">Se connecter</a>
+            <?php if ($message): ?>
+                <div class="alert <?php echo htmlspecialchars($status); ?>"><?php echo $message; ?></div>
+            <?php endif; ?>
+
+            <form method="POST" novalidate>
+                <div class="input-group">
+                    <label for="pseudo">Nom d'utilisateur</label>
+                    <input type="text" id="pseudo" name="pseudo" required minlength="3" maxlength="30"
+                           placeholder="Ex: PionMagique"
+                           value="<?php echo htmlspecialchars($_POST['pseudo'] ?? ''); ?>">
+                </div>
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required
+                           placeholder="joueur@mail.com"
+                           value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+                </div>
+                <div class="input-group">
+                    <label for="password">Mot de passe <small>(8 caractères min.)</small></label>
+                    <input type="password" id="password" name="password" required minlength="8"
+                           placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn">S'inscrire</button>
+            </form>
+
+            <div class="switch-mode">
+                Déjà inscrit ? <a href="connexion.php">Se connecter</a>
+            </div>
+        </div>
     </div>
-</div>
 </body>
 </html>
