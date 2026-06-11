@@ -667,37 +667,5 @@ if (isset($_SESSION['user_id'])) {
             </div>
         </div>
     </div>
-
-    <?php if (!isset($_SESSION['user_id']) && !$hideOverlay): ?>
-        <div class="overlay">
-            <div class="login-container">
-                <h1>Connexion</h1>
-                <p class="subtitle">Heureux de vous revoir !</p>
-
-                <?php if (!empty($erreur)): ?>
-                    <div class="alert error"><?php echo htmlspecialchars($erreur); ?></div>
-                <?php endif; ?>
-
-                <form method="POST" novalidate>
-                    <div class="input-group">
-                        <label for="identifiant">Email ou nom d'utilisateur</label>
-                        <input type="text" id="identifiant" name="identifiant" required
-                               placeholder="Votre pseudo ou email"
-                               value="<?php echo htmlspecialchars($_POST['identifiant'] ?? ''); ?>">
-                    </div>
-                    <div class="input-group">
-                        <label for="password">Mot de passe</label>
-                        <input type="password" id="password" name="password" required placeholder="••••••••">
-                    </div>
-                    <button type="submit" class="btn btn-submit-login">Se connecter</button>
-                </form>
-
-                <div class="switch-mode">
-                    Pas encore de compte ? <a href="inscription.php">S'inscrire</a>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
-
 </body>
 </html>
