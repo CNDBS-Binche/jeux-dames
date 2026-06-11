@@ -21,8 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_SESSION['user_id'])) {
             $_SESSION['user_id'] = $user_data['id'];
             $_SESSION['pseudo']  = $user_data['pseudo'];
             
-            // Redirection pour rafraîchir la page et enlever l'overlay
-            header('Location: index.php');
+            // Modification ici : redirection vers le tableau de bord
+            header('Location: dashboard.php');
             exit();
         } else {
             $erreur = 'Identifiant ou mot de passe incorrect.';
@@ -552,10 +552,9 @@ if (isset($_SESSION['user_id'])) {
 </head>
 <body>
 
-    <!-- Barre latérale -->
     <div class="sidebar">
         <div class="sidebar-brand">
-             ⚪ Jeu de Dames
+             白 Jeu de Dames
         </div>
         <div class="sidebar-menu">
             <a href="index.php" class="sidebar-link active">🏠 Accueil</a>
@@ -576,7 +575,6 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 
-    <!-- Contenu Principal (Reste affiché derrière) -->
     <div class="main-content">
         <div class="main-container">
             <div class="user-header">
@@ -600,30 +598,23 @@ if (isset($_SESSION['user_id'])) {
                         <div class="boards-container">
                             <div class="board-wrapper">
                                 <div class="mini-board">
-                                    <!-- Rangée 1 -->
                                     <div class="board-row">
                                         <div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div>
                                     </div>
-                                    <!-- Rangée 2 -->
                                     <div class="board-row">
                                         <div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div>
                                     </div>
-                                    <!-- Rangée 3 -->
                                     <div class="board-row">
                                         <div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div>
                                     </div>
-                                    <!-- Vides -->
                                     <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
                                     <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
-                                    <!-- Rangée 6 -->
                                     <div class="board-row">
                                         <div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div>
                                     </div>
-                                    <!-- Rangée 7 -->
                                     <div class="board-row">
                                         <div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div>
                                     </div>
-                                    <!-- Rangée 8 -->
                                     <div class="board-row">
                                         <div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div>
                                     </div>
@@ -686,10 +677,6 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 
-    <!-- 
-       L'OVERLAY DE CONNEXION (S'active uniquement si déconnecté)
-       Il floute et assombrit l'index situé derrière lui.
-    -->
     <?php if (!isset($_SESSION['user_id'])): ?>
         <div class="overlay">
             <div class="login-container">
