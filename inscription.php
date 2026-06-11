@@ -210,9 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
-
-    <iframe src="dashboard.php?hide_overlay=1" class="background-dashboard"></iframe>
-
+    
     <div class="overlay">
         <div class="login-container">
             <h1>Inscription</h1>
