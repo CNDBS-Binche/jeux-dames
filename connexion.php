@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Connexion – Dames</title>
     <style>
        /* ==========================================================================
-           1. LE MÊME FOND D'ÉCRAN BRUN BOISÉ ET SON QUADRILLAGE ANIMÉ (INDEX)
+           1. LE FOND EXACT DU DASHBOARD (EFFET LOSANGES / SANS ANIMATION)
            ========================================================================== */
         body {
             display: flex;
@@ -62,31 +62,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         body::before {
             content: "";
             position: absolute;
-            width: 200%;
-            height: 200%;
+            top: 0; left: 0; right: 0; bottom: 0;
             background-image: 
-                linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%), 
-                linear-gradient(-45deg, rgba(0,0,0,0.1) 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.1) 75%), 
-                linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.1) 75%);
+                linear-gradient(45deg, rgba(0,0,0,0.15) 25%, transparent 25%), 
+                linear-gradient(-45deg, rgba(0,0,0,0.15) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.15) 75%), 
+                linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.15) 75%);
             background-size: 100px 100px;
             z-index: 0;
-            animation: move 60s linear infinite;
-        }
-
-        @keyframes move {
-            from { transform: translate(-25%, -25%); }
-            to { transform: translate(0, 0); }
         }
 
         /* ==========================================================================
-           2. DESIGN DU CADRE DE CONNEXION REPRENANT LES THÈMES DU DASHBOARD
+           2. CADRE DE CONNEXION SÉCURISÉ
            ========================================================================== */
         .login-container {
-            background-color: rgba(43, 29, 18, 0.75); /* Même marron semi-transparent */
+            background-color: rgba(43, 29, 18, 0.6); /* Même opacité que le dashboard */
             backdrop-filter: blur(12px);
             padding: 40px;
-            border-radius: 12px;
+            border-radius: 10px;
             width: 100%;
             max-width: 400px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
@@ -137,10 +130,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .input-group input:focus {
-            border-color: #81b64c; /* Accent vert au clic */
+            border-color: #81b64c;
         }
 
-        /* Alertes erreurs */
         .alert.error {
             background-color: rgba(231, 76, 60, 0.2);
             border: 1px solid rgba(231, 76, 60, 0.4);
@@ -153,7 +145,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-weight: 500;
         }
 
-        /* Grand bouton vert de connexion */
         .btn {
             width: 100%;
             padding: 14px;
@@ -175,7 +166,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transform: scale(0.98);
         }
 
-        /* Liens de redirection bas de page */
         .switch-mode {
             margin-top: 25px;
             text-align: center;
