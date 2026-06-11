@@ -26,23 +26,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     } else {
         $clanId = (int)$_POST['clan_id'];
         
-        // Exemple de logique : Ajout dans une table 'membres_clans' (A adapter selon ta BDD)
-        // $req = $bdd->prepare('INSERT INTO membres_clans (clan_id, user_id, role) VALUES (?, ?, "membre")');
-        // $req->execute([$clanId, $userId]);
-        
+        // Logique SQL à insérer ici plus tard
         $message = "Demande envoyée avec succès au clan !";
         $messageType = "success";
     }
 }
 
-// 4. SIMULATION DES CLANS DISPONIBLES (À remplacer par un SELECT * FROM clans)
+// 4. SIMULATION DES CLANS DISPONIBLES (Avec ajout d'une clé 'langue' pour la cohérence)
 $clansListe = [
-    ['id' => 1, 'nom' => 'Les Maîtres du Damier', 'drapeau' => '🇫🇷', 'trophees' => 4520, 'membres' => 12, 'bio' => 'Objectif top mondial ! Aucun pion laissé au hasard.'],
-    ['id' => 2, 'nom' => 'Blitz Faction', 'drapeau' => '🇧🇪', 'trophees' => 3890, 'membres' => 8, 'bio' => 'Pour les amoureux des parties rapides et agressives.'],
-    ['id' => 3, 'nom' => 'Strategia', 'drapeau' => '🇨🇦', 'trophees' => 2100, 'membres' => 4, 'bio' => 'Ici on apprend et on progresse ensemble calmement.']
+    ['id' => 1, 'nom' => 'Les Maîtres du Damier', 'drapeau' => '🇫🇷', 'langue' => 'Français', 'trophees' => 4520, 'membres' => 12, 'bio' => 'Objectif top mondial ! Aucun pion laissé au hasard.'],
+    ['id' => 2, 'nom' => 'Blitz Faction', 'drapeau' => '🇧🇪', 'langue' => 'Français', 'trophees' => 3890, 'membres' => 8, 'bio' => 'Pour les amoureux des parties rapides et agressives.'],
+    ['id' => 3, 'nom' => 'Strategia', 'drapeau' => '🇨🇦', 'langue' => 'Anglais/Français', 'trophees' => 2100, 'membres' => 4, 'bio' => 'Ici on apprend et on progresse ensemble calmement.']
 ];
 
-// Logique de filtrage basique si une recherche est soumise
 if (!empty($_GET['search'])) {
     $search = strtolower(trim($_GET['search']));
     $clansListe = array_filter($clansListe, function($c) use ($search) {
@@ -180,9 +176,11 @@ if (!empty($_GET['search'])) {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 20px;
         }
 
         .clan-info-left {
+            flex: 1;
             display: flex;
             flex-direction: column;
             gap: 5px;
@@ -208,20 +206,27 @@ if (!empty($_GET['search'])) {
             color: #c4b49c;
         }
 
+        .clan-actions-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             color: #fff;
             text-decoration: none;
-            padding: 12px 22px;
+            padding: 12px 20px;
             border-radius: 6px;
             font-weight: bold;
-            font-size: 15px;
+            font-size: 14px;
             border: none;
             transition: filter 0.2s, transform 0.1s;
             cursor: pointer;
             box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+            white-space: nowrap;
         }
         .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
         .btn-play { background-color: #81b64c; border-bottom: 4px solid #68943b; text-transform: uppercase; }
@@ -275,17 +280,21 @@ if (!empty($_GET['search'])) {
                                         <span style="font-size: 20px;"><?php echo htmlspecialchars($clan['drapeau']); ?></span>
                                     </div>
                                     <div class="clan-meta-stats">
-                                        🏆 <strong><?php echo $clan['trophees']; ?></strong> trophées &bull; 👥 <strong><?php echo $clan['membres']; ?>/30</strong> membres
+                                        🏆 <strong><?php echo $clan['trophees']; ?></strong> trophées &bull; 👥 <strong><?php echo $clan['membres']; ?>/30</strong> membres &bull; 🌐 <i><?php echo htmlspecialchars($clan['langue']); ?></i>
                                     </div>
                                     <p class="clan-card-bio"><?php echo htmlspecialchars($clan['bio']); ?></p>
                                 </div>
                                 
-                                <form method="POST" action="">
-                                    <input type="hidden" name="action" value="rejoindre">
-                                    <input type="hidden" name="clan_id" value="<?php echo $clan['id']; ?>">
-                                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                                    <button type="submit" class="btn btn-play" style="padding: 10px 18px; font-size: 14px;">Rejoindre</button>
-                                </form>
+                                <div class="clan-actions-right">
+                                    <a href="clan_membres.php?id=<?php echo $clan['id']; ?>" class="btn btn-chat">👁️ Voir</a>
+                                    
+                                    <form method="POST" action="" style="margin: 0;">
+                                        <input type="hidden" name="action" value="rejoindre">
+                                        <input type="hidden" name="clan_id" value="<?php echo $clan['id']; ?>">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                        <button type="submit" class="btn btn-play">Rejoindre</button>
+                                    </form>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>

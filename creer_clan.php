@@ -24,7 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $nomClan = trim($_POST['nom_clan']);
         $drapeau = trim($_POST['drapeau']);
-        $bio = trim($_POST['bio_clan']);
+        $langue  = trim($_POST['langue']);
+        $bio     = trim($_POST['bio_clan']);
 
         if (strlen($nomClan) < 4 || strlen($nomClan) > 30) {
             $message = "Le nom du clan doit contenir entre 4 et 30 caractères.";
@@ -33,15 +34,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = "Veuillez insérer une description pour votre clan.";
             $messageType = "danger";
         } else {
-            // Exemple d'insertion SQL à décommenter après configuration de ta table 'clans'
+            // Exemple d'insertion SQL mis à jour avec la langue :
             /*
-            $req = $bdd->prepare('INSERT INTO clans (nom, drapeau, bio, chef_id, trophees) VALUES (?, ?, ?, ?, 0)');
-            $req->execute([$nomClan, $drapeau, $bio, $userId]);
-            
-            // On met à jour le statut clan du joueur
-            $clanId = $bdd->lastInsertId();
-            $reqUser = $bdd->prepare('UPDATE utilisateurs SET clan_id = ? WHERE id = ?');
-            $reqUser->execute([$clanId, $userId]);
+            $req = $bdd->prepare('INSERT INTO clans (nom, drapeau, langue, bio, chef_id, trophees) VALUES (?, ?, ?, ?, ?, 0)');
+            $req->execute([$nomClan, $drapeau, $langue, $bio, $userId]);
             */
             
             $message = "Félicitations ! Votre clan a été fondé avec succès.";
@@ -136,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-color: rgba(33, 21, 13, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 12px;
-            padding: 40px;
+            padding: 35px;
             display: flex;
             flex-direction: column;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
@@ -162,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             flex-direction: column;
             gap: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .form-group label {
@@ -252,6 +248,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <option value="🇨🇭">Suisse (🇨🇭)</option>
                             <option value="🇨🇦">Canada (🇨🇦)</option>
                             <option value="🌍">International (🌍)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="langue">Langue Principale du Clan</label>
+                        <select id="langue" name="langue">
+                            <option value="Français">Français</option>
+                            <option value="Anglais">Anglais</option>
+                            <option value="Espagnol">Espagnol</option>
+                            <option value="Allemand">Allemand</option>
+                            <option value="Multilingue">Multilingue (Toutes langues)</option>
                         </select>
                     </div>
 
