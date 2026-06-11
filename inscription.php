@@ -245,10 +245,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <button type="submit" class="btn">S'inscrire</button>
             </form>
-
-            <div class="switch-mode">
-                Déjà inscrit ? <a href="connexion.php">Se connecter</a>
-            </div>
         </div>
     </div>
 </body>
