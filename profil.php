@@ -621,14 +621,203 @@ $defaites = 0;
                     <label for="inputFlag">Nationalité (Drapeau)</label>
                     <select name="code_drapeau" id="inputFlag" class="form-control">
                         <option value="un" <?php echo $user_flag == 'un' ? 'selected' : ''; ?>>🌐 International (Universel)</option>
-                        <option value="fr" <?php echo $user_flag == 'fr' ? 'selected' : ''; ?>>🇫🇷 France</option>
-                        <option value="be" <?php echo $user_flag == 'be' ? 'selected' : ''; ?>>🇧🇪 Belgique</option>
-                        <option value="ca" <?php echo $user_flag == 'ca' ? 'selected' : ''; ?>>🇨🇦 Canada</option>
-                        <option value="ch" <?php echo $user_flag == 'ch' ? 'selected' : ''; ?>>🇨🇭 Suisse</option>
-                        <option value="us" <?php echo $user_flag == 'us' ? 'selected' : ''; ?>>🇺🇸 États-Unis</option>
-                        <option value="ma" <?php echo $user_flag == 'ma' ? 'selected' : ''; ?>>🇲🇦 Maroc</option>
-                        <option value="dz" <?php echo $user_flag == 'dz' ? 'selected' : ''; ?>>🇩🇿 Algérie</option>
-                        <option value="tn" <?php echo $user_flag == 'tn' ? 'selected' : ''; ?>>🇹🇳 Tunisie</option>
+                        <option value="un" <?php echo $user_flag == 'un' ? 'selected' : ''; ?>>🌐 International (Universel)</option>
+<option value="af" <?php echo $user_flag == 'af' ? 'selected' : ''; ?>>🇦🇫 Afghanistan</option>
+<option value="za" <?php echo $user_flag == 'za' ? 'selected' : ''; ?>>🇿🇦 Afrique du Sud</option>
+<option value="al" <?php echo $user_flag == 'al' ? 'selected' : ''; ?>>🇦🇱 Albanie</option>
+<option value="dz" <?php echo $user_flag == 'dz' ? 'selected' : ''; ?>>🇩🇿 Algérie</option>
+<option value="de" <?php echo $user_flag == 'de' ? 'selected' : ''; ?>>🇩🇪 Allemagne</option>
+<option value="ad" <?php echo $user_flag == 'ad' ? 'selected' : ''; ?>>🇦🇩 Andorre</option>
+<option value="ao" <?php echo $user_flag == 'ao' ? 'selected' : ''; ?>>🇦🇴 Angola</option>
+<option value="ag" <?php echo $user_flag == 'ag' ? 'selected' : ''; ?>>🇦🇬 Antigua-et-Barbuda</option>
+<option value="sa" <?php echo $user_flag == 'sa' ? 'selected' : ''; ?>>🇸🇦 Arabie saoudite</option>
+<option value="ar" <?php echo $user_flag == 'ar' ? 'selected' : ''; ?>>🇦🇷 Argentine</option>
+<option value="am" <?php echo $user_flag == 'am' ? 'selected' : ''; ?>>🇦🇲 Arménie</option>
+<option value="au" <?php echo $user_flag == 'au' ? 'selected' : ''; ?>>🇦🇺 Australie</option>
+<option value="at" <?php echo $user_flag == 'at' ? 'selected' : ''; ?>>🇦🇹 Autriche</option>
+<option value="az" <?php echo $user_flag == 'az' ? 'selected' : ''; ?>>🇦🇿 Azerbaïdjan</option>
+<option value="bs" <?php echo $user_flag == 'bs' ? 'selected' : ''; ?>>🇧🇸 Bahamas</option>
+<option value="bh" <?php echo $user_flag == 'bh' ? 'selected' : ''; ?>>🇧🇭 Bahreïn</option>
+<option value="bd" <?php echo $user_flag == 'bd' ? 'selected' : ''; ?>>🇧🇩 Bangladesh</option>
+<option value="bb" <?php echo $user_flag == 'bb' ? 'selected' : ''; ?>>🇧🇧 Barbade</option>
+<option value="be" <?php echo $user_flag == 'be' ? 'selected' : ''; ?>>🇧🇪 Belgique</option>
+<option value="bz" <?php echo $user_flag == 'bz' ? 'selected' : ''; ?>>🇧🇿 Belize</option>
+<option value="bj" <?php echo $user_flag == 'bj' ? 'selected' : ''; ?>>🇧🇯 Bénin</option>
+<option value="bt" <?php echo $user_flag == 'bt' ? 'selected' : ''; ?>>🇧🇹 Bhoutan</option>
+<option value="by" <?php echo $user_flag == 'by' ? 'selected' : ''; ?>>🇧🇾 Biélorussie</option>
+<option value="mm" <?php echo $user_flag == 'mm' ? 'selected' : ''; ?>>🇲🇲 Birmanie</option>
+<option value="bo" <?php echo $user_flag == 'bo' ? 'selected' : ''; ?>>🇧🇴 Bolivie</option>
+<option value="ba" <?php echo $user_flag == 'ba' ? 'selected' : ''; ?>>🇧🇦 Bosnie-Herzégovine</option>
+<option value="bw" <?php echo $user_flag == 'bw' ? 'selected' : ''; ?>>🇧🇼 Botswana</option>
+<option value="br" <?php echo $user_flag == 'br' ? 'selected' : ''; ?>>🇧🇷 Brésil</option>
+<option value="bn" <?php echo $user_flag == 'bn' ? 'selected' : ''; ?>>🇧🇳 Brunei</option>
+<option value="bg" <?php echo $user_flag == 'bg' ? 'selected' : ''; ?>>🇧🇬 Bulgarie</option>
+<option value="bf" <?php echo $user_flag == 'bf' ? 'selected' : ''; ?>>🇧🇫 Burkina Faso</option>
+<option value="bi" <?php echo $user_flag == 'bi' ? 'selected' : ''; ?>>🇧🇮 Burundi</option>
+<option value="kh" <?php echo $user_flag == 'kh' ? 'selected' : ''; ?>>🇰🇭 Cambodge</option>
+<option value="cm" <?php echo $user_flag == 'cm' ? 'selected' : ''; ?>>🇨🇲 Cameroun</option>
+<option value="ca" <?php echo $user_flag == 'ca' ? 'selected' : ''; ?>>🇨🇦 Canada</option>
+<option value="cv" <?php echo $user_flag == 'cv' ? 'selected' : ''; ?>>🇨🇻 Cap-Vert</option>
+<option value="cf" <?php echo $user_flag == 'cf' ? 'selected' : ''; ?>>🇨🇫 République centrafricaine</option>
+<option value="cl" <?php echo $user_flag == 'cl' ? 'selected' : ''; ?>>🇨🇱 Chili</option>
+<option value="cn" <?php echo $user_flag == 'cn' ? 'selected' : ''; ?>>🇨🇳 Chine</option>
+<option value="cy" <?php echo $user_flag == 'cy' ? 'selected' : ''; ?>>🇨🇾 Chypre</option>
+<option value="co" <?php echo $user_flag == 'co' ? 'selected' : ''; ?>>🇨🇴 Colombie</option>
+<option value="km" <?php echo $user_flag == 'km' ? 'selected' : ''; ?>>🇰🇲 Comores</option>
+<option value="cg" <?php echo $user_flag == 'cg' ? 'selected' : ''; ?>>🇨🇬 Congo-Brazzaville</option>
+<option value="cd" <?php echo $user_flag == 'cd' ? 'selected' : ''; ?>>🇨🇩 Congo-Kinshasa</option>
+<option value="kp" <?php echo $user_flag == 'kp' ? 'selected' : ''; ?>>🇰🇵 Corée du Nord</option>
+<option value="kr" <?php echo $user_flag == 'kr' ? 'selected' : ''; ?>>🇰🇷 Corée du Sud</option>
+<option value="cr" <?php echo $user_flag == 'cr' ? 'selected' : ''; ?>>🇨🇷 Costa Rica</option>
+<option value="ci" <?php echo $user_flag == 'ci' ? 'selected' : ''; ?>>🇨🇮 Côte d'Ivoire</option>
+<option value="hr" <?php echo $user_flag == 'hr' ? 'selected' : ''; ?>>🇭🇷 Croatie</option>
+<option value="cu" <?php echo $user_flag == 'cu' ? 'selected' : ''; ?>>🇨🇺 Cuba</option>
+<option value="dk" <?php echo $user_flag == 'dk' ? 'selected' : ''; ?>>🇩🇰 Danemark</option>
+<option value="dj" <?php echo $user_flag == 'dj' ? 'selected' : ''; ?>>🇩🇯 Djibouti</option>
+<option value="dm" <?php echo $user_flag == 'dm' ? 'selected' : ''; ?>>🇩🇲 Dominique</option>
+<option value="eg" <?php echo $user_flag == 'eg' ? 'selected' : ''; ?>>🇪🇬 Égypte</option>
+<option value="ae" <?php echo $user_flag == 'ae' ? 'selected' : ''; ?>>🇦🇪 Émirats arabes unis</option>
+<option value="ec" <?php echo $user_flag == 'ec' ? 'selected' : ''; ?>>🇪🇨 Équateur</option>
+<option value="er" <?php echo $user_flag == 'er' ? 'selected' : ''; ?>>🇪🇷 Érythrée</option>
+<option value="es" <?php echo $user_flag == 'es' ? 'selected' : ''; ?>>🇪🇸 Espagne</option>
+<option value="ee" <?php echo $user_flag == 'ee' ? 'selected' : ''; ?>>🇪🇪 Estonie</option>
+<option value="us" <?php echo $user_flag == 'us' ? 'selected' : ''; ?>>🇺🇸 États-Unis</option>
+<option value="et" <?php echo $user_flag == 'et' ? 'selected' : ''; ?>>🇪🇹 Éthiopie</option>
+<option value="fj" <?php echo $user_flag == 'fj' ? 'selected' : ''; ?>>🇫🇯 Fidji</option>
+<option value="fi" <?php echo $user_flag == 'fi' ? 'selected' : ''; ?>>🇫🇮 Finlande</option>
+<option value="fr" <?php echo $user_flag == 'fr' ? 'selected' : ''; ?>>🇫🇷 France</option>
+<option value="ga" <?php echo $user_flag == 'ga' ? 'selected' : ''; ?>>🇬🇦 Gabon</option>
+<option value="gm" <?php echo $user_flag == 'gm' ? 'selected' : ''; ?>>🇬🇲 Gambie</option>
+<option value="ge" <?php echo $user_flag == 'ge' ? 'selected' : ''; ?>>🇬🇪 Géorgie</option>
+<option value="gh" <?php echo $user_flag == 'gh' ? 'selected' : ''; ?>>🇬🇭 Ghana</option>
+<option value="gi" <?php echo $user_flag == 'gi' ? 'selected' : ''; ?>>🇬🇮 Gibraltar</option>
+<option value="gr" <?php echo $user_flag == 'gr' ? 'selected' : ''; ?>>🇬🇷 Grèce</option>
+<option value="gd" <?php echo $user_flag == 'gd' ? 'selected' : ''; ?>>🇬🇩 Grenade</option>
+<option value="gt" <?php echo $user_flag == 'gt' ? 'selected' : ''; ?>>🇬🇹 Guatemala</option>
+<option value="gn" <?php echo $user_flag == 'gn' ? 'selected' : ''; ?>>🇬🇳 Guinée</option>
+<option value="gq" <?php echo $user_flag == 'gq' ? 'selected' : ''; ?>>🇬🇶 Guinée équatoriale</option>
+<option value="gw" <?php echo $user_flag == 'gw' ? 'selected' : ''; ?>>🇬🇼 Guinée-Bissau</option>
+<option value="gy" <?php echo $user_flag == 'gy' ? 'selected' : ''; ?>>🇬🇾 Guyane</option>
+<option value="ht" <?php echo $user_flag == 'ht' ? 'selected' : ''; ?>>🇭🇹 Haïti</option>
+<option value="hn" <?php echo $user_flag == 'hn' ? 'selected' : ''; ?>>🇭🇳 Honduras</option>
+<option value="hu" <?php echo $user_flag == 'hu' ? 'selected' : ''; ?>>🇭🇺 Hongrie</option>
+<option value="in" <?php echo $user_flag == 'in' ? 'selected' : ''; ?>>🇮🇳 Inde</option>
+<option value="id" <?php echo $user_flag == 'id' ? 'selected' : ''; ?>>🇮🇩 Indonésie</option>
+<option value="iq" <?php echo $user_flag == 'iq' ? 'selected' : ''; ?>>🇮🇶 Irak</option>
+<option value="ir" <?php echo $user_flag == 'ir' ? 'selected' : ''; ?>>🇮🇷 Iran</option>
+<option value="ie" <?php echo $user_flag == 'ie' ? 'selected' : ''; ?>>🇮🇪 Irlande</option>
+<option value="is" <?php echo $user_flag == 'is' ? 'selected' : ''; ?>>🇮🇸 Islande</option>
+<option value="il" <?php echo $user_flag == 'il' ? 'selected' : ''; ?>>🇮🇱 Israël</option>
+<option value="it" <?php echo $user_flag == 'it' ? 'selected' : ''; ?>>🇮🇹 Italie</option>
+<option value="jm" <?php echo $user_flag == 'jm' ? 'selected' : ''; ?>>🇯🇲 Jamaïque</option>
+<option value="jp" <?php echo $user_flag == 'jp' ? 'selected' : ''; ?>>🇯🇵 Japon</option>
+<option value="jo" <?php echo $user_flag == 'jo' ? 'selected' : ''; ?>>🇯🇴 Jordanie</option>
+<option value="kz" <?php echo $user_flag == 'kz' ? 'selected' : ''; ?>>🇰🇿 Kazakhstan</option>
+<option value="ke" <?php echo $user_flag == 'ke' ? 'selected' : ''; ?>>🇰🇪 Kenya</option>
+<option value="kg" <?php echo $user_flag == 'kg' ? 'selected' : ''; ?>>🇰🇬 Kirghizistan</option>
+<option value="ki" <?php echo $user_flag == 'ki' ? 'selected' : ''; ?>>🇰🇮 Kiribati</option>
+<option value="kw" <?php echo $user_flag == 'kw' ? 'selected' : ''; ?>>🇰🇼 Koweït</option>
+<option value="la" <?php echo $user_flag == 'la' ? 'selected' : ''; ?>>🇱🇦 Laos</option>
+<option value="ls" <?php echo $user_flag == 'ls' ? 'selected' : ''; ?>>🇱🇸 Lesotho</option>
+<option value="lv" <?php echo $user_flag == 'lv' ? 'selected' : ''; ?>>🇱🇻 Lettonie</option>
+<option value="lb" <?php echo $user_flag == 'lb' ? 'selected' : ''; ?>>🇱🇧 Liban</option>
+<option value="lr" <?php echo $user_flag == 'lr' ? 'selected' : ''; ?>>🇱🇷 Liberia</option>
+<option value="ly" <?php echo $user_flag == 'ly' ? 'selected' : ''; ?>>🇱🇾 Libye</option>
+<option value="li" <?php echo $user_flag == 'li' ? 'selected' : ''; ?>>🇱🇮 Liechtenstein</option>
+<option value="lt" <?php echo $user_flag == 'lt' ? 'selected' : ''; ?>>🇱🇹 Lituanie</option>
+<option value="lu" <?php echo $user_flag == 'lu' ? 'selected' : ''; ?>>🇱🇺 Luxembourg</option>
+<option value="mk" <?php echo $user_flag == 'mk' ? 'selected' : ''; ?>>🇲🇰 Macédoine du Nord</option>
+<option value="mg" <?php echo $user_flag == 'mg' ? 'selected' : ''; ?>>🇲🇬 Madagascar</option>
+<option value="my" <?php echo $user_flag == 'my' ? 'selected' : ''; ?>>🇲🇾 Malaisie</option>
+<option value="mw" <?php echo $user_flag == 'mw' ? 'selected' : ''; ?>>🇲🇼 Malawi</option>
+<option value="mv" <?php echo $user_flag == 'mv' ? 'selected' : ''; ?>>🇲🇻 Maldives</option>
+<option value="ml" <?php echo $user_flag == 'ml' ? 'selected' : ''; ?>>🇲🇱 Mali</option>
+<option value="mt" <?php echo $user_flag == 'mt' ? 'selected' : ''; ?>>🇲🇹 Malte</option>
+<option value="ma" <?php echo $user_flag == 'ma' ? 'selected' : ''; ?>>🇲🇦 Maroc</option>
+<option value="mh" <?php echo $user_flag == 'mh' ? 'selected' : ''; ?>>🇲🇭 Îles Marshall</option>
+<option value="mu" <?php echo $user_flag == 'mu' ? 'selected' : ''; ?>>🇲🇺 Maurice</option>
+<option value="mr" <?php echo $user_flag == 'mr' ? 'selected' : ''; ?>>🇲🇷 Mauritanie</option>
+<option value="mx" <?php echo $user_flag == 'mx' ? 'selected' : ''; ?>>🇲🇽 Mexique</option>
+<option value="fm" <?php echo $user_flag == 'fm' ? 'selected' : ''; ?>>🇫🇲 Micronésie</option>
+<option value="md" <?php echo $user_flag == 'md' ? 'selected' : ''; ?>>🇲🇩 Moldavie</option>
+<option value="mc" <?php echo $user_flag == 'mc' ? 'selected' : ''; ?>>🇲🇨 Monaco</option>
+<option value="mn" <?php echo $user_flag == 'mn' ? 'selected' : ''; ?>>🇲🇳 Mongolie</option>
+<option value="me" <?php echo $user_flag == 'me' ? 'selected' : ''; ?>>🇲🇪 Monténégro</option>
+<option value="mz" <?php echo $user_flag == 'mz' ? 'selected' : ''; ?>>🇲🇿 Mozambique</option>
+<option value="na" <?php echo $user_flag == 'na' ? 'selected' : ''; ?>>🇳🇦 Namibie</option>
+<option value="nr" <?php echo $user_flag == 'nr' ? 'selected' : ''; ?>>🇳🇷 Nauru</option>
+<option value="np" <?php echo $user_flag == 'np' ? 'selected' : ''; ?>>🇳🇵 Népal</option>
+<option value="ni" <?php echo $user_flag == 'ni' ? 'selected' : ''; ?>>🇳🇮 Nicaragua</option>
+<option value="ne" <?php echo $user_flag == 'ne' ? 'selected' : ''; ?>>🇳🇪 Niger</option>
+<option value="ng" <?php echo $user_flag == 'ng' ? 'selected' : ''; ?>>🇳🇬 Nigeria</option>
+<option value="no" <?php echo $user_flag == 'no' ? 'selected' : ''; ?>>🇳🇴 Norvège</option>
+<option value="nz" <?php echo $user_flag == 'nz' ? 'selected' : ''; ?>>🇳🇿 Nouvelle-Zélande</option>
+<option value="om" <?php echo $user_flag == 'om' ? 'selected' : ''; ?>>🇴🇲 Oman</option>
+<option value="ug" <?php echo $user_flag == 'ug' ? 'selected' : ''; ?>>🇺🇬 Ouganda</option>
+<option value="uz" <?php echo $user_flag == 'uz' ? 'selected' : ''; ?>>🇺🇿 Ouzbékistan</option>
+<option value="pk" <?php echo $user_flag == 'pk' ? 'selected' : ''; ?>>🇵🇰 Pakistan</option>
+<option value="pw" <?php echo $user_flag == 'pw' ? 'selected' : ''; ?>>🇵🇼 Palaos</option>
+<option value="ps" <?php echo $user_flag == 'ps' ? 'selected' : ''; ?>>🇵🇸 Palestine</option>
+<option value="pa" <?php echo $user_flag == 'pa' ? 'selected' : ''; ?>>🇵🇦 Panama</option>
+<option value="pg" <?php echo $user_flag == 'pg' ? 'selected' : ''; ?>>🇵🇬 Papouasie-Nouvelle-Guinée</option>
+<option value="py" <?php echo $user_flag == 'py' ? 'selected' : ''; ?>>🇵🇾 Paraguay</option>
+<option value="nl" <?php echo $user_flag == 'nl' ? 'selected' : ''; ?>>🇳🇱 Pays-Bas</option>
+<option value="pe" <?php echo $user_flag == 'pe' ? 'selected' : ''; ?>>🇵🇪 Pérou</option>
+<option value="ph" <?php echo $user_flag == 'ph' ? 'selected' : ''; ?>>🇵🇭 Philippines</option>
+<option value="pl" <?php echo $user_flag == 'pl' ? 'selected' : ''; ?>>🇵🇱 Pologne</option>
+<option value="pt" <?php echo $user_flag == 'pt' ? 'selected' : ''; ?>>🇵🇹 Portugal</option>
+<option value="qa" <?php echo $user_flag == 'qa' ? 'selected' : ''; ?>>🇶🇦 Qatar</option>
+<option value="cf" <?php echo $user_flag == 'cf' ? 'selected' : ''; ?>>🇨🇫 République centrafricaine</option>
+<option value="do" <?php echo $user_flag == 'do' ? 'selected' : ''; ?>>🇩🇴 République dominicaine</option>
+<option value="cz" <?php echo $user_flag == 'cz' ? 'selected' : ''; ?>>🇨🇿 République tchèque</option>
+<option value="ro" <?php echo $user_flag == 'ro' ? 'selected' : ''; ?>>🇷🇴 Roumanie</option>
+<option value="gb" <?php echo $user_flag == 'gb' ? 'selected' : ''; ?>>🇬🇧 Royaume-Uni</option>
+<option value="ru" <?php echo $user_flag == 'ru' ? 'selected' : ''; ?>>🇷🇺 Russie</option>
+<option value="rw" <?php echo $user_flag == 'rw' ? 'selected' : ''; ?>>🇷🇼 Rwanda</option>
+<option value="kn" <?php echo $user_flag == 'kn' ? 'selected' : ''; ?>>🇰🇳 Saint-Christophe-et-Niévès</option>
+<option value="sm" <?php echo $user_flag == 'sm' ? 'selected' : ''; ?>>🇸🇲 Saint-Marin</option>
+<option value="vc" <?php echo $user_flag == 'vc' ? 'selected' : ''; ?>>🇻🇨 Saint-Vincent-et-les-Grenadines</option>
+<option value="lc" <?php echo $user_flag == 'lc' ? 'selected' : ''; ?>>🇱🇨 Sainte-Lucie</option>
+<option value="sb" <?php echo $user_flag == 'sb' ? 'selected' : ''; ?>>🇸🇧 Îles Salomon</option>
+<option value="ws" <?php echo $user_flag == 'ws' ? 'selected' : ''; ?>>🇼🇸 Samoa</option>
+<option value="st" <?php echo $user_flag == 'st' ? 'selected' : ''; ?>>🇸🇹 Sao Tomé-et-Principe</option>
+<option value="sn" <?php echo $user_flag == 'sn' ? 'selected' : ''; ?>>🇸🇳 Sénégal</option>
+<option value="rs" <?php echo $user_flag == 'rs' ? 'selected' : ''; ?>>🇷🇸 Serbie</option>
+<option value="sc" <?php echo $user_flag == 'sc' ? 'selected' : ''; ?>>🇸🇨 Seychelles</option>
+<option value="sl" <?php echo $user_flag == 'sl' ? 'selected' : ''; ?>>🇸🇱 Sierra Leone</option>
+<option value="sg" <?php echo $user_flag == 'sg' ? 'selected' : ''; ?>>🇸🇬 Singapour</option>
+<option value="sk" <?php echo $user_flag == 'sk' ? 'selected' : ''; ?>>🇸🇰 Slovaquie</option>
+<option value="si" <?php echo $user_flag == 'si' ? 'selected' : ''; ?>>🇸🇮 Slovénie</option>
+<option value="so" <?php echo $user_flag == 'so' ? 'selected' : ''; ?>>🇸🇴 Somalie</option>
+<option value="sd" <?php echo $user_flag == 'sd' ? 'selected' : ''; ?>>🇸🇩 Soudan</option>
+<option value="ss" <?php echo $user_flag == 'ss' ? 'selected' : ''; ?>>🇸🇸 Soudan du Sud</option>
+<option value="lk" <?php echo $user_flag == 'lk' ? 'selected' : ''; ?>>🇱🇰 Sri Lanka</option>
+<option value="se" <?php echo $user_flag == 'se' ? 'selected' : ''; ?>>🇸🇪 Suède</option>
+<option value="ch" <?php echo $user_flag == 'ch' ? 'selected' : ''; ?>>🇨🇭 Suisse</option>
+<option value="sr" <?php echo $user_flag == 'sr' ? 'selected' : ''; ?>>🇸🇷 Suriname</option>
+<option value="sz" <?php echo $user_flag == 'sz' ? 'selected' : ''; ?>>🇸🇿 Eswatini</option>
+<option value="sy" <?php echo $user_flag == 'sy' ? 'selected' : ''; ?>>🇸🇾 Syrie</option>
+<option value="tj" <?php echo $user_flag == 'tj' ? 'selected' : ''; ?>>🇹🇯 Tadjikistan</option>
+<option value="tw" <?php echo $user_flag == 'tw' ? 'selected' : ''; ?>>🇹🇼 Taïwan</option>
+<option value="tz" <?php echo $user_flag == 'tz' ? 'selected' : ''; ?>>🇹🇿 Tanzanie</option>
+<option value="td" <?php echo $user_flag == 'td' ? 'selected' : ''; ?>>🇹🇩 Tchad</option>
+<option value="th" <?php echo $user_flag == 'th' ? 'selected' : ''; ?>>🇹🇭 Thaïlande</option>
+<option value="tl" <?php echo $user_flag == 'tl' ? 'selected' : ''; ?>>🇹🇱 Timor oriental</option>
+<option value="tg" <?php echo $user_flag == 'tg' ? 'selected' : ''; ?>>🇹🇬 Togo</option>
+<option value="to" <?php echo $user_flag == 'to' ? 'selected' : ''; ?>>🇹🇴 Tonga</option>
+<option value="tt" <?php echo $user_flag == 'tt' ? 'selected' : ''; ?>>🇹🇹 Trinité-et-Tobago</option>
+<option value="tn" <?php echo $user_flag == 'tn' ? 'selected' : ''; ?>>🇹🇳 Tunisie</option>
+<option value="tm" <?php echo $user_flag == 'tm' ? 'selected' : ''; ?>>🇹🇲 Turkménistan</option>
+<option value="tr" <?php echo $user_flag == 'tr' ? 'selected' : ''; ?>>🇹🇷 Turquie</option>
+<option value="tv" <?php echo $user_flag == 'tv' ? 'selected' : ''; ?>>🇹🇻 Tuvalu</option>
+<option value="ua" <?php echo $user_flag == 'ua' ? 'selected' : ''; ?>>🇺🇦 Ukraine</option>
+<option value="uy" <?php echo $user_flag == 'uy' ? 'selected' : ''; ?>>🇺🇾 Uruguay</option>
+<option value="va" <?php echo $user_flag == 'va' ? 'selected' : ''; ?>>🇻🇦 Vatican</option>
+<option value="ve" <?php echo $user_flag == 've' ? 'selected' : ''; ?>>🇻🇪 Venezuela</option>
+<option value="vn" <?php echo $user_flag == 'vn' ? 'selected' : ''; ?>>🇻🇳 Viêt Nam</option>
+<option value="ye" <?php echo $user_flag == 'ye' ? 'selected' : ''; ?>>🇾🇪 Yémen</option>
+<option value="zm" <?php echo $user_flag == 'zm' ? 'selected' : ''; ?>>🇿🇲 Zambie</option>
+<option value="zw" <?php echo $user_flag == 'zw' ? 'selected' : ''; ?>>🇿🇼 Zimbabwe</option>
                     </select>
                 </div>
 
