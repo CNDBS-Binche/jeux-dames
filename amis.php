@@ -118,7 +118,7 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
     <title>Mes Amis - Jeu de Dames</title>
     <style>
         /* ==========================================================================
-           1. FOND D'ÉCRAN FIXE (EMPÊCHE LA PAGE DE DESCENDRE À L'INFINI)
+           1. FOND D'ÉCRAN FIXE
            ========================================================================== */
         body {
             display: flex;
@@ -135,7 +135,7 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
 
         body::before {
             content: "";
-            position: fixed; /* Fixé à l'écran pour ne pas agrandir la page */
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -150,7 +150,6 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
             animation: move 60s linear infinite;
         }
 
-        /* Déplacement du motif interne au lieu du conteneur global */
         @keyframes move {
             from { background-position: 0 0; }
             to { background-position: 100px 100px; }
@@ -216,7 +215,7 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
         }
 
         /* ==========================================================================
-           3. CONTENU PRINCIPAL ET GRILLE CENTRÉE
+           3. CONTENU PRINCIPAL ET GRILLE AGRANDIE + CENTRÉE
            ========================================================================== */
         .main-content {
             margin-left: 240px;
@@ -227,7 +226,6 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
             box-sizing: border-box;
         }
 
-        /* Conteneur parent ajouté pour gérer le centrage global horizontal */
         .dashboard-container {
             display: flex;
             flex-direction: column;
@@ -235,16 +233,15 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
             width: 100%;
         }
 
-        /* Bloc interne de contenu qui englobe le titre et les cartes */
         .dashboard-inner {
             width: 100%;
-            max-width: 1100px; /* Aligné sur la largeur de tes autres pages */
+            max-width: 1300px; /* Augmenté de 1100px à 1300px pour des cadres plus larges */
         }
 
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1.6fr 1.1fr;
-            gap: 30px;
+            gap: 35px; /* Légèrement plus d'espace entre les colonnes */
             width: 100%;
         }
 
@@ -257,35 +254,35 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
         .left-column, .right-column {
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 30px;
         }
 
         .card {
             background-color: rgba(33, 21, 13, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 25px;
+            border-radius: 14px;
+            padding: 30px; /* Augmenté de 25px à 30px pour aérer l'intérieur des grands cadres */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
             backdrop-filter: blur(8px);
         }
 
         .card h2 {
             margin-top: 0;
             color: #fff;
-            font-size: 20px;
+            font-size: 22px; /* Légèrement plus grand pour suivre la proportion du cadre */
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
         .card p {
-            margin: 0 0 20px 0;
-            font-size: 14px;
+            margin: 0 0 22px 0;
+            font-size: 14.5px;
             line-height: 1.6;
             color: #c4b49c;
         }
@@ -299,7 +296,7 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
             justify-content: center;
             color: #fff;
             text-decoration: none;
-            padding: 12px 20px;
+            padding: 12px 22px;
             border-radius: 6px;
             font-weight: bold;
             font-size: 15px;
@@ -359,7 +356,7 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
 
         .search-box input {
             flex: 1;
-            padding: 12px;
+            padding: 14px; /* Un poil plus grand pour aller avec le nouveau layout */
             border: 1px solid #5d3a1a;
             border-radius: 6px;
             background-color: rgba(0, 0, 0, 0.4);
@@ -378,7 +375,7 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
             margin: 0;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         .liste-joueurs li {
@@ -386,7 +383,7 @@ $amis = $reqAmis->fetchAll(PDO::FETCH_ASSOC);
             justify-content: space-between;
             align-items: center;
             background-color: rgba(0, 0, 0, 0.2);
-            padding: 12px 15px;
+            padding: 14px 18px;
             border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.02);
         }
