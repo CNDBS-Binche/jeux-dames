@@ -37,7 +37,6 @@ if (isset($_SESSION['user_id'])) {
     $user = $query->fetch();
     
     // Récupération des vraies statistiques depuis la base si disponible
-    // (A adapter selon les colonnes de votre table utilisateurs)
     $victoires = $user['victoires'] ?? 0;
     $defaites = $user['defaites'] ?? 0;
 } else {
@@ -318,6 +317,10 @@ if (isset($_SESSION['user_id'])) {
             font-weight: bold;
             font-size: 15px;
             transition: opacity 0.2s;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .btn:hover {
@@ -363,9 +366,6 @@ if (isset($_SESSION['user_id'])) {
             opacity: 0.6;
         }
 
-        /* ==========================================================================
-           4. UN SEUL DAMIER CENTRÉ
-           ========================================================================== */
         .boards-container {
             display: grid;
             grid-template-columns: 1fr;
@@ -441,9 +441,6 @@ if (isset($_SESSION['user_id'])) {
             color: #fff;
         }
 
-        /* ==========================================================================
-           5. HISTORIQUE DES PARTIES
-           ========================================================================== */
         .history-list {
             display: flex;
             flex-direction: column;
@@ -487,16 +484,15 @@ if (isset($_SESSION['user_id'])) {
         .lose .history-badge { background-color: rgba(231, 76, 60, 0.2); color: #e74c3c; }
 
         /* ==========================================================================
-           6. DESIGN DU RECOUVREMENT DE CONNEXION (POPUP FLOU)
+           4. RECOUVREMENT DE CONNEXION OPTIMISÉ POUR CORRESPONDRE À LA PHOTO
            ========================================================================== */
         .overlay {
             position: fixed;
             top: 0;
-            left: 0;
-            width: 100%;
+            left: 240px; /* Aligné après la barre latérale comme demandé */
+            width: calc(100% - 240px);
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
+            background-color: transparent; /* Pas de fond noir opaque, préserve l'arrière-plan boisé */
             z-index: 100;
             display: flex;
             justify-content: center;
@@ -588,6 +584,11 @@ if (isset($_SESSION['user_id'])) {
         .switch-mode a:hover {
             text-decoration: underline;
         }
+        
+        .btn-submit-login {
+            background-color: #81b64c;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -616,127 +617,122 @@ if (isset($_SESSION['user_id'])) {
     </div>
 
     <div class="main-content">
-        <div class="main-container">
-            
-            <div class="user-header">
-                <div class="user-profile-link">
-                    <div class="user-profile-info">
-                        <div class="user-avatar">
-                            <?php if (!empty($user['avatar'])): ?>
-                                <img src="<?php echo htmlspecialchars($user['avatar']); ?>" alt="Photo de profil">
-                            <?php else: ?>
-                                👤
-                            <?php endif; ?>
-                        </div>
-                        <div>
-                            <h1 style="margin:0; font-size: 24px; color:#fff;"><?php echo htmlspecialchars($user['pseudo']); ?></h1>
-                        </div>
-                    </div>
-                </div>
-                <div style="font-size: 13px; color: #a8947a;">
-                    Visiteur ou membre depuis le <?php echo date('d/m/Y', strtotime($user['date_inscription'])); ?>
-                </div>
-            </div>
-
-            <div class="dashboard-grid">
-                
-                <div class="left-column">
-                    <div class="card card-play">
-                        <h2>Prêt à en découdre ?</h2>
-                        <p style="color: #f0d9b5; opacity: 0.8;">Défiez des joueurs en ligne, peaufinez vos tactiques et grimpez dans le classement du jeu de dames.</p>
-                        
-                        <div class="boards-container">
-                            <a href="plateau.php" class="board-wrapper">
-                                <div class="mini-board">
-                                    <div class="board-row">
-                                        <div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div>
-                                    </div>
-                                    <div class="board-row">
-                                        <div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div>
-                                    </div>
-                                    <div class="board-row">
-                                        <div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div>
-                                    </div>
-                                    <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
-                                    <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
-                                    <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
-                                    <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
-                                    <div class="board-row">
-                                        <div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div>
-                                    </div>
-                                    <div class="board-row">
-                                        <div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div>
-                                    </div>
-                                    <div class="board-row">
-                                        <div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div>
-                                    </div>
-                                </div>
-                                <div class="board-label">Lancer une partie</div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h2>📜 Historique des dernières parties</h2>
-                        <div class="history-list">
-                            <div class="history-item win">
-                                <div class="history-details">
-                                    <span class="history-opponent">Contre Maxlamenace2207</span>
-                                    <span class="history-date">Le 09/06/2026 à 11:20</span>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 15px;">
-                                    <span class="history-badge">Victoire</span>
-                                </div>
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <div class="main-container">
+                <div class="user-header">
+                    <div class="user-profile-link">
+                        <div class="user-profile-info">
+                            <div class="user-avatar">
+                                <?php if (!empty($user['avatar'])): ?>
+                                    <img src="<?php echo htmlspecialchars($user['avatar']); ?>" alt="Photo de profil">
+                                <?php else: ?>
+                                    👤
+                                <?php endif; ?>
                             </div>
-
-                            <div class="history-item lose">
-                                <div class="history-details">
-                                    <span class="history-opponent">Contre Ordinateur (Facile)</span>
-                                    <span class="history-date">Le 08/06/2026 à 18:45</span>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 15px;">
-                                    <span class="history-badge">Défaite</span>
-                                </div>
+                            <div>
+                                <h1 style="margin:0; font-size: 24px; color:#fff;"><?php echo htmlspecialchars($user['pseudo']); ?></h1>
                             </div>
                         </div>
+                    </div>
+                    <div style="font-size: 13px; color: #a8947a;">
+                        Visiteur ou membre depuis le <?php echo date('d/m/Y', strtotime($user['date_inscription'])); ?>
                     </div>
                 </div>
 
-                <div class="right-column">
-                    <div class="card">
-                        <h2>📊 Mes Statistiques</h2>
-                        <div class="stat-box">
-                            <div class="stat-item">
-                                <span class="stat-val" style="color: #81b64c;"><?php echo $victoires; ?></span>
-                                <span class="stat-lbl">Victoires</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-val" style="color: #e74c3c;"><?php echo $defaites; ?></span>
-                                <span class="stat-lbl">Défaites</span>
+                <div class="dashboard-grid">
+                    <div class="left-column">
+                        <div class="card card-play">
+                            <h2>Prêt à en découdre ?</h2>
+                            <p style="color: #f0d9b5; opacity: 0.8;">Défiez des joueurs en ligne, peaufinez vos tactiques et grimpez dans le classement du jeu de dames.</p>
+                            
+                            <div class="boards-container">
+                                <a href="plateau.php" class="board-wrapper">
+                                    <div class="mini-board">
+                                        <div class="board-row">
+                                            <div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div>
+                                        </div>
+                                        <div class="board-row">
+                                            <div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div>
+                                        </div>
+                                        <div class="board-row">
+                                            <div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div><div class="cell"></div><div class="cell"><div class="piece black"></div></div>
+                                        </div>
+                                        <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                                        <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                                        <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                                        <div class="board-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                                        <div class="board-row">
+                                            <div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div>
+                                        </div>
+                                        <div class="board-row">
+                                            <div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div>
+                                        </div>
+                                        <div class="board-row">
+                                            <div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div><div class="cell"><div class="piece white"></div></div><div class="cell"></div>
+                                        </div>
+                                    </div>
+                                    <div class="board-label">Lancer une partie</div>
+                                </a>
                             </div>
                         </div>
-                        <a href="profil.php" class="btn btn-primary">Détail du profil</a>
+
+                        <div class="card">
+                            <h2>📜 Historique des dernières parties</h2>
+                            <div class="history-list">
+                                <div class="history-item win">
+                                    <div class="history-details">
+                                        <span class="history-opponent">Contre Maxlamenace2207</span>
+                                        <span class="history-date">Le 09/06/2026 à 11:20</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 15px;">
+                                        <span class="history-badge">Victoire</span>
+                                    </div>
+                                </div>
+
+                                <div class="history-item lose">
+                                    <div class="history-details">
+                                        <span class="history-opponent">Contre Ordinateur (Facile)</span>
+                                        <span class="history-date">Le 08/06/2026 à 18:45</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 15px;">
+                                        <span class="history-badge">Défaite</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="card">
-                        <h2>👥 Liste d'amis</h2>
-                        <?php if (isset($_SESSION['user_id'])): ?>
+                    <div class="right-column">
+                        <div class="card">
+                            <h2>📊 Mes Statistiques</h2>
+                            <div class="stat-box">
+                                <div class="stat-item">
+                                    <span class="stat-val" style="color: #81b64c;"><?php echo $victoires; ?></span>
+                                    <span class="stat-lbl">Victoires</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-val" style="color: #e74c3c;"><?php echo $defaites; ?></span>
+                                    <span class="stat-lbl">Défaites</span>
+                                </div>
+                            </div>
+                            <a href="profil.php" class="btn btn-primary">Détail du profil</a>
+                        </div>
+
+                        <div class="card">
+                            <h2>👥 Liste d'amis</h2>
                             <p class="empty-state">Aucun ami en ligne pour le moment.</p>
-                        <?php else: ?>
-                            <p class="empty-state">Connectez-vous pour voir vos amis en ligne.</p>
-                        <?php endif; ?>
-                        <a href="amis.php" class="btn btn-primary">Gérer mes amis</a>
-                    </div>
+                            <a href="amis.php" class="btn btn-primary">Gérer mes amis</a>
+                        </div>
 
-                    <div class="card">
-                        <h2>🛡️ Mon Clan</h2>
-                        <p>Créez une alliance, arborez un tag unique et participez au classement général des clans.</p>
-                        <a href="clans.php" class="btn btn-primary">Accéder aux Clans</a>
+                        <div class="card">
+                            <h2>🛡️ Mon Clan</h2>
+                            <p>Créez une alliance, arborez un tag unique et participez au classement général des clans.</p>
+                            <a href="clans.php" class="btn btn-primary">Accéder aux Clans</a>
+                        </div>
                     </div>
                 </div>
-
             </div>
-        </div>
+        <?php endif; ?>
     </div>
 
     <?php if (!isset($_SESSION['user_id'])): ?>
@@ -760,7 +756,7 @@ if (isset($_SESSION['user_id'])) {
                         <label for="password">Mot de passe</label>
                         <input type="password" id="password" name="password" required placeholder="••••••••">
                     </div>
-                    <button type="submit" class="btn">Se connecter</button>
+                    <button type="submit" class="btn btn-submit-login">Se connecter</button>
                 </form>
 
                 <div class="switch-mode">
