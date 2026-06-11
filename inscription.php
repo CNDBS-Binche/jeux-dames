@@ -50,7 +50,179 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription – Dames</title>
-    <link rel="stylesheet" href="log.css">
+    <style>
+       /* ==========================================================================
+           1. LE MÊME FOND D'ÉCRAN BRUN BOISÉ ET SON QUADRILLAGE ANIMÉ
+           ========================================================================== */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #f0d9b5; 
+            background: radial-gradient(circle, #4a321f, #2b1d12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background-image: 
+                linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%), 
+                linear-gradient(-45deg, rgba(0,0,0,0.1) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.1) 75%), 
+                linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.1) 75%);
+            background-size: 100px 100px;
+            z-index: 0;
+            animation: move 60s linear infinite;
+        }
+
+        @keyframes move {
+            from { transform: translate(-25%, -25%); }
+            to { transform: translate(0, 0); }
+        }
+
+        /* ==========================================================================
+           2. DESIGN DU CADRE D'INSCRIPTION (ASSORTI À LA CONNEXION)
+           ========================================================================== */
+        .login-container {
+            background-color: rgba(43, 29, 18, 0.75); /* Même marron semi-transparent */
+            backdrop-filter: blur(12px);
+            padding: 40px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 1;
+            box-sizing: border-box;
+        }
+
+        .login-container h1 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 28px;
+            color: #fff;
+            text-align: center;
+        }
+
+        .subtitle {
+            margin-top: 0;
+            margin-bottom: 30px;
+            color: #a8947a;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #c4b49c;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .input-group label small {
+            color: #a8947a;
+            font-weight: normal;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            background-color: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(122, 74, 40, 0.4);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 15px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: #81b64c; /* Focus vert */
+        }
+
+        /* Alertes dynamiques */
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .alert.error {
+            background-color: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.4);
+            color: #e74c3c;
+        }
+
+        .alert.success {
+            background-color: rgba(129, 182, 76, 0.2);
+            border: 1px solid rgba(129, 182, 76, 0.4);
+            color: #81b64c;
+        }
+        
+        .alert.success a {
+            color: #fff;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        /* Grand bouton d'action vert */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #81b64c;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            background-color: #6a9b3c;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Liens de redirection bas de page */
+        .switch-mode {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 14px;
+            color: #c4b49c;
+        }
+
+        .switch-mode a {
+            color: #81b64c;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .switch-mode a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
 <div class="login-container">
@@ -79,7 +251,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="password" id="password" name="password" required minlength="8"
                    placeholder="••••••••">
         </div>
-        <button type="submit" class="btn" style="background: var(--wood);">S'inscrire</button>
+        <button type="submit" class="btn">S'inscrire</button>
     </form>
 
     <div class="switch-mode">
