@@ -13,7 +13,7 @@ $success_msg = $_SESSION['success_msg'] ?? "";
 $error_msg = $_SESSION['error_msg'] ?? "";
 unset($_SESSION['success_msg'], $_SESSION['error_msg']);
 
-// 2. TRAITEMENT DU FORMULAIRE DE MISE À JOUR
+// 2. TRAITEMENT DU FORMULAIRE DE MISE À POUR
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Cas de la mise à jour des paramètres texte
@@ -75,8 +75,8 @@ $query = $bdd->prepare('SELECT pseudo, date_inscription, biographie, code_drapea
 $query->execute([$_SESSION['user_id']]);
 $user = $query->fetch();
 
-// Valeurs par défaut sécurisées
-$user_bio = !empty($user['biographie']) ? $user['biographie'] : "Bienvenue sur mon profil ! Passionné de jeu de dames et de stratégie.";
+// Valeur par défaut vide pour la biographie
+$user_bio = !empty($user['biographie']) ? $user['biographie'] : "";
 $user_flag = !empty($user['code_drapeau']) ? $user['code_drapeau'] : "un";
 
 // Validation stricte des couleurs récupérées de la BDD pour le bloc CSS :root
@@ -99,7 +99,7 @@ $defaites = 0;
 
         body {
             display: flex;
-            height: 100vh; /* CORRECTION : Forcé à 100% de la hauteur de l'écran */
+            height: 100vh;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -107,7 +107,7 @@ $defaites = 0;
             color: #f0d9b5;
             background: radial-gradient(circle, #4a321f, #2b1d12);
             position: relative;
-            overflow: hidden; /* CORRECTION : Bloque les barres de défilement globales provoquées par l'animation du fond */
+            overflow: hidden;
         }
 
         body::before {
@@ -187,12 +187,21 @@ $defaites = 0;
             margin-left: 240px;
             flex-grow: 1;
             padding: 40px;
-            max-width: 1200px;
-            width: calc(100% - 240px);
-            height: 100vh;     /* CORRECTION : Occupe toute la hauteur disponible de la fenêtre */
-            overflow-y: auto;  /* CORRECTION : Permet le défilement du contenu de profil de façon isolée */
+            height: 100vh;
+            overflow-y: auto;
             z-index: 1;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centre les conteneurs enfants horizontalement */
+        }
+
+        /* Conteneur interne pour limiter la largeur et centrer parfaitement les cadres */
+        .main-container {
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .profile-header {
@@ -202,6 +211,8 @@ $defaites = 0;
             border-radius: 8px;
             margin-bottom: 30px;
             position: relative;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .profile-main-info {
@@ -286,16 +297,6 @@ $defaites = 0;
             vertical-align: middle;
         }
 
-        .badge-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: #c4b49c;
-            padding: 4px 10px;
-            font-size: 11px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
         .bio-display-line {
             color: #d2c1ab;
             font-size: 13.5px;
@@ -306,6 +307,7 @@ $defaites = 0;
             max-width: 600px;
             border-left: 3px solid #81b64c;
             font-style: italic;
+            min-height: 18px;
         }
 
         .meta-info {
@@ -352,6 +354,11 @@ $defaites = 0;
             font-size: 14px;
             font-weight: 600;
             padding: 5px 0;
+            transition: color 0.2s;
+        }
+
+        .tab-link:hover {
+            color: #fff;
         }
 
         .tab-link.active {
@@ -363,6 +370,7 @@ $defaites = 0;
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 30px;
+            width: 100%;
         }
 
         .card-left-placeholder {
@@ -506,83 +514,84 @@ $defaites = 0;
     </div>
 
     <div class="main-content">
-        
-        <?php if(!empty($success_msg)): ?>
-            <div class="alert-success"><?php echo htmlspecialchars($success_msg); ?></div>
-        <?php endif; ?>
-        <?php if(!empty($error_msg)): ?>
-            <div class="alert-error"><?php echo htmlspecialchars($error_msg); ?></div>
-        <?php endif; ?>
-
-        <div class="profile-header">
-            <button class="btn-modifier-profil" onclick="openModal('editModal')">Modifier le profil</button>
+        <div class="main-container">
             
-            <div class="profile-main-info">
-                <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="uploadAvatar(event)">
+            <?php if(!empty($success_msg)): ?>
+                <div class="alert-success"><?php echo htmlspecialchars($success_msg); ?></div>
+            <?php endif; ?>
+            <?php if(!empty($error_msg)): ?>
+                <div class="alert-error"><?php echo htmlspecialchars($error_msg); ?></div>
+            <?php endif; ?>
+
+            <div class="profile-header">
+                <button class="btn-modifier-profil" onclick="openModal('editModal')">Modifier le profil</button>
                 
-                <div class="big-avatar" id="avatarContainer" onclick="triggerAvatarUpload()" title="Cliquez pour changer votre photo de profil">
-                    <?php if(!empty($user['avatar'])): ?>
-                        <img src="<?php echo htmlspecialchars($user['avatar']); ?>" class="avatar-img" id="avatarImg" alt="Avatar">
-                    <?php else: ?>
-                        <span id="avatarPlaceholder">♙</span>
-                    <?php endif; ?>
-                    <div class="avatar-overlay">Changer la photo</div>
-                </div>
-                
-                <div class="user-details">
-                    <div class="username-row">
-                        <h1 id="displayPseudo"><?php echo htmlspecialchars($user['pseudo'] ?? ''); ?></h1>
-                        <span id="flagContainer">
-                            <img class="flag-img" src="https://flagcdn.com/w40/<?php echo htmlspecialchars($user_flag); ?>.png" alt="Drapeau">
-                        </span>
-                        <button class="badge-btn">Ajouter un badge</button>
+                <div class="profile-main-info">
+                    <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="uploadAvatar(event)">
+                    
+                    <div class="big-avatar" id="avatarContainer" onclick="triggerAvatarUpload()" title="Cliquez pour changer votre photo de profil">
+                        <?php if(!empty($user['avatar'])): ?>
+                            <img src="<?php echo htmlspecialchars($user['avatar']); ?>" class="avatar-img" id="avatarImg" alt="Avatar">
+                        <?php else: ?>
+                            <span id="avatarPlaceholder">♙</span>
+                        <?php endif; ?>
+                        <div class="avatar-overlay">Changer la photo</div>
                     </div>
                     
-                    <div class="bio-display-line" id="displayBio">
-                        <?php echo htmlspecialchars($user_bio); ?>
+                    <div class="user-details">
+                        <div class="username-row">
+                            <h1 id="displayPseudo"><?php echo htmlspecialchars($user['pseudo'] ?? ''); ?></h1>
+                            <span id="flagContainer">
+                                <img class="flag-img" src="https://flagcdn.com/w40/<?php echo htmlspecialchars($user_flag); ?>.png" alt="Drapeau">
+                            </span>
+                        </div>
+                        
+                        <div class="bio-display-line" id="displayBio">
+                            <?php echo !empty($user_bio) ? htmlspecialchars($user_bio) : "Aucune biographie pour le moment."; ?>
+                        </div>
+                        
+                        <div class="meta-info">
+                            <span>Inscription le <strong><?php echo htmlspecialchars($user['date_inscription'] ?? 'Inconnue'); ?></strong></span>
+                            <span>•</span>
+                            <span><strong>2</strong> amis</span>
+                            <span>•</span>
+                            <span><strong><?php echo $victoires; ?></strong> Victoires / <strong><?php echo $defaites; ?></strong> Défaites</span>
+                            <span>•</span>
+                            <span style="color: #81b64c;">En ligne maintenant</span>
+                        </div>
                     </div>
-                    
-                    <div class="meta-info">
-                        <span>Inscription le <strong><?php echo htmlspecialchars($user['date_inscription'] ?? 'Inconnue'); ?></strong></span>
-                        <span>•</span>
-                        <span><strong>2</strong> amis</span>
-                        <span>•</span>
-                        <span><strong><?php echo $victoires; ?></strong> Victoires / <strong><?php echo $defaites; ?></strong> Défaites</span>
-                        <span>•</span>
-                        <span style="color: #81b64c;">En ligne maintenant</span>
-                    </div>
+                </div>
+
+                <div class="profile-tabs">
+                    <a href="profil.php" class="tab-link active">Aperçu</a>
+                    <a href="parties.php" class="tab-link">Parties</a>
+                    <a href="clans.php" class="tab-link">Clans</a>
+                    <a href="amis.php" class="tab-link">Amis</a>
                 </div>
             </div>
 
-            <div class="profile-tabs">
-                <a href="#" class="tab-link active">Aperçu</a>
-                <a href="#" class="tab-link">Parties</a>
-                <a href="#" class="tab-link">Statistiques</a>
-                <a href="#" class="tab-link">Amis</a>
-            </div>
-        </div>
-
-        <div class="dashboard-grid">
-            <div class="card-left-placeholder">
-                <p>Vous n'avez pas de parties actives.</p>
-                <div style="font-size: 12px; margin-top: 10px;">Historique des affrontements (0)</div>
-            </div>
-
-            <div>
-                <div class="card-right-item">
-                    <span class="item-title"><span style="color:#ff6b6b;">🔥</span> Série de 54 jours</span>
+            <div class="dashboard-grid">
+                <div class="card-left-placeholder">
+                    <p>Vous n'avez pas de parties actives.</p>
+                    <div style="font-size: 12px; margin-top: 10px;">Historique des affrontements (0)</div>
                 </div>
 
-                <div class="card-right-item clickable" onclick="openModal('themeModal')">
-                    <div>
-                        <span class="item-title">Votre thème</span>
-                        <div style="font-size:11px; color: #81b64c; margin-top:2px;">Modifier ⚙️</div>
+                <div>
+                    <div class="card-right-item">
+                        <span class="item-title"><span style="color:#ff6b6b;">🔥</span> Série de 54 jours</span>
                     </div>
-                    <div class="mini-board-preview" id="currentThemePreview">
-                        <div class="light"></div><div class="dark"></div><div class="light"></div><div class="dark"></div>
-                        <div class="dark"></div><div class="light"></div><div class="dark"></div><div class="light"></div>
-                        <div class="light"></div><div class="dark"></div><div class="light"></div><div class="dark"></div>
-                        <div class="dark"></div><div class="light"></div><div class="dark"></div><div class="light"></div>
+
+                    <div class="card-right-item clickable" onclick="openModal('themeModal')">
+                        <div>
+                            <span class="item-title">Votre thème</span>
+                            <div style="font-size:11px; color: #81b64c; margin-top:2px;">Modifier ⚙️</div>
+                        </div>
+                        <div class="mini-board-preview" id="currentThemePreview">
+                            <div class="light"></div><div class="dark"></div><div class="light"></div><div class="dark"></div>
+                            <div class="dark"></div><div class="light"></div><div class="dark"></div><div class="light"></div>
+                            <div class="light"></div><div class="dark"></div><div class="light"></div><div class="dark"></div>
+                            <div class="dark"></div><div class="light"></div><div class="dark"></div><div class="light"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -605,7 +614,7 @@ $defaites = 0;
                 
                 <div class="form-group">
                     <label for="inputBio">Biographie / Présentation</label>
-                    <textarea name="biographie" id="inputBio" class="form-control" rows="3"><?php echo htmlspecialchars($user_bio); ?></textarea>
+                    <textarea name="biographie" id="inputBio" class="form-control" rows="3" placeholder="Parlez-nous de vous..."><?php echo htmlspecialchars($user_bio); ?></textarea>
                 </div>
 
                 <div class="form-group">
