@@ -63,7 +63,7 @@ $defaites = 0;
         }
 
         /* ==========================================================================
-           2. BARRE LATÉRALE DE NAVIGATION (Marron sombre) WITH INTEGRATED AUTH BUTTONS
+           2. BARRE LATÉRALE DE NAVIGATION (Marron sombre)
            ========================================================================== */
         .sidebar {
             width: 240px;
@@ -121,7 +121,6 @@ $defaites = 0;
             padding-left: 11px;
         }
 
-        /* Remplacement du bouton déconnexion par la zone d'authentification */
         .sidebar-auth-zone {
             margin-top: auto;
             display: flex;
@@ -162,7 +161,7 @@ $defaites = 0;
         }
 
         /* ==========================================================================
-           3. CONTENU PRINCIPAL (Centré sur l'écran restant)
+           3. CONTENU PRINCIPAL
            ========================================================================== */
         .main-content {
             margin-left: 240px;
@@ -224,10 +223,12 @@ $defaites = 0;
             font-size: 24px;
         }
 
+        /* AJOUT DE ALIGN-ITEMS: START POUR EVITER QUE LA COLONNE DROITE GLISSE */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1.3fr 1fr;
             gap: 30px;
+            align-items: start;
         }
 
         .left-column, .right-column {
@@ -536,7 +537,7 @@ $defaites = 0;
                                     <span class="history-opponent">Contre Ordinateur (Facile)</span>
                                     <span class="history-date">Le 08/06/2026 à 18:45</span>
                                 </div>
-                                style="display: flex; align-items: center; gap: 15px;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
                                     <span class="history-badge">Défaite</span>
                                 </div>
                             </div>
