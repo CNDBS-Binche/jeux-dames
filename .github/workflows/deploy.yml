@@ -19,7 +19,7 @@ jobs:
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
-          server: ftp.cluster121.hosting.ovh.net
+          server: ftp-maximepcndbs.alwaysdata.net
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /www/jeux-dames/
+          server-dir: /www
