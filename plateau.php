@@ -25,16 +25,14 @@ $action = $_GET['action'] ?? '';
 $monRole = 'spectateur'; 
 
 if ($matchId > 0) {
-    // On regarde qui est qui dans cette partie
     $reqPartie = $bdd->prepare('SELECT id_challengeur, id_defie FROM parties_jcj WHERE id = ?');
     $reqPartie->execute([$matchId]);
     $partie = $reqPartie->fetch();
 
     if ($partie) {
-        if ($partie['id_challengeur'] == $userId) {
-            $monRole = 'blanc'; // Le créateur du défi a les Blancs
-        } elseif ($partie['id_defie'] == $userId) {
-            $monRole = 'noir';  // Le défié a les Noirs
+        // CORRECTION : Attribution aléatoire automatique au chargement de la page
+        if ($partie['id_challengeur'] == $userId || $partie['id_defie'] == $userId) {
+            $monRole = (rand(0, 1) === 0) ? 'blanc' : 'noir';
         }
     }
 }
@@ -59,7 +57,7 @@ if ($matchId > 0) {
     <div class="statut-header">
         Tour : <span id="status-tour" class="tour-blanc">Blancs</span>
     </div>
-    <div id="statut-jeu">En attente des joueurs</div>
+    <div id="statut-jeu">Préparation...</div>
     
     <hr class="separateur-controle">
     
@@ -83,12 +81,9 @@ if ($matchId > 0) {
 
     <div id="overlay-preparation">
         <div class="boite-preparation">
-            <h2>Préparation de la partie</h2>
-            <p>Chaque joueur doit se déclarer prêt pour lancer le chronomètre.</p>
-            <div class="zone-boutons-prets">
-                <button id="btn-pret-blanc" class="btn-pret">🤍 Blancs : En attente</button>
-                <button id="btn-pret-noir" class="btn-pret">🖤 Noirs : En attente</button>
-            </div>
+            <h2>La partie va commencer</h2>
+            <p>Attribution de votre couleur aléatoire effectuée (Vous jouez les : <strong><?php echo strtoupper($monRole); ?></strong>)</p>
+            <div id="compte-a-rebours" style="font-size: 3rem; font-weight: bold; color: #e74c3c; margin-top: 15px;">3</div>
         </div>
     </div>
 
@@ -162,73 +157,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let dernierCoupCompteur = 0;
 
-    // --- GESTION DU SYSTÈME "PRÊT" EN RESEAU ---
-    let blancPret = false;
-    let noirPret = false;
-
     const overlayPrep = document.getElementById('overlay-preparation');
-    const btnPretBlanc = document.getElementById('btn-pret-blanc');
-    const btnPretNoir = document.getElementById('btn-pret-noir');
     const btnAbandon = document.getElementById('btn-abandon');
     const btnNulle = document.getElementById('btn-nulle');
-    let intervallePret = null;
+    const compteAReboursEl = document.getElementById('compte-a-rebours');
 
-    // Désactiver le bouton qui ne correspond pas au rôle du joueur
-    if (MON_ROLE === 'blanc') {
-        btnPretNoir.disabled = true;
-        btnPretNoir.style.cursor = 'not-allowed';
-    } else if (MON_ROLE === 'noir') {
-        btnPretBlanc.disabled = true;
-        btnPretBlanc.style.cursor = 'not-allowed';
-    } else { // Spectateur
-        btnPretBlanc.disabled = true;
-        btnPretNoir.disabled = true;
-    }
+    // --- MODIFICATION : COMPTE À REBOURS DE 3 SECONDES AUTOMATIQUE ---
+    let tempsRestant = 3;
+    let indexCompteARebours = setInterval(() => {
+        tempsRestant--;
+        if (tempsRestant > 0) {
+            compteAReboursEl.innerText = tempsRestant;
+        } else {
+            clearInterval(indexCompteARebours);
+            demarrerLaPartie();
+        }
+    }, 1000);
 
-    // Clic sur le bouton Prêt
-    function envoyerDeclarationPret() {
-        if (MATCH_ID <= 0) return;
-        
-        const formData = new FormData();
-        formData.append('match_id', MATCH_ID);
-
-        fetch('jcj_ajax.php?action=se_declarer_pret', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.statut === 'succes') {
-                if (MON_ROLE === 'blanc') {
-                    marquerBoutonBlancPret();
-                } else if (MON_ROLE === 'noir') {
-                    marquerBoutonNoirPret();
-                }
-            }
-        });
-    }
-
-    btnPretBlanc.addEventListener('click', envoyerDeclarationPret);
-    btnPretNoir.addEventListener('click', envoyerDeclarationPret);
-
-    function marquerBoutonBlancPret() {
-        blancPret = true;
-        btnPretBlanc.classList.add('pret-valide');
-        btnPretBlanc.innerText = "🤍 Blancs : PRÊT !";
-        btnPretBlanc.disabled = true;
-    }
-
-    function marquerBoutonNoirPret() {
-        noirPret = true;
-        btnPretNoir.classList.add('pret-valide');
-        btnPretNoir.innerText = "🖤 Noirs : PRÊT !";
-        btnPretNoir.disabled = true;
-    }
-
-    // Fonction qui lance la partie visuellement
+    // Fonction qui lance la partie visuellement après les 3 secondes
     function demarrerLaPartie() {
-        clearInterval(intervallePret); // On arrête de demander au serveur si les joueurs sont prêts
-        
         overlayPrep.style.opacity = "0";
         setTimeout(() => { overlayPrep.style.display = "none"; }, 400);
 
@@ -240,25 +187,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         elTimerBlancBox.classList.add('actif');
         lancerTimer();
-    }
-
-    // Boucle automatique (toutes les 1.5 secondes) pour vérifier si l'autre est prêt
-    if (MATCH_ID > 0) {
-        intervallePret = setInterval(function() {
-            if (partieCommencee) return;
-
-            fetch(`jcj_ajax.php?action=verifier_prets&match_id=${MATCH_ID}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.blanc && !blancPret) marquerBoutonBlancPret();
-                    if (data.noir && !noirPret) marquerBoutonNoirPret();
-
-                    if (blancPret && noirPret) {
-                        demarrerLaPartie();
-                    }
-                })
-                .catch(err => console.error("Erreur synchro Prêt :", err));
-        }, 1500);
     }
 
     // --- GESTION DES CHRONOMÈTRES & ANIMATION VICTOIRE ---
@@ -325,8 +253,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function creerExplosionConfettis(elementCible) {
         const couleurs = ['#f1c40f', '#2ecc71', '#e74c3c', '#3498db', '#9b59b6', '#e67e22', '#1abc9c'];
         const rect = elementCible.getBoundingClientRect();
-        
-        // Détecte si le gagnant est le bloc du haut (Noir)
         const estTimerNoir = elementCible.id === 'timer-noir';
         
         for (let i = 0; i < 100; i++) {
@@ -345,8 +271,6 @@ document.addEventListener('DOMContentLoaded', function() {
             conf.style.top = `${depY}px`;
             
             const trajetX = (Math.random() - 0.5) * 350; 
-            
-            // Si c'est le timer noir, la valeur Y est positive (chute), sinon négative (montée)
             const forceY = Math.random() * 200 + 150;
             const trajetY = estTimerNoir ? forceY : -forceY; 
             
@@ -355,7 +279,6 @@ document.addEventListener('DOMContentLoaded', function() {
             conf.style.setProperty('--x', `${trajetX}px`);
             conf.style.setProperty('--y', `${trajetY}px`);
             conf.style.setProperty('--r', rotation);
-            
             conf.style.animationDelay = `${Math.random() * 0.4}s`;
             
             document.body.appendChild(conf);
@@ -580,7 +503,6 @@ document.addEventListener('DOMContentLoaded', function() {
         verrouillerJeu();
     }
 
-    // --- REPLICATION TECHNIQUE POUR LE PULL ADVERSE ---
     function executerDeplacementGraphique(departLigne, departCol, destLigne, destCol) {
         const caseDepart = document.querySelector(`[data-ligne="${departLigne}"][data-col="${departCol}"].black`);
         const caseArrivee = document.querySelector(`[data-ligne="${destLigne}"][data-col="${destCol}"].black`);
@@ -592,8 +514,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const estDameAuDepart = pion.classList.contains('dame');
         const couleurPion = pion.classList.contains('blanc') ? 'blanc' : 'noir';
 
-        let trajectoires = calculerTrajectoires(departLigne, departCol, couleurPion, estDameAuDepart);
-        let coupApplique = trajectoires.find(c => c.destLigne === destLigne && c.destCol === destCol);
+        let trajectories = calculerTrajectoires(departLigne, departCol, couleurPion, estDameAuDepart);
+        let coupApplique = trajectories.find(c => c.destLigne === destLigne && c.destCol === destCol);
 
         if (!coupApplique) {
             coupApplique = { captures: [], etapes: [{ l: destLigne, c: destCol }] };
@@ -637,12 +559,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- SELECTION ET MOUVEMENT LOCAL (MOUVEMENT JOUEUR) ---
     casesNoires.forEach(caseNoire => {
         caseNoire.addEventListener('click', function() {
             if (partieTerminee || !partieCommencee) return;
-
-            // Barrière JcJ
             if (MATCH_ID > 0 && tourActuel !== MON_ROLE) return;
 
             let pion = this.querySelector('.pion');
@@ -679,7 +598,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     this.appendChild(pionSelectionne.element);
 
-                    // --- ENVOI DU MOUVEMENT (PUSH) ---
                     if (MATCH_ID > 0) {
                         const formData = new FormData();
                         formData.append('match_id', MATCH_ID);
@@ -720,34 +638,30 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-// --- SYNCHRONISATION PAR POLLING (PULL) ---
-if (MATCH_ID > 0) {
-    setInterval(function() {
-        // Si c'est à mon tour de jouer, je n'attends pas de coup de l'adversaire
-        if (tourActuel === MON_ROLE) return;
+    // --- SYNCHRONISATION PAR POLLING (PULL) ---
+    if (MATCH_ID > 0) {
+        setInterval(function() {
+            if (tourActuel === MON_ROLE) return;
 
-        fetch(`jcj_ajax.php?action=charger_dernier_coup&match_id=${MATCH_ID}`)
-            .then(response => response.json())
-            .then(data => {
-                // On vérifie qu'on a bien reçu un coup et que son numéro est supérieur à notre compteur local
-                if (data && data.num_coup > dernierCoupCompteur) {
-                    console.log("Nouveau coup détecté de l'adversaire :", data);
-                    
-                    dernierCoupCompteur = data.num_coup;
-                    
-                    // Extraction des coordonnées (Ligne, Colonne)
-                    const [depL, depC] = data.case_depart.split(',').map(Number);
-                    const [arrL, arrC] = data.case_arrivee.split(',').map(Number);
-                    
-                    console.log(`Exécution du déplacement : de (${depL},${depC}) vers (${arrL},${arrC})`);
-                    
-                    // On force l'exécution graphique
-                    executerDeplacementGraphique(depL, depC, arrL, arrC);
-                }
-            })
-            .catch(err => console.error("Erreur polling coups :", err));
-    }, 2000);
-}
+            fetch(`jcj_ajax.php?action=charger_dernier_coup&match_id=${MATCH_ID}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.num_coup > dernierCoupCompteur) {
+                        console.log("Nouveau coup détecté de l'adversaire :", data);
+                        
+                        dernierCoupCompteur = data.num_coup;
+                        
+                        const [depL, depC] = data.case_depart.split(',').map(Number);
+                        const [arrL, arrC] = data.case_arrivee.split(',').map(Number);
+                        
+                        console.log(`Exécution du déplacement : de (${depL},${depC}) vers (${arrL},${arrC})`);
+                        
+                        executerDeplacementGraphique(depL, depC, arrL, arrC);
+                    }
+                })
+                .catch(err => console.error("Erreur polling coups :", err));
+        }, 2000);
+    }
 });
 </script>
 </body>
