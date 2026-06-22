@@ -22,4 +22,5 @@ jobs:
           server: ssh-maximepcndbs.alwaysdata.net
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          port : 22
           server-dir: /www/
