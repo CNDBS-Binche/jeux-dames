@@ -1,26 +1,26 @@
-name: Deploy to FTP
+name: Deploy to Alwaysdata
 
 on:
   push:
     branches:
-      - main
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      - main 
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+     
+      - name: 📂 Checkout code
         uses: actions/checkout@v4
 
-      - name: FTP Deploy
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+     
+      - name: 🚀 Déploiement SFTP sur Alwaysdata
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
-          server: ssh-maximepcndbs.alwaysdata.net
           username: ${{ secrets.FTP_USERNAME }}
+          server: ${{ secrets.FTP_SERVER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          port : 22
-          server-dir: /www/
+          port: 22
+          local_path: './*'
+          remote_path: '/home/maximepcndbs/www' 
