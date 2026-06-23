@@ -3,10 +3,10 @@
 // config.php — Connexion PDO Directe
 // ============================================================
 
-$host     = 'maxcore981.mysql.db';
-$dbname   = 'maxcore981';
-$username = 'maxcore981';
-$password = 'Antonio64';
+$host     = 'mysql-maximepcndbs.alwaysdata.net';
+$dbname   = 'maximepcndbs_dames';
+$username = 'maximepcndbs';
+$password = '@3J8Ax3t9:y9:dlU26';
 
 try {
     $bdd = new PDO(
